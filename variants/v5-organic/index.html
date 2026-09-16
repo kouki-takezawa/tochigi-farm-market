@@ -94,7 +94,7 @@ function renderCard(f) {
   if (f.has_listing_today) badges.push(`<span class="badge">本日出品あり</span>`);
   if (f.next_event_date) badges.push(`<span class="badge event">${formatDateShort(f.next_event_date)} イベント</span>`);
   return `
-    <a class="farmer-card" href="https://tochigi-farm-market.pages.dev/farmer.html?id=${encodeURIComponent(f.id)}">
+    <a class="farmer-card" href="/farmer.html?id=${encodeURIComponent(f.id)}">
       <div class="thumb" ${thumbStyle}>${f.cover_image_url ? "" : "🌾"}</div>
       <div class="info">
         <p class="name">${escapeHtml(f.name)}</p>

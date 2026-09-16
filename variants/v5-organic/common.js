@@ -1,7 +1,4 @@
-// バリアント(デザイン比較用サブサイト)共通のヘルパー関数。
-// public/common.js とほぼ同じだが、農家ページ以外の共通ページ(マップ・出品者ログイン)は
-// 本体サイト(tochigi-farm-market.pages.dev)側のものにリンクする点だけが異なる。
-const MAIN_SITE = "https://tochigi-farm-market.pages.dev";
+// 全ページ共通のヘルパー関数
 
 function escapeHtml(str) {
   if (str == null) return "";
@@ -84,9 +81,9 @@ function initNav(activeHref) {
   }
 
   const links = [
-    { href: "/", label: "農家一覧(このデザイン)" },
-    { href: MAIN_SITE + "/map.html", label: "マップ" },
-    { href: MAIN_SITE + "/seller.html", label: isSellerLoggedIn() ? "出品者ページ" : "出品者ログイン" },
+    { href: "/", label: "農家一覧" },
+    { href: "/map.html", label: "マップ" },
+    { href: "/seller.html", label: isSellerLoggedIn() ? "出品者ページ" : "出品者ログイン" },
   ];
 
   const overlay = document.createElement("div");
@@ -115,4 +112,20 @@ function initNav(activeHref) {
   overlay.addEventListener("click", (ev) => {
     if (ev.target === overlay) close();
   });
+}
+
+async function uploadImage(fileInput, farmerId, token) {
+  const file = fileInput.files[0];
+  if (!file) return null;
+  const form = new FormData();
+  form.append("file", file);
+  form.append("farmer_id", farmerId);
+  const res = await fetch("/api/upload", {
+    method: "POST",
+    headers: { "x-manage-token": token },
+    body: form,
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.error || "画像のアップロードに失敗しました");
+  return body.url;
 }

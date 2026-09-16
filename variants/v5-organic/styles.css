@@ -169,6 +169,82 @@ img { max-width: 100%; }
 .site-footer .credit { margin-top: 10px; font-size: 10px; }
 .site-footer a { color: var(--terracotta); }
 
+/* 通常ページ用のシンプルなヘッダー(map/post/admin/seller) */
+.app-header:not(.hero) {
+  background: linear-gradient(135deg, var(--terracotta), #a04d2e);
+  color: #fdf6e8;
+  padding: 22px 20px 18px;
+  position: relative;
+}
+.app-header .app-title { font-size: 19px; font-weight: 700; margin: 0; font-family: "Shippori Mincho", serif; }
+.app-header .app-tagline { font-size: 12px; opacity: 0.9; margin: 6px 0 0; }
+
+.container { max-width: 640px; margin: 0 auto; padding: 0 20px 48px; }
+
+/* 農家ページ */
+.cover { width: 100%; aspect-ratio: 16/9; background: #f0e4cc center/cover no-repeat; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+.farmer-header { padding: 22px; border-bottom: 1px solid var(--border); background: var(--card-bg); }
+.farmer-header h1 { font-family: "Shippori Mincho", serif; font-size: 22px; margin: 0 0 6px; }
+.farmer-header .meta { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+.farmer-header .desc { font-size: 14px; white-space: pre-wrap; }
+
+.contact-buttons { display: flex; gap: 10px; margin-top: 16px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 12px 18px; border-radius: 999px; border: none; font-size: 13px; font-weight: 700;
+  text-decoration: none; cursor: pointer;
+}
+.btn.line { background: #06c755; color: #fff; flex: 1; }
+.btn.phone { background: var(--terracotta); color: #fff; flex: 1; }
+.btn.primary { background: var(--sage); color: #fff; }
+.btn.secondary { background: var(--card-bg); color: var(--ink); border: 1px solid var(--border); }
+.btn.danger { background: var(--card-bg); color: var(--terracotta); border: 1px solid var(--terracotta); }
+.btn.block { display: flex; width: 100%; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+section.section { padding: 20px; border-bottom: 1px solid var(--border); background: var(--card-bg); }
+section.section h2 { font-family: "Shippori Mincho", serif; font-size: 16px; margin: 0 0 14px; }
+
+.listing-card, .event-card { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px dashed var(--border); }
+.listing-card:last-child, .event-card:last-child { border-bottom: none; }
+.listing-card .thumb { width: 60px; height: 60px; flex: none; border-radius: 12px; background: #f0e4cc center/cover no-repeat; display: flex; align-items: center; justify-content: center; }
+.listing-card .title, .event-card .title { font-weight: 700; font-size: 14px; margin: 0; }
+.listing-card .comment, .event-card .desc { font-size: 13px; color: var(--muted); margin: 3px 0; }
+.listing-card .price { font-size: 14px; font-weight: 700; color: var(--terracotta); }
+.event-card .date-box {
+  flex: none; width: 48px; height: 48px; border-radius: 12px; background: var(--sage); color: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
+}
+.event-card .sub { font-size: 12px; color: var(--muted); margin: 2px 0; }
+
+.badge.special { background: #f6ddc4; color: var(--terracotta); }
+.badge.labor { background: #dfe9dc; color: var(--sage); }
+
+/* フォーム(post.html / admin.html / seller.html) */
+form.stack { display: flex; flex-direction: column; gap: 14px; }
+label { font-size: 13px; font-weight: 700; display: block; margin-bottom: 5px; }
+input[type=text], input[type=number], input[type=tel], input[type=url], input[type=date], input[type=time],
+input[type=password], textarea, select {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px;
+  background: var(--card-bg); color: var(--ink); font-family: inherit;
+}
+textarea { min-height: 80px; resize: vertical; }
+.checkbox-row { display: flex; align-items: center; gap: 8px; }
+.checkbox-row input { width: auto; }
+
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; padding: 18px; margin-bottom: 18px; }
+.card h3 { margin: 0 0 14px; font-size: 15px; font-family: "Shippori Mincho", serif; }
+
+.item-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+.item-row:last-child { border-bottom: none; }
+.item-row .actions { display: flex; gap: 6px; flex: none; }
+.item-row .actions button { padding: 6px 10px; font-size: 11px; }
+
+.image-preview { width: 100%; max-width: 200px; border-radius: 10px; margin-top: 8px; display: none; }
+.image-preview.show { display: block; }
+
+.result-box { background: #eee2c8; border-radius: 14px; padding: 16px; margin-top: 12px; }
+
 .hamburger-btn {
   position: absolute;
   top: 16px;
@@ -182,6 +258,12 @@ img { max-width: 100%; }
   font-size: 15px;
   cursor: pointer;
   z-index: 1010;
+}
+.hamburger-btn-floating {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  background: rgba(74,56,38,0.55);
 }
 .nav-overlay {
   position: fixed; inset: 0; background: rgba(74,56,38,0.4);

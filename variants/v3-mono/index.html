@@ -12,6 +12,15 @@
 <body>
 <div class="variant-banner">デザイン案 3 / 6 - Mono Grid　<a href="https://tochigi-farm-market.pages.dev/">本体サイトに戻る</a></div>
 
+<nav class="top-nav">
+  <a href="/" class="top-nav-brand">TOCHIGI MARCHE</a>
+  <div class="top-nav-links">
+    <a href="/" class="active">INDEX</a>
+    <a href="/map.html">MAP</a>
+    <a href="/seller.html">LOGIN</a>
+  </div>
+</nav>
+
 <header class="app-header hero">
   <div class="hero-inner">
     <p class="kicker">TOCHIGI, JP — 01</p>
@@ -94,7 +103,7 @@ function renderCard(f) {
   if (f.has_listing_today) badges.push(`<span class="badge">本日出品あり</span>`);
   if (f.next_event_date) badges.push(`<span class="badge event">${formatDateShort(f.next_event_date)} イベント</span>`);
   return `
-    <a class="farmer-card" href="https://tochigi-farm-market.pages.dev/farmer.html?id=${encodeURIComponent(f.id)}">
+    <a class="farmer-card" href="/farmer.html?id=${encodeURIComponent(f.id)}">
       <div class="thumb" ${thumbStyle}>${f.cover_image_url ? "" : "🌾"}</div>
       <div class="info">
         <p class="name">${escapeHtml(f.name)}</p>
@@ -106,7 +115,6 @@ function renderCard(f) {
   `;
 }
 
-initNav("/");
 load();
 </script>
 </body>

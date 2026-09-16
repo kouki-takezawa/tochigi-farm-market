@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>マップ | 栃木の直売マルシェ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Klee+One:wght@600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+  #map { width: 100%; height: 320px; }
+  .leaflet-popup-content { font-size: 13px; }
+  .leaflet-popup-content a { font-weight: 700; }
+  .distance-list { display: flex; flex-direction: column; gap: 10px; padding: 16px 20px; }
+  .locate-row { display: flex; gap: 8px; padding: 16px 20px 12px; align-items: center; flex-wrap: wrap; }
+  .locate-row select { flex: 1; min-width: 140px; }
+</style>
+</head>
+<body>
+<header class="app-header">
+  <p class="app-title">栃木の直売マルシェ</p>
+  <p class="app-tagline">マップで近くの農家を探す</p>
+</header>
+
+<div class="locate-row">
+  <button id="locate-btn" class="btn primary">現在地から探す</button>
+  <select id="municipality-select">
+    <option value="">市町村から選ぶ</option>
+  </select>
+</div>
+<p id="map-status" style="padding:0 20px;font-size:12px;color:var(--muted);"></p>
+
+<div id="map"></div>
+
+<div id="distance-list" class="distance-list">
+  <div class="loading">読み込み中...</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="/common.js"></script>
+<script>
+const TOCHIGI_CENTER = [36.5658, 139.8836];
+const JAPAN_BOUNDS = L.latLngBounds([24, 122], [46, 154]);
+let allFarmers = [];
+let map;
+let markers = [];
+let userLatLng = null;
+
+function initMap() {
+  map = L.map("map", {
+    minZoom: 5,
+    maxBounds: JAPAN_BOUNDS,
+    maxBoundsViscosity: 1.0,
+  }).setView(TOCHIGI_CENTER, 10);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 18,
+    noWrap: true,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+  addJapanMask();
+}
+
+async function addJapanMask() {
+  try {
+    const res = await fetch("/japan-mask.json");
+    const rings = await res.json();
+    const worldRing = [[-85, -180], [-85, 180], [85, 180], [85, -180]];
+    L.polygon([worldRing, ...rings], { stroke: false, fillColor: "#7a7a72", fillOpacity: 0.5, interactive: false }).addTo(map);
+  } catch (e) {}
+}
+
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+async function load() {
+  initMap();
+  try {
+    const data = await apiFetch("/api/farmers");
+    allFarmers = data.farmers || [];
+    renderMunicipalitySelect();
+    renderMarkers();
+    renderList();
+  } catch (e) {
+    document.getElementById("distance-list").innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function renderMunicipalitySelect() {
+  const select = document.getElementById("municipality-select");
+  const municipalities = Array.from(new Set(allFarmers.map((f) => f.municipality)));
+  select.innerHTML = `<option value="">市町村から選ぶ</option>` + municipalities.map((m) => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("");
+  select.addEventListener("change", () => {
+    if (!select.value) return;
+    const target = allFarmers.find((f) => f.municipality === select.value && f.lat != null);
+    if (target) map.setView([target.lat, target.lng], 12);
+    document.getElementById("map-status").textContent = `${select.value}に地図を移動しました`;
+    renderList();
+  });
+}
+
+function renderMarkers() {
+  markers.forEach((m) => map.removeLayer(m));
+  markers = [];
+  const withLocation = allFarmers.filter((f) => f.lat != null && f.lng != null);
+  withLocation.forEach((f) => {
+    const badges = [];
+    if (f.has_listing_today) badges.push("本日出品あり");
+    if (f.next_event_date) badges.push(`${formatDateShort(f.next_event_date)} イベント`);
+    const marker = L.marker([f.lat, f.lng]).addTo(map);
+    marker.bindPopup(`
+      <b>${escapeHtml(f.name)}</b><br>
+      ${escapeHtml(f.municipality)} ・ ${escapeHtml(f.crops)}<br>
+      ${badges.length ? `<span style="color:#c0603a;">${badges.join(" / ")}</span><br>` : ""}
+      <a href="/farmer.html?id=${encodeURIComponent(f.id)}">農家ページを見る →</a>
+    `);
+    markers.push(marker);
+  });
+  if (withLocation.length && !userLatLng) {
+    const bounds = L.latLngBounds(withLocation.map((f) => [f.lat, f.lng]));
+    map.fitBounds(bounds, { padding: [30, 30], maxZoom: 12 });
+  }
+}
+
+function renderList() {
+  const el = document.getElementById("distance-list");
+  const municipalityFilter = document.getElementById("municipality-select").value;
+  let list = allFarmers.filter((f) => f.lat != null && f.lng != null);
+  if (municipalityFilter) list = list.filter((f) => f.municipality === municipalityFilter);
+  if (userLatLng) {
+    list = list.map((f) => ({ ...f, _distance: haversineKm(userLatLng[0], userLatLng[1], f.lat, f.lng) })).sort((a, b) => a._distance - b._distance);
+  }
+  const withoutLocation = allFarmers.filter((f) => f.lat == null || f.lng == null);
+  if (!list.length && !withoutLocation.length) {
+    el.innerHTML = `<div class="empty-state">表示できる農家がありません。</div>`;
+    return;
+  }
+  el.innerHTML =
+    list.map((f) => `
+      <a class="farmer-card" href="/farmer.html?id=${encodeURIComponent(f.id)}">
+        <div class="thumb" ${f.cover_image_url ? `style="background-image:url('${escapeHtml(f.cover_image_url)}')"` : ""}>${f.cover_image_url ? "" : "🌾"}</div>
+        <div class="info">
+          <p class="name">${escapeHtml(f.name)}</p>
+          <p class="location">${escapeHtml(f.municipality)}${f._distance != null ? ` ・ 現在地から約${f._distance.toFixed(1)}km` : ""}</p>
+          <p class="crops">${escapeHtml(f.crops)}</p>
+        </div>
+      </a>`).join("") +
+    (withoutLocation.length ? `<p class="empty-state" style="text-align:left;">位置情報が未登録の農家が${withoutLocation.length}件あります(<a href="/">一覧</a>でご確認ください)</p>` : "");
+}
+
+document.getElementById("locate-btn").addEventListener("click", () => {
+  const statusEl = document.getElementById("map-status");
+  if (!navigator.geolocation) {
+    statusEl.textContent = "この端末では現在地取得に対応していません。市町村から選んでください。";
+    return;
+  }
+  statusEl.textContent = "現在地を取得中...";
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      userLatLng = [pos.coords.latitude, pos.coords.longitude];
+      map.setView(userLatLng, 12);
+      L.circleMarker(userLatLng, { radius: 8, color: "#c0603a", fillColor: "#c0603a", fillOpacity: 0.6 }).addTo(map).bindPopup("現在地");
+      statusEl.textContent = "現在地から近い順に並び替えました";
+      renderList();
+    },
+    () => { statusEl.textContent = "位置情報の利用が許可されませんでした。市町村から選んでください。"; }
+  );
+});
+
+initNav("/map.html");
+load();
+</script>
+</body>
+</html>

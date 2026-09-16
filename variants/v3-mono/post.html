@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>投稿・編集 | 栃木の直売マルシェ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<nav class="top-nav">
+  <a href="/" class="top-nav-brand">TOCHIGI MARCHE</a>
+  <div class="top-nav-links">
+    <a href="/">INDEX</a>
+    <a href="/map.html">MAP</a>
+    <a href="/seller.html">LOGIN</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>農家の投稿・編集画面</h1>
+  <p>このページのURLはブックマークして、いつでも更新できるようにしてください</p>
+</div>
+
+<div class="container" id="page">
+  <div class="loading">読み込み中...</div>
+</div>
+
+<script src="/common.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const farmerId = params.get("farmer");
+const token = params.get("token");
+
+let state = { farmer: null, listings: [], events: [] };
+
+async function load() {
+  const page = document.getElementById("page");
+  if (!farmerId || !token) {
+    page.innerHTML = `<div class="error-message">管理用URLが正しくありません。運営者から届いたURLをそのまま開いてください。</div>`;
+    return;
+  }
+  try {
+    const data = await apiFetch(`/api/farmers/${encodeURIComponent(farmerId)}`);
+    state = data;
+    renderAll();
+  } catch (e) {
+    page.innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function renderAll() {
+  const page = document.getElementById("page");
+  page.innerHTML = `
+    <div class="card">
+      <h3>プロフィール</h3>
+      <form id="profile-form" class="stack">
+        <div>
+          <label>農家名</label>
+          <input type="text" name="name" required value="${escapeHtml(state.farmer.name)}" />
+        </div>
+        <div>
+          <label>所在地(市町村)</label>
+          <input type="text" name="municipality" required value="${escapeHtml(state.farmer.municipality)}" placeholder="例: 宇都宮市" />
+        </div>
+        <div>
+          <label>作っているもの</label>
+          <input type="text" name="crops" value="${escapeHtml(state.farmer.crops)}" placeholder="例: トマト・きゅうり" />
+        </div>
+        <div>
+          <label>こだわり・紹介文</label>
+          <textarea name="description">${escapeHtml(state.farmer.description)}</textarea>
+        </div>
+        <div>
+          <label>カバー写真</label>
+          <input type="file" name="cover_image" accept="image/*" />
+          <img class="image-preview ${state.farmer.cover_image_url ? "show" : ""}" id="cover-preview" src="${escapeHtml(state.farmer.cover_image_url || "")}" />
+        </div>
+        <div>
+          <label>LINE公式アカウントURL(任意)</label>
+          <input type="url" name="line_url" value="${escapeHtml(state.farmer.line_url || "")}" placeholder="https://line.me/R/ti/p/@xxxx" />
+        </div>
+        <div>
+          <label>電話番号(任意)</label>
+          <input type="tel" name="phone" value="${escapeHtml(state.farmer.phone || "")}" placeholder="09012345678" />
+        </div>
+        <button type="submit" class="btn primary block">プロフィールを保存</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>出品を追加</h3>
+      <form id="listing-form" class="stack">
+        <div>
+          <label>写真</label>
+          <input type="file" name="image" accept="image/*" />
+        </div>
+        <div>
+          <label>品目名</label>
+          <input type="text" name="title" required placeholder="例: 朝採れトマト" />
+        </div>
+        <div>
+          <label>一言コメント</label>
+          <textarea name="comment" placeholder="例: 甘みが強い品種です"></textarea>
+        </div>
+        <div>
+          <label>価格(任意・円)</label>
+          <input type="number" name="price" min="0" placeholder="未入力なら「価格応相談」と表示されます" />
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" name="is_special" id="is_special" />
+          <label for="is_special" style="margin:0;">わけあり・特価品として表示する</label>
+        </div>
+        <button type="submit" class="btn primary block">出品する</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>出品中の一覧</h3>
+      <div id="listing-list">${state.listings.length ? state.listings.map(renderListingRow).join("") : `<p class="empty-state">まだ出品がありません。</p>`}</div>
+    </div>
+
+    <div class="card">
+      <h3>イベント・人手募集を追加</h3>
+      <form id="event-form" class="stack">
+        <div>
+          <label>種別</label>
+          <select name="kind">
+            <option value="event">イベント</option>
+            <option value="labor">人手募集</option>
+          </select>
+        </div>
+        <div>
+          <label>タイトル</label>
+          <input type="text" name="title" required placeholder="例: いちご狩り体験 / 稲刈り手伝い募集" />
+        </div>
+        <div>
+          <label>日付</label>
+          <input type="date" name="event_date" required />
+        </div>
+        <div>
+          <label>時間(任意)</label>
+          <input type="text" name="event_time" placeholder="例: 10:00〜15:00" />
+        </div>
+        <div>
+          <label>場所</label>
+          <input type="text" name="location" placeholder="例: ○○農園 直売所前" />
+        </div>
+        <div>
+          <label>内容の一言説明</label>
+          <textarea name="description"></textarea>
+        </div>
+        <div>
+          <label>参加費(任意)</label>
+          <input type="text" name="fee" placeholder="例: 1500円 / 無料" />
+        </div>
+        <button type="submit" class="btn primary block">登録する</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>登録済みイベント・募集</h3>
+      <div id="event-list">${state.events.length ? state.events.map(renderEventRow).join("") : `<p class="empty-state">まだ登録がありません。</p>`}</div>
+    </div>
+
+    <p style="text-align:center;font-size:13px;padding:16px 0 32px;"><a href="/farmer.html?id=${encodeURIComponent(farmerId)}">公開ページを見る →</a></p>
+  `;
+
+  bindEvents();
+}
+
+function renderListingRow(l) {
+  return `
+    <div class="item-row" data-id="${l.id}">
+      <div>
+        <p style="font-weight:700;margin:0;">${escapeHtml(l.title)} ${l.is_special ? `<span class="badge special">わけあり</span>` : ""}</p>
+        <p style="font-size:13px;color:var(--muted);margin:2px 0;">${escapeHtml(l.comment)}</p>
+        <p style="font-size:13px;margin:0;">${priceLabel(l.price)}</p>
+      </div>
+      <div class="actions">
+        <button class="btn secondary" data-action="delete-listing" data-id="${l.id}">削除</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderEventRow(e) {
+  return `
+    <div class="item-row" data-id="${e.id}">
+      <div>
+        <p style="font-weight:700;margin:0;">${escapeHtml(e.title)} ${e.kind === "labor" ? `<span class="badge labor">人手募集</span>` : ""}</p>
+        <p style="font-size:13px;color:var(--muted);margin:2px 0;">${escapeHtml(formatDateLong(e.event_date))}${e.event_time ? " " + escapeHtml(e.event_time) : ""}</p>
+      </div>
+      <div class="actions">
+        <button class="btn secondary" data-action="delete-event" data-id="${e.id}">削除</button>
+      </div>
+    </div>
+  `;
+}
+
+function bindEvents() {
+  document.getElementById("profile-form").addEventListener("submit", onProfileSubmit);
+  document.getElementById("listing-form").addEventListener("submit", onListingSubmit);
+  document.getElementById("event-form").addEventListener("submit", onEventSubmit);
+
+  document.querySelectorAll('[data-action="delete-listing"]').forEach((btn) => {
+    btn.addEventListener("click", () => onDeleteListing(btn.dataset.id));
+  });
+  document.querySelectorAll('[data-action="delete-event"]').forEach((btn) => {
+    btn.addEventListener("click", () => onDeleteEvent(btn.dataset.id));
+  });
+
+  const coverInput = document.querySelector('input[name="cover_image"]');
+  coverInput.addEventListener("change", () => {
+    const file = coverInput.files[0];
+    if (!file) return;
+    const preview = document.getElementById("cover-preview");
+    preview.src = URL.createObjectURL(file);
+    preview.classList.add("show");
+  });
+}
+
+async function onProfileSubmit(ev) {
+  ev.preventDefault();
+  const form = ev.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  try {
+    const fd = new FormData(form);
+    let coverUrl = state.farmer.cover_image_url || null;
+    const file = form.cover_image.files[0];
+    if (file) {
+      coverUrl = await uploadImage(form.cover_image, farmerId, token);
+    }
+    await apiFetch(`/api/farmers/${encodeURIComponent(farmerId)}`, {
+      method: "PUT",
+      headers: { "x-manage-token": token },
+      body: JSON.stringify({
+        name: fd.get("name"),
+        municipality: fd.get("municipality"),
+        crops: fd.get("crops"),
+        description: fd.get("description"),
+        cover_image_url: coverUrl,
+        line_url: fd.get("line_url") || null,
+        phone: fd.get("phone") || null,
+      }),
+    });
+    showToast("プロフィールを保存しました");
+    await load();
+  } catch (e) {
+    showToast(e.message);
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
+async function onListingSubmit(ev) {
+  ev.preventDefault();
+  const form = ev.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  try {
+    const fd = new FormData(form);
+    let imageUrl = null;
+    if (form.image.files[0]) {
+      imageUrl = await uploadImage(form.image, farmerId, token);
+    }
+    await apiFetch(`/api/farmers/${encodeURIComponent(farmerId)}/listings`, {
+      method: "POST",
+      headers: { "x-manage-token": token },
+      body: JSON.stringify({
+        title: fd.get("title"),
+        comment: fd.get("comment"),
+        price: fd.get("price") ? Number(fd.get("price")) : null,
+        is_special: fd.get("is_special") === "on",
+        image_url: imageUrl,
+      }),
+    });
+    showToast("出品しました");
+    await load();
+  } catch (e) {
+    showToast(e.message);
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
+async function onEventSubmit(ev) {
+  ev.preventDefault();
+  const form = ev.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  try {
+    const fd = new FormData(form);
+    await apiFetch(`/api/farmers/${encodeURIComponent(farmerId)}/events`, {
+      method: "POST",
+      headers: { "x-manage-token": token },
+      body: JSON.stringify({
+        kind: fd.get("kind"),
+        title: fd.get("title"),
+        event_date: fd.get("event_date"),
+        event_time: fd.get("event_time") || null,
+        location: fd.get("location"),
+        description: fd.get("description"),
+        fee: fd.get("fee") || null,
+      }),
+    });
+    showToast("登録しました");
+    await load();
+  } catch (e) {
+    showToast(e.message);
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
+async function onDeleteListing(id) {
+  if (!confirm("この出品を削除しますか？")) return;
+  try {
+    await apiFetch(`/api/farmers/${encodeURIComponent(farmerId)}/listings/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      headers: { "x-manage-token": token },
+    });
+    showToast("削除しました");
+    await load();
+  } catch (e) {
+    showToast(e.message);
+  }
+}
+
+async function onDeleteEvent(id) {
+  if (!confirm("この予定を削除しますか？")) return;
+  try {
+    await apiFetch(`/api/farmers/${encodeURIComponent(farmerId)}/events/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      headers: { "x-manage-token": token },
+    });
+    showToast("削除しました");
+    await load();
+  } catch (e) {
+    showToast(e.message);
+  }
+}
+
+load();
+</script>
+</body>
+</html>

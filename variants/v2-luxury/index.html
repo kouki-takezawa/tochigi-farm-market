@@ -12,6 +12,15 @@
 <body>
 <div class="variant-banner">デザイン案候補 - Luxury　<a href="https://tochigi-farm-market.pages.dev/">本体サイトに戻る</a></div>
 
+<nav class="top-nav">
+  <a href="/" class="top-nav-brand">栃木の直売マルシェ</a>
+  <div class="top-nav-links">
+    <a href="/" class="active">農家一覧</a>
+    <a href="/map.html">マップ</a>
+    <a href="/seller.html">出品者ログイン</a>
+  </div>
+</nav>
+
 <header class="app-header hero">
   <div class="hero-inner">
     <p class="kicker">Tochigi Farm Market</p>
@@ -94,7 +103,7 @@ function renderCard(f) {
   if (f.has_listing_today) badges.push(`<span class="badge">本日出品あり</span>`);
   if (f.next_event_date) badges.push(`<span class="badge event">${formatDateShort(f.next_event_date)} イベント</span>`);
   return `
-    <a class="farmer-card" href="https://tochigi-farm-market.pages.dev/farmer.html?id=${encodeURIComponent(f.id)}">
+    <a class="farmer-card" href="/farmer.html?id=${encodeURIComponent(f.id)}">
       <div class="thumb" ${thumbStyle}>${f.cover_image_url ? "" : "🌾"}</div>
       <div class="info">
         <p class="name">${escapeHtml(f.name)}</p>
@@ -106,7 +115,6 @@ function renderCard(f) {
   `;
 }
 
-initNav("/");
 load();
 </script>
 </body>

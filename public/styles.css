@@ -550,49 +550,48 @@ body.has-bottom-nav { padding-bottom: 64px; }
 }
 .bottom-nav-item.active { color: var(--green-dark); font-weight: 700; }
 
-/* コンパクトなアプリバー(読み物としての大きな写真ヒーローの代わり) */
-header.app-header.appbar {
+/* 企業サイト風の白ヘッダー(coconala.com等を参考): ロゴ+横並びテキストナビ。
+   狭い画面ではテキストナビを隠し、initNav()が差し込むハンバーガーに切り替える */
+header.app-header.site-nav {
   min-height: 0;
-  background: linear-gradient(135deg, var(--green), var(--green-dark));
-  padding: 18px 16px 16px;
-}
-header.app-header.appbar .app-title {
-  font-family: "Shippori Mincho", serif;
-  font-size: 19px;
-}
-
-/* カテゴリ/クイックアクセス チップ列(ポケットマルシェの「カテゴリから探す」を参考) */
-.quick-cats {
+  background: #fff;
+  color: var(--text);
   display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding: 16px 16px 4px;
-  max-width: 640px;
-  margin: 0 auto;
-  -webkit-overflow-scrolling: touch;
-}
-.quick-cats::-webkit-scrollbar { display: none; }
-.quick-cat {
-  flex: none;
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  width: 68px;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.site-logo {
+  font-family: "Shippori Mincho", serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
   text-decoration: none;
+  white-space: nowrap;
+}
+.site-nav-links { display: none; }
+.site-nav-cta { display: none; }
+@media (min-width: 860px) {
+  header.app-header.site-nav { padding: 16px 32px; }
+  .site-nav-links { display: flex; align-items: center; gap: 28px; margin: 0 auto 0 40px; }
+  .site-nav-links a { font-size: 14px; font-weight: 600; color: var(--text); text-decoration: none; }
+  .site-nav-links a:hover, .site-nav-links a.current { color: var(--green-dark); }
+  .site-nav-cta { display: inline-block; font-size: 13px; font-weight: 700; color: var(--green-dark); text-decoration: none; white-space: nowrap; }
+  header.app-header.site-nav .hamburger-btn { display: none; }
+}
+/* 白背景のヘッダーなので、ハンバーガーボタンは濃色でコントラストを確保する */
+header.app-header.site-nav .hamburger-btn {
+  border-color: var(--border);
+  background: var(--bg);
   color: var(--text);
 }
-.quick-cat-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--green-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-}
-.quick-cat span:last-child { font-size: 11px; text-align: center; }
+
+/* 検索バー用の帯(白ヘッダーの下、ヒーローの上に配置) */
+.search-strip { background: var(--green-light); padding: 12px 16px; }
+.search-strip .search-bar { max-width: 520px; margin: 0 auto; background: #fff; }
 
 /* セクション見出し(カルーセル/グリッドの上) */
 .platform-section { max-width: 640px; margin: 0 auto; padding: 22px 16px 4px; }
@@ -670,7 +669,6 @@ header.app-header.appbar .app-title {
   background: rgba(255,255,255,0.94);
   border-radius: 999px;
   padding: 10px 14px;
-  margin-top: 12px;
 }
 .search-bar input {
   border: none;
@@ -683,13 +681,17 @@ header.app-header.appbar .app-title {
 }
 .search-bar input::placeholder { color: var(--muted); }
 
-/* バナーカルーセル: scroll-snapで実装(JSのタッチ処理を書かずにスワイプ対応) */
-.banner-carousel { position: relative; padding-top: 14px; }
+/* バナーカルーセル: coconala.com等の企業サイトを参考に、全幅の写真+
+   中央寄せの大見出しをクロスフェードで切り替える構成にしている */
+.banner-carousel { position: relative; }
 .banner-track {
   position: relative;
-  aspect-ratio: 16/5;
-  max-height: 220px;
+  aspect-ratio: 16/9;
+  max-height: 360px;
   overflow: hidden;
+}
+@media (min-width: 860px) {
+  .banner-track { aspect-ratio: 21/8; max-height: 480px; }
 }
 .banner-slide {
   position: absolute;
@@ -697,9 +699,10 @@ header.app-header.appbar .app-title {
   background-position: center;
   background-size: cover;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 18px 20px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
   text-decoration: none;
   opacity: 0;
   pointer-events: none;
@@ -710,11 +713,20 @@ header.app-header.appbar .app-title {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.4) 100%);
 }
-.banner-eyebrow, .banner-title { position: relative; z-index: 1; color: #fff; margin: 0; }
-.banner-eyebrow { font-size: 11px; letter-spacing: 0.14em; opacity: 0.9; margin-bottom: 4px; }
-.banner-title { font-family: "Shippori Mincho", serif; font-size: 18px; font-weight: 700; text-shadow: 0 1px 8px rgba(0,0,0,0.4); }
+.banner-title {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  margin: 0;
+  max-width: 18em;
+  font-family: "Shippori Mincho", serif;
+  font-weight: 700;
+  font-size: clamp(20px, 4.2vw, 40px);
+  line-height: 1.5;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.45);
+}
 .banner-dots { display: flex; justify-content: center; gap: 6px; padding: 10px 0 2px; }
 .banner-dot { width: 6px; height: 6px; border-radius: 50%; border: none; background: var(--border); padding: 0; cursor: pointer; }
 .banner-dot.active { background: var(--green); width: 16px; border-radius: 4px; }

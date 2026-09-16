@@ -10,26 +10,34 @@
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-<header class="app-header appbar">
-  <p class="app-title">栃木の直売マルシェ</p>
+<header class="app-header site-nav">
+  <a href="/" class="site-logo">栃木の直売マルシェ</a>
+  <nav class="site-nav-links">
+    <a href="/" class="current">農家一覧</a>
+    <a href="/listings.html">出品一覧</a>
+    <a href="/events.html">イベント</a>
+    <a href="/map.html">マップ</a>
+    <a href="/jobs.html">バイト求人</a>
+  </nav>
+  <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
+</header>
+
+<div class="search-strip">
   <label class="search-bar">
     <input type="search" id="search-input" placeholder="農家名・作物・出品名で探す" />
   </label>
-</header>
+</div>
 
 <section class="banner-carousel" aria-label="お知らせ">
   <div class="banner-track" id="banner-track">
     <a class="banner-slide" href="#items" style="background-image:url('/images/hero-vegetables-01.jpg')">
-      <p class="banner-eyebrow">TOCHIGI FARM MARKET</p>
       <p class="banner-title">畑から、まっすぐ食卓へ。</p>
     </a>
     <a class="banner-slide" href="/jobs.html" style="background-image:url('/images/strawberry-greenhouse.jpg')">
-      <p class="banner-eyebrow">RECRUIT</p>
       <p class="banner-title">収穫を手伝うバイト、募集中。</p>
     </a>
     <a class="banner-slide" href="#join" style="background-image:url('/images/red-rice-paddy.jpg')">
-      <p class="banner-eyebrow">FOR FARMERS</p>
-      <p class="banner-title">出品・掲載はすべて無料です。</p>
+      <p class="banner-title">出品・掲載は、すべて無料です。</p>
     </a>
   </div>
   <div class="banner-dots" id="banner-dots"></div>

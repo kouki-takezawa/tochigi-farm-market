@@ -1,6 +1,7 @@
 import { Env } from "../_lib/util";
 
-// GET /images/:farmerId/:filename -> R2に保存した画像を配信
+// GET /uploads/:farmerId/:filename -> R2に保存した画像を配信
+// (public/images/ は静的アセット用に予約するため、アップロード画像はここ /uploads/* で配信する)
 export const onRequestGet: PagesFunction<Env> = async ({ params, env }) => {
   if (!env.IMAGES) {
     return new Response("Not Found", { status: 404 });

@@ -36,5 +36,5 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     httpMetadata: { contentType: file.type },
   });
 
-  return json({ url: `/images/${key}` }, { status: 201 });
+  return json({ url: `/uploads/${key}` }, { status: 201 });
 };

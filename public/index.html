@@ -4,6 +4,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>栃木の直売マルシェ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -16,15 +19,63 @@
     <a href="/map.html" class="btn" style="flex:1;text-align:center;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.6);text-decoration:none;">マップ</a>
   </div>
 </header>
-<p class="hero-credit">写真: <a href="https://commons.wikimedia.org/wiki/File:A_woven_basket_filled_with_an_assortment_of_colorful_vegetables.jpg" target="_blank" rel="noopener">Shixart1985</a> (CC BY 2.0)</p>
 
-<div class="tabs" id="municipality-tabs"></div>
+<section class="intro-section">
+  <img class="intro-image" src="/images/rice-terrace-01.jpg" loading="lazy" alt="栃木の田園風景" />
+  <div class="intro-text">
+    <span class="section-eyebrow">OUR STORY</span>
+    <h2 class="section-title">田んぼと畑の恵みを、<br />そのまま食卓へ。</h2>
+    <p class="section-body">栃木県内の小さな農家が、丹精込めて育てた野菜やお米。<br />知り合いだけに届けていた「とれたて」を、少しだけ遠くへ。<br />顔の見える距離感のまま、あなたの食卓に。</p>
+  </div>
+</section>
 
-<main id="content">
-  <div class="loading">読み込み中...</div>
-</main>
+<section class="feature-section">
+  <span class="section-eyebrow center">WHY US</span>
+  <h2 class="section-title center">選ばれる3つの理由</h2>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <img src="/images/tomatoes-basket-01.jpg" loading="lazy" alt="とれたて野菜" />
+      <div class="feature-body">
+        <h3>とれたて新鮮</h3>
+        <p>朝採れの野菜を、その日のうちに。畑から直接届きます。</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <img src="/images/zucchini-basket-01.jpg" loading="lazy" alt="農家の畑" />
+      <div class="feature-body">
+        <h3>顔が見える安心</h3>
+        <p>誰が、どこで作ったか。連絡も直接やり取りできます。</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <img src="/images/cucumber-basket-01.jpg" loading="lazy" alt="季節の野菜かご" />
+      <div class="feature-body">
+        <h3>地元だから、近い</h3>
+        <p>栃木県内限定。気軽に立ち寄れる距離感です。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="listing-section">
+  <span class="section-eyebrow center">FARMERS</span>
+  <h2 class="section-title center">掲載中の農家</h2>
+
+  <div class="tabs" id="municipality-tabs"></div>
+
+  <main id="content">
+    <div class="loading">読み込み中...</div>
+  </main>
+</section>
 
 <p class="footer-note">出品・イベントの投稿・閲覧はすべて無料です。購入・お申し込みは各農家と直接やり取りしてください。</p>
+<p class="photo-credits">
+  写真:
+  <a href="https://commons.wikimedia.org/wiki/File:A_woven_basket_filled_with_an_assortment_of_colorful_vegetables.jpg" target="_blank" rel="noopener">Shixart1985</a>,
+  <a href="https://commons.wikimedia.org/wiki/File:Rice_Terrace,_Sanazawanomori.jpg" target="_blank" rel="noopener">Minakami Town</a>,
+  <a href="https://commons.wikimedia.org/wiki/File:Tomatoes_in_basket_2020_G1.jpg" target="_blank" rel="noopener">George Chernilevsky</a>
+  (Wikimedia Commons, CC BY / CC BY-SA / Public Domain)
+</p>
 
 <script src="/common.js"></script>
 <script>

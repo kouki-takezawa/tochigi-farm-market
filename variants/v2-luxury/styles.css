@@ -159,6 +159,22 @@ img { max-width: 100%; }
   justify-content: center;
   font-size: 20px;
 }
+
+/* Recommend: RECOMMENDグリッド(5商品並列)の構成を踏襲。768px以上ではカード型グリッドに切り替え */
+@media (min-width: 760px) {
+  .farmer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; }
+  .farmer-card {
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .farmer-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(43,40,34,0.08); }
+  .farmer-card .thumb { width: 100%; height: 180px; border-radius: 0; font-size: 32px; }
+  .farmer-card .info { padding: 16px; }
+}
 .farmer-card .name { font-weight: 600; font-size: 16px; margin: 0 0 4px; }
 .farmer-card .location { font-size: 12px; color: var(--muted); margin: 0 0 4px; letter-spacing: 0.03em; }
 .farmer-card .crops { font-size: 13px; margin: 0 0 8px; color: var(--muted); }
@@ -360,3 +376,87 @@ textarea { min-height: 80px; resize: vertical; }
   font-size: 13px; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 2000;
 }
 .toast.show { opacity: 1; }
+
+/* トップページ: 参考サイト(takenaka-foodware.jp)のScroll Down導線 */
+.scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #f7f4ec;
+  text-decoration: none;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  opacity: 0.85;
+}
+.scroll-cue-line {
+  width: 1px;
+  height: 34px;
+  background: linear-gradient(180deg, rgba(247,244,236,0.9), rgba(247,244,236,0));
+}
+
+.section-head { text-align: center; margin-bottom: 32px; }
+.section-head h2 { font-size: 22px; font-weight: 600; margin: 8px 0 0; }
+.text-link { font-size: 12px; letter-spacing: 0.05em; color: var(--accent); text-decoration: none; display: inline-block; }
+.text-link:hover { text-decoration: underline; }
+.text-link.center { display: block; text-align: center; margin-top: 20px; }
+
+/* Our Harvest: BRANDS(2ブランド並列)セクションの構成を踏襲 */
+.harvest-section { padding: 60px 20px; max-width: 900px; margin: 0 auto; }
+.harvest-grid { display: grid; grid-template-columns: 1fr; gap: 40px; }
+.harvest-card { text-align: left; }
+.harvest-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 18px; }
+.harvest-photo { aspect-ratio: 1; background-position: center; background-size: cover; background-color: #efe9da; }
+.harvest-eyebrow { font-family: "Cormorant Garamond", serif; font-style: italic; color: var(--accent); font-size: 16px; margin: 0 0 8px; }
+.harvest-text { font-size: 14px; color: var(--muted); margin: 0 0 14px; }
+
+@media (min-width: 760px) {
+  .harvest-grid { grid-template-columns: 1fr 1fr; gap: 48px; }
+}
+
+/* Our Story: BRAND STORY(複数背景写真+ヒストリー)の構成を踏襲 */
+.story-section { position: relative; padding: 90px 24px; margin: 40px 0; overflow: hidden; color: #f7f4ec; text-align: center; }
+.story-bg { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; z-index: 0; }
+.story-bg-photo { background-position: center; background-size: cover; filter: brightness(0.42) saturate(0.9); }
+.story-inner { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; }
+.story-inner .tag { color: #d8bd8a; }
+.story-inner h2 { font-size: 22px; font-weight: 600; margin: 8px 0 20px; color: #fdfbf6; }
+.story-inner p { font-size: 14px; line-height: 2; color: #e8e2d2; margin: 0; }
+
+/* News: 日付つきリスト(NEWSセクション)の構成を踏襲。イベントAPIから実データを表示 */
+.news-section { padding: 60px 20px; max-width: 640px; margin: 0 auto; }
+.news-list { display: flex; flex-direction: column; }
+.news-row { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: baseline; padding: 16px 4px; border-bottom: 1px solid var(--border); text-decoration: none; color: inherit; }
+.news-date { font-size: 12px; color: var(--accent); font-family: "Cormorant Garamond", serif; font-style: italic; flex: none; width: 130px; }
+.news-title { font-size: 14px; font-weight: 600; flex: 1; min-width: 140px; }
+.news-farmer { font-size: 12px; color: var(--muted); width: 100%; }
+
+/* Recruit: OEMセクション(写真+説明+CTA)の構成を踏襲。求人APIから実データを表示 */
+.recruit-section { display: flex; flex-direction: column; max-width: 900px; margin: 0 auto; }
+.recruit-photo { aspect-ratio: 16/9; background-position: center; background-size: cover; background-color: #efe9da; }
+.recruit-body { padding: 40px 20px 60px; text-align: center; }
+.recruit-body h2 { font-size: 22px; font-weight: 600; margin: 8px 0 14px; }
+.recruit-body > p { font-size: 14px; color: var(--muted); max-width: 460px; margin: 0 auto 28px; }
+.jobs-preview { display: flex; flex-direction: column; gap: 12px; max-width: 460px; margin: 0 auto 20px; text-align: left; }
+.jobs-preview .job-card { margin-bottom: 0; }
+
+@media (min-width: 760px) {
+  .recruit-section { flex-direction: row; align-items: stretch; }
+  .recruit-photo { flex: 1; aspect-ratio: auto; }
+  .recruit-body { flex: 1; text-align: left; padding: 48px; }
+  .recruit-body > p { margin: 0 0 28px; }
+  .jobs-preview { margin: 0 0 20px; }
+}
+
+/* For Farmers: CONTACTセクションの構成を踏襲 */
+.join-section { padding: 60px 20px 70px; text-align: center; max-width: 480px; margin: 0 auto; }
+.join-section h2 { font-size: 20px; font-weight: 600; margin: 8px 0 16px; }
+.join-section p { font-size: 13px; color: var(--muted); }
+
+.footer-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; margin-bottom: 18px; font-size: 12px; }
+.footer-nav a { color: var(--muted); text-decoration: none; letter-spacing: 0.03em; }
+.footer-nav a:hover { color: var(--accent); }

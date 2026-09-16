@@ -390,3 +390,81 @@ textarea { min-height: 80px; resize: vertical; }
   font-size: 13px; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 2000;
 }
 .toast.show { opacity: 1; }
+
+.section-head { text-align: center; margin-bottom: 24px; }
+.section-head h2 { font-family: "Shippori Mincho", serif; font-size: 22px; font-weight: 700; margin: 8px 0 0; }
+.link-underline.center { display: block; text-align: center; margin-top: 22px; }
+
+/* 定期購入セクション(見出し+文章+画像)の構成を踏襲 */
+.today-section { display: flex; flex-direction: column-reverse; max-width: 980px; margin: 0 auto; gap: 0; }
+.today-photo { aspect-ratio: 16/9; background-position: center; background-size: cover; background-color: var(--card-bg); border-radius: 0; }
+.today-body { padding: 44px 22px; text-align: center; }
+.today-body h2 { font-family: "Shippori Mincho", serif; font-size: 22px; margin: 8px 0 14px; }
+.today-body > p { font-size: 14px; color: var(--muted); max-width: 480px; margin: 0 auto 18px; }
+
+@media (min-width: 760px) {
+  .today-section { flex-direction: row; align-items: stretch; border-radius: 28px; overflow: hidden; box-shadow: 0 14px 30px rgba(74,56,38,0.1); }
+  .today-photo { flex: 1; aspect-ratio: auto; }
+  .today-body { flex: 1; text-align: left; padding: 48px; }
+  .today-body > p { margin: 0 0 18px; }
+}
+
+/* Information: お知らせ一覧(サムネイル付きグリッド)の構成を踏襲。イベントAPIから実データを表示 */
+.info-section { padding: 20px 22px 50px; max-width: 900px; margin: 0 auto; }
+.info-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.info-card { display: block; background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 16px 18px; text-decoration: none; color: inherit; }
+.info-date { font-size: 12px; color: var(--terracotta); font-weight: 700; margin: 0 0 4px; }
+.info-title { font-size: 14px; font-weight: 700; margin: 0 0 4px; }
+.info-farmer { font-size: 12px; color: var(--muted); margin: 0; }
+@media (min-width: 640px) { .info-grid { grid-template-columns: 1fr 1fr; } }
+
+/* Items: 商品カードグリッド(8点)の構成を踏襲。出品APIから実データを表示 */
+.items-section { padding: 20px 22px 50px; max-width: 980px; margin: 0 auto; }
+.items-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.item-card { display: block; text-decoration: none; color: inherit; }
+.item-photo { aspect-ratio: 1; border-radius: 16px; background-position: center; background-size: cover; background-color: #f0e4cc; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 8px; box-shadow: 0 6px 16px rgba(74,56,38,0.08); }
+.item-title { font-size: 13px; font-weight: 700; margin: 0 0 2px; }
+.item-price { font-size: 13px; color: var(--terracotta); font-weight: 700; margin: 0 0 2px; }
+.item-farmer { font-size: 11px; color: var(--muted); margin: 0; }
+@media (min-width: 640px) { .items-grid { grid-template-columns: repeat(4, 1fr); } }
+
+/* 資源循環セクション: 簡易ダイアグラム+説明文の構成を踏襲 */
+.circulation-section { padding: 20px 22px 56px; max-width: 720px; margin: 0 auto; text-align: center; }
+.circulation-diagram { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-bottom: 26px; }
+.circulation-step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.circulation-icon { font-size: 26px; width: 56px; height: 56px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+.circulation-step p { font-size: 11px; margin: 0; color: var(--muted); }
+.circulation-arrow { color: var(--sage); font-size: 16px; }
+.circulation-text { font-size: 14px; color: var(--muted); max-width: 560px; margin: 0 auto; }
+
+/* 出品者募集バナー: Membershipバナーの構成を踏襲 */
+.member-banner { background: linear-gradient(135deg, var(--sage), #5f7a55); margin: 0 0 56px; padding: 48px 22px; }
+.member-banner-inner { max-width: 560px; margin: 0 auto; text-align: center; color: #fdf6e8; }
+.member-banner-inner .tag { color: #e6efe0; }
+.member-banner-inner h2 { font-family: "Shippori Mincho", serif; font-size: 21px; margin: 8px 0 14px; }
+.member-banner-inner p { font-size: 13px; opacity: 0.95; margin: 0; }
+
+/* Stories: 縦横比の異なる画像グリッドの構成を踏襲 */
+.stories-section { padding: 20px 22px 56px; max-width: 980px; margin: 0 auto; }
+.stories-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.stories-grid figure { margin: 0; }
+.story-photo { aspect-ratio: 1; border-radius: 18px; background-position: center; background-size: cover; background-color: #f0e4cc; box-shadow: 0 8px 18px rgba(74,56,38,0.1); }
+.story-tall .story-photo { aspect-ratio: 3/4; }
+.stories-grid figcaption { font-size: 12px; color: var(--muted); margin-top: 8px; }
+@media (min-width: 640px) { .stories-grid { grid-template-columns: repeat(3, 1fr); } }
+
+/* エリアから探す: Stores/Stay/Restaurant(大きな画像+テキスト)の構成を踏襲 */
+.area-section { padding: 20px 22px 60px; max-width: 980px; margin: 0 auto; }
+.area-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.area-card { position: relative; display: block; aspect-ratio: 16/9; border-radius: 22px; overflow: hidden; text-decoration: none; color: #fdf6e8; }
+.area-photo { position: absolute; inset: 0; background-position: center; background-size: cover; }
+.area-photo::after { content: ""; }
+.area-card::before { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(74,56,38,0.65), rgba(74,56,38,0.05)); }
+.area-copy { position: absolute; left: 20px; bottom: 16px; z-index: 1; }
+.area-name { font-family: "Shippori Mincho", serif; font-size: 18px; font-weight: 700; margin: 0 0 2px; }
+.area-desc { font-size: 12px; margin: 0; opacity: 0.9; }
+@media (min-width: 640px) { .area-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.footer-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; margin-bottom: 16px; font-size: 12px; }
+.footer-nav a { color: var(--muted); text-decoration: none; }
+.footer-nav a:hover { color: var(--terracotta); }

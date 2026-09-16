@@ -328,3 +328,92 @@ textarea { min-height: 80px; resize: vertical; }
   font-size: 12px; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 2000;
 }
 .toast.show { opacity: 1; }
+
+/* トップページ: 参考サイト(tosou.nishizaki.co.jp)のScroll Down導線 */
+.scroll-cue {
+  position: absolute;
+  right: 32px;
+  bottom: 16px;
+  font-family: "Roboto Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.scroll-cue:hover { color: var(--accent); }
+
+/* 矢印記号の帯(参考サイトの「［↑→↓←●］」装飾を踏襲) */
+.arrow-strip {
+  font-family: "Roboto Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  background: #f5f5f5;
+  border-bottom: 1px solid var(--border);
+  padding: 8px 16px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mono-head { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 24px; flex-wrap: wrap; gap: 6px; }
+.mono-head h2 { font-size: 22px; font-weight: 700; margin: 0; }
+
+/* ABOUT / FARMERS / MARKET: 画像+テキスト+サブリンクの構成を踏襲 */
+.mono-section { padding: 48px 32px; max-width: 1100px; margin: 0 auto; border-bottom: 1px solid var(--border); }
+.mono-section.alt { background: #f5f5f5; max-width: none; }
+.mono-section.alt > * { max-width: 1100px; margin-left: auto; margin-right: auto; }
+.mono-split { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start; }
+.mono-split.reverse { direction: rtl; }
+.mono-split.reverse > * { direction: ltr; }
+.mono-photo.square { aspect-ratio: 1; background-position: center; background-size: cover; background-color: #f0f0f0; border: 1px solid var(--border); }
+.mono-photo-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mono-photo { aspect-ratio: 1; background-position: center; background-size: cover; background-color: #f0f0f0; border: 1px solid var(--border); }
+.mono-body p { font-size: 14px; line-height: 1.9; margin: 0 0 18px; max-width: 480px; }
+.mono-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.mono-links a { font-family: "Roboto Mono", monospace; font-size: 12px; text-decoration: none; color: var(--ink); }
+.mono-links a:hover { color: var(--accent); }
+
+@media (min-width: 760px) {
+  .mono-split { grid-template-columns: 0.9fr 1.1fr; gap: 48px; }
+  .mono-photo.square { max-width: 420px; }
+}
+
+/* Gallery: 施工例9枚グリッド(3x3)の構成を踏襲 */
+.gallery-section { padding: 48px 32px; max-width: 1100px; margin: 0 auto; border-bottom: 1px solid var(--border); }
+.gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; background: var(--border); border: 1px solid var(--border); }
+.gallery-grid figure { margin: 0; background: #fff; position: relative; }
+.gallery-photo { aspect-ratio: 1; background-position: center; background-size: cover; background-color: #f0f0f0; }
+.gallery-grid figcaption { font-family: "Roboto Mono", monospace; font-size: 10px; padding: 8px 10px; color: var(--muted); }
+@media (min-width: 640px) {
+  .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Case: 施工例1件を大きく紹介する構成を踏襲。実データから1軒を表示 */
+.case-section { padding: 48px 32px; max-width: 1100px; margin: 0 auto; border-bottom: 1px solid var(--border); }
+.case-card { display: flex; flex-direction: column; text-decoration: none; color: inherit; border: 1px solid var(--border); }
+.case-photo { aspect-ratio: 16/9; background-position: center; background-size: cover; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+.case-body { padding: 20px; }
+.case-name { font-size: 18px; font-weight: 700; margin: 0 0 6px; }
+.case-meta { font-family: "Roboto Mono", monospace; font-size: 12px; color: var(--muted); margin: 0 0 10px; }
+.case-link { font-family: "Roboto Mono", monospace; font-size: 12px; color: var(--accent); margin: 0; }
+@media (min-width: 760px) {
+  .case-card { flex-direction: row; }
+  .case-photo { flex: 1.2; aspect-ratio: auto; }
+  .case-body { flex: 1; align-self: center; }
+}
+
+/* Library: 出品/イベント/求人ライブラリー導線 */
+.library-section { padding: 48px 32px 64px; max-width: 1100px; margin: 0 auto; }
+.library-text { font-size: 14px; color: var(--muted); max-width: 520px; margin: 0 0 24px; }
+.library-links { display: flex; flex-wrap: wrap; gap: 0; border: 1px solid var(--border); width: fit-content; }
+.library-link { font-family: "Roboto Mono", monospace; font-size: 12px; text-decoration: none; color: var(--ink); padding: 12px 20px; border-right: 1px solid var(--border); }
+.library-link:last-child { border-right: none; }
+.library-link:hover { background: var(--ink); color: #fff; }
+
+.footer-nav { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 16px; border: 1px solid var(--border); width: fit-content; }
+.footer-nav a { font-size: 11px; text-decoration: none; color: var(--ink); padding: 6px 12px; border-right: 1px solid var(--border); }
+.footer-nav a:last-child { border-right: none; }
+.footer-nav a:hover { background: var(--ink); color: #fff; }
+.back-to-top { display: inline-block; margin-top: 16px; font-family: "Roboto Mono", monospace; font-size: 11px; color: var(--ink); text-decoration: none; }
+.back-to-top:hover { color: var(--accent); }

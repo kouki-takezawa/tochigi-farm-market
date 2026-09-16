@@ -31,6 +31,16 @@
         <div><label>紹介文</label><textarea name="description"></textarea></div>
         <div><label>LINE公式URL(任意)</label><input type="url" name="line_url" /></div>
         <div><label>電話番号(任意)</label><input type="tel" name="phone" /></div>
+        <div>
+          <label>住所(マップのピン用・番地まで入れると精度が上がります)</label>
+          <input type="text" name="address" placeholder="例: 栃木県宇都宮市桜1-1-1" />
+          <button type="button" id="geocode-btn" class="btn secondary" style="margin-top:6px;">この住所から緯度経度を取得</button>
+          <p id="geocode-status" style="font-size:12px;color:var(--muted);margin:6px 0 0;"></p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;"><label>緯度(任意)</label><input type="text" name="lat" inputmode="decimal" placeholder="例: 36.5551" /></div>
+          <div style="flex:1;"><label>経度(任意)</label><input type="text" name="lng" inputmode="decimal" placeholder="例: 139.8828" /></div>
+        </div>
         <button type="submit" class="btn primary block">登録して管理URLを発行</button>
       </form>
       <div id="create-result"></div>
@@ -84,12 +94,59 @@ async function loadFarmerList() {
     const data = await apiFetch("/api/farmers");
     const farmers = data.farmers || [];
     el.innerHTML = farmers.length
-      ? farmers.map((f) => `<div class="item-row"><div><b>${escapeHtml(f.name)}</b><br><span style="font-size:12px;color:var(--muted);">${escapeHtml(f.municipality)} ・ ${escapeHtml(f.id)}</span></div></div>`).join("")
+      ? farmers
+          .map(
+            (f) => `
+        <div class="item-row">
+          <div><b>${escapeHtml(f.name)}</b><br><span style="font-size:12px;color:var(--muted);">${escapeHtml(f.municipality)} ・ ${escapeHtml(f.id)}</span></div>
+          <div class="actions"><button class="btn secondary" data-delete-farmer="${escapeHtml(f.id)}">削除</button></div>
+        </div>`
+          )
+          .join("")
       : `<p class="empty-state">まだ登録農家がいません。</p>`;
+
+    el.querySelectorAll("[data-delete-farmer]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.deleteFarmer;
+        if (!confirm(`「${id}」を削除しますか？出品・イベントもすべて削除され、元に戻せません。`)) return;
+        try {
+          await adminFetch(`/api/admin/farmers/${encodeURIComponent(id)}`, { method: "DELETE" });
+          showToast("削除しました");
+          await loadFarmerList();
+        } catch (e) {
+          showToast(e.message);
+        }
+      });
+    });
   } catch (e) {
     el.innerHTML = `<p class="error-message">${escapeHtml(e.message)}</p>`;
   }
 }
+
+document.getElementById("geocode-btn").addEventListener("click", async () => {
+  const form = document.getElementById("create-form");
+  const statusEl = document.getElementById("geocode-status");
+  const address = form.address.value.trim() || `栃木県${form.municipality.value.trim()}`;
+  if (!address) {
+    statusEl.textContent = "住所または市町村を入力してください";
+    return;
+  }
+  statusEl.textContent = "検索中...";
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=jp&limit=1&q=${encodeURIComponent(address)}`;
+    const res = await fetch(url);
+    const results = await res.json();
+    if (!results.length) {
+      statusEl.textContent = "見つかりませんでした。住所をより詳しく入力するか、緯度経度を手動で入力してください。";
+      return;
+    }
+    form.lat.value = results[0].lat;
+    form.lng.value = results[0].lon;
+    statusEl.textContent = `取得しました: ${results[0].display_name}`;
+  } catch (e) {
+    statusEl.textContent = "取得に失敗しました。緯度経度を手動で入力してください。";
+  }
+});
 
 document.getElementById("create-form").addEventListener("submit", async (ev) => {
   ev.preventDefault();
@@ -107,6 +164,8 @@ document.getElementById("create-form").addEventListener("submit", async (ev) => 
         description: fd.get("description"),
         line_url: fd.get("line_url") || null,
         phone: fd.get("phone") || null,
+        lat: fd.get("lat") ? Number(fd.get("lat")) : null,
+        lng: fd.get("lng") ? Number(fd.get("lng")) : null,
       }),
     });
     const fullUrl = `${location.origin}${data.manage_url}`;
@@ -138,6 +197,7 @@ document.getElementById("reissue-form").addEventListener("submit", async (ev) =>
   }
 });
 
+initNav(null);
 init();
 </script>
 </body>

@@ -5,6 +5,10 @@ const MAX_BYTES = 8 * 1024 * 1024; // 8MB
 
 // POST /api/upload  (multipart/form-data: file, farmer_id, ヘッダー x-manage-token)
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+  if (!env.IMAGES) {
+    return json({ error: "画像アップロードは準備中です。しばらくお待ちください(写真なしでも投稿できます)。" }, { status: 503 });
+  }
+
   const form = await request.formData();
   const file = form.get("file");
   const farmerId = form.get("farmer_id");

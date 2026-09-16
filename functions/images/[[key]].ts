@@ -2,6 +2,10 @@ import { Env } from "../_lib/util";
 
 // GET /images/:farmerId/:filename -> R2に保存した画像を配信
 export const onRequestGet: PagesFunction<Env> = async ({ params, env }) => {
+  if (!env.IMAGES) {
+    return new Response("Not Found", { status: 404 });
+  }
+
   const parts = params.key as string[]; // catch-all [[key]] からのパス配列
   const key = parts.join("/");
 

@@ -62,6 +62,58 @@ function priceLabel(price) {
   return `${Number(price).toLocaleString()}円`;
 }
 
+function isSellerLoggedIn() {
+  return localStorage.getItem("seller_logged_in") === "1";
+}
+
+function initNav(activeHref) {
+  const header = document.querySelector("header.app-header");
+
+  const btn = document.createElement("button");
+  btn.className = "hamburger-btn";
+  btn.setAttribute("aria-label", "メニュー");
+  btn.innerHTML = "☰";
+  if (header) {
+    header.appendChild(btn);
+  } else {
+    btn.classList.add("hamburger-btn-floating");
+    document.body.appendChild(btn);
+  }
+
+  const links = [
+    { href: "/", label: "農家一覧(購入者)" },
+    { href: "/map.html", label: "マップ" },
+    { href: "/seller.html", label: isSellerLoggedIn() ? "出品者ページ" : "出品者ログイン" },
+  ];
+
+  const overlay = document.createElement("div");
+  overlay.className = "nav-overlay";
+  overlay.innerHTML = `
+    <nav class="nav-drawer">
+      <div class="nav-drawer-header">
+        <span>メニュー</span>
+        <button class="nav-close" aria-label="閉じる">✕</button>
+      </div>
+      <ul>
+        ${links
+          .map(
+            (l) =>
+              `<li><a href="${l.href}" class="${l.href === activeHref ? "active" : ""}">${escapeHtml(l.label)}</a></li>`
+          )
+          .join("")}
+      </ul>
+    </nav>
+  `;
+  document.body.appendChild(overlay);
+
+  const close = () => overlay.classList.remove("open");
+  btn.addEventListener("click", () => overlay.classList.add("open"));
+  overlay.querySelector(".nav-close").addEventListener("click", close);
+  overlay.addEventListener("click", (ev) => {
+    if (ev.target === overlay) close();
+  });
+}
+
 async function uploadImage(fileInput, farmerId, token) {
   const file = fileInput.files[0];
   if (!file) return null;

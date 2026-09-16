@@ -12,7 +12,7 @@
   <p class="app-tagline">栃木県内限定・顔が見える直売と農家のイベント情報</p>
   <div class="view-toggle">
     <button id="tab-list" class="active">リスト</button>
-    <button id="tab-map">マップ(準備中)</button>
+    <a href="/map.html" class="btn" style="flex:1;text-align:center;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.6);text-decoration:none;">マップ</a>
   </div>
 </header>
 
@@ -95,10 +95,7 @@ function renderCard(f) {
   `;
 }
 
-document.getElementById("tab-map").addEventListener("click", () => {
-  showToast("マップ表示は今後のアップデートで追加予定です");
-});
-
+initNav("/");
 load();
 </script>
 </body>

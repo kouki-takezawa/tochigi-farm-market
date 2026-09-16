@@ -8,7 +8,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
   let query = supabase
     .from("farmers")
-    .select("id, name, municipality, crops, description, cover_image_url, line_url, phone, updated_at")
+    .select("id, name, municipality, crops, description, cover_image_url, line_url, phone, lat, lng, updated_at")
     .order("updated_at", { ascending: false });
 
   if (municipality) {
@@ -68,6 +68,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     cover_image_url?: string;
     line_url?: string;
     phone?: string;
+    lat?: number | null;
+    lng?: number | null;
   }>();
 
   if (!body.name || !body.municipality) {
@@ -88,6 +90,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     cover_image_url: body.cover_image_url ?? null,
     line_url: body.line_url ?? null,
     phone: body.phone ?? null,
+    lat: body.lat ?? null,
+    lng: body.lng ?? null,
     manage_token: manageToken,
     created_at: now,
     updated_at: now,

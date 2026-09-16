@@ -10,6 +10,8 @@ create table if not exists farmers (
   cover_image_url text,
   line_url text,
   phone text,
+  lat double precision,
+  lng double precision,
   manage_token text not null unique,
   created_at bigint not null,
   updated_at bigint not null

@@ -7,7 +7,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ params, env }) => {
 
   const { data: farmer, error: farmerError } = await supabase
     .from("farmers")
-    .select("id, name, municipality, crops, description, cover_image_url, line_url, phone, updated_at")
+    .select("id, name, municipality, crops, description, cover_image_url, line_url, phone, lat, lng, updated_at")
     .eq("id", id)
     .maybeSingle();
 

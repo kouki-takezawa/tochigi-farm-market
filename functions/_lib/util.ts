@@ -1,7 +1,7 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 export interface Env {
-  IMAGES: R2Bucket;
+  IMAGES?: R2Bucket; // R2有効化まで未設定(functions/api/upload.ts, functions/images/[[key]].ts で存在チェック)
   ADMIN_SECRET: string;
   SUPABASE_URL: string;
   SUPABASE_SERVICE_ROLE_KEY: string;

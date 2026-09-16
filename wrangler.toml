@@ -2,10 +2,13 @@ name = "tochigi-farm-market"
 compatibility_date = "2025-01-01"
 pages_build_output_dir = "public"
 
-# 画像保存用 R2バケット(事前に `wrangler r2 bucket create tochigi-farm-market-images` で作成)
-[[r2_buckets]]
-binding = "IMAGES"
-bucket_name = "tochigi-farm-market-images"
+# 画像保存用R2バケット(現在R2は未有効化のため一時的にコメントアウト中。
+# Cloudflareダッシュボードで支払い情報を登録してR2を有効化し、
+# `wrangler r2 bucket create tochigi-farm-market-images` でバケットを作成したら
+# 以下のコメントを外して再デプロイしてください)
+# [[r2_buckets]]
+# binding = "IMAGES"
+# bucket_name = "tochigi-farm-market-images"
 
 # SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / ADMIN_SECRET は
 # `wrangler pages secret put <NAME>` またはCloudflareダッシュボードの

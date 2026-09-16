@@ -841,6 +841,121 @@ header.app-header.appbar .app-title {
   display: flex;
   align-items: center;
   gap: 14px;
+  scroll-margin-top: 12px;
 }
 .recruit-banner p { margin: 0; font-size: 13px; color: var(--text); flex: 1; }
 .recruit-banner strong { display: block; font-size: 14px; margin-bottom: 2px; }
+
+/* ============================================================
+   poke-m.com(ポケットマルシェ)の実構成を参考にした要素
+   検索バー / バナーカルーセル / サブバナー / 商品カードの生産者行 /
+   タグ型のエリア絞り込み / グループ化フッター
+   ============================================================ */
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.94);
+  border-radius: 999px;
+  padding: 10px 14px;
+  margin-top: 12px;
+}
+.search-bar input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--text);
+  flex: 1;
+  font-family: inherit;
+}
+.search-bar input::placeholder { color: var(--muted); }
+
+/* バナーカルーセル: scroll-snapで実装(JSのタッチ処理を書かずにスワイプ対応) */
+.banner-carousel { position: relative; padding-top: 14px; }
+.banner-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.banner-track::-webkit-scrollbar { display: none; }
+.banner-slide {
+  flex: none;
+  width: 100%;
+  scroll-snap-align: start;
+  aspect-ratio: 16/7;
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 18px 20px;
+  text-decoration: none;
+  position: relative;
+}
+.banner-slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);
+}
+.banner-eyebrow, .banner-title { position: relative; z-index: 1; color: #fff; margin: 0; }
+.banner-eyebrow { font-size: 11px; letter-spacing: 0.14em; opacity: 0.9; margin-bottom: 4px; }
+.banner-title { font-family: "Shippori Mincho", serif; font-size: 18px; font-weight: 700; text-shadow: 0 1px 8px rgba(0,0,0,0.4); }
+.banner-dots { display: flex; justify-content: center; gap: 6px; padding: 10px 0 2px; }
+.banner-dot { width: 6px; height: 6px; border-radius: 50%; border: none; background: var(--border); padding: 0; cursor: pointer; }
+.banner-dot.active { background: var(--green); width: 16px; border-radius: 4px; }
+
+/* サブバナー: 2枚横並び */
+.sub-banners { display: flex; gap: 10px; max-width: 640px; margin: 14px auto 0; padding: 0 16px; }
+.sub-banner {
+  flex: 1;
+  aspect-ratio: 4/3;
+  border-radius: var(--radius);
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  position: relative;
+  text-decoration: none;
+  overflow: hidden;
+}
+.sub-banner::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.5) 100%); }
+.sub-banner span { position: relative; z-index: 1; color: #fff; font-size: 13px; font-weight: 700; text-shadow: 0 1px 6px rgba(0,0,0,0.4); }
+
+/* 出品グリッド(新着の出品) */
+.items-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+@media (min-width: 520px) { .items-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 720px) { .items-grid { grid-template-columns: repeat(5, 1fr); } }
+.items-grid .item-card, .carousel .item-card { width: auto; }
+.carousel .item-card { width: 148px; }
+
+/* 商品カード: 写真の下に生産者(アバター+名前)行を挟む構成をポケマルから踏襲 */
+.item-producer { display: flex; align-items: center; gap: 6px; margin: 8px 0 4px; }
+.item-avatar {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--green); color: #fff; font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex: none;
+}
+.item-producer-name { font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-title { margin: 0 0 2px; }
+.item-region { font-size: 11px; color: var(--muted); margin: 0 0 2px; }
+
+/* エリアから探す: タグ型の絞り込み(ポケマルの「旬のキーワード」相当) */
+.area-tags-section { max-width: 640px; margin: 0 auto; padding: 22px 16px 4px; }
+.area-tags { padding: 0; background: transparent; border: none; }
+.area-tags .tab { border-radius: 999px; }
+
+/* グループ化フッター(利用者向け/農家向けにリンクを分ける構成をポケマルから踏襲) */
+.site-footer-grouped { padding: 28px 16px 20px; max-width: 640px; margin: 0 auto; }
+.footer-cols { display: flex; gap: 32px; flex-wrap: wrap; margin-bottom: 20px; }
+.footer-col-title { font-size: 12px; font-weight: 700; color: var(--text); margin: 0 0 10px; }
+.footer-col { display: flex; flex-direction: column; gap: 8px; }
+.footer-col a { font-size: 12px; color: var(--muted); text-decoration: none; }
+.footer-col a:hover { color: var(--green-dark); }
+.site-footer-grouped .footer-note { padding: 0; text-align: left; border-top: 1px solid var(--border); padding-top: 16px; }
+.site-footer-grouped .photo-credits { padding: 8px 0 0; text-align: left; }
+.footer-copyright { font-size: 11px; color: var(--muted); margin: 12px 0 0; }

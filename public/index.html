@@ -12,23 +12,60 @@
 <body>
 <header class="app-header appbar">
   <p class="app-title">栃木の直売マルシェ</p>
-  <p class="app-tagline">畑から、まっすぐ食卓へ。栃木県内限定の直売プラットフォーム。</p>
+  <label class="search-bar">
+    <span aria-hidden="true">🔍</span>
+    <input type="search" id="search-input" placeholder="農家名・作物・出品名で探す" />
+  </label>
 </header>
 
-<nav class="quick-cats" aria-label="かんたんメニュー">
-  <a class="quick-cat" href="/listings.html"><span class="quick-cat-icon">🥬</span><span>出品一覧</span></a>
-  <a class="quick-cat" href="/map.html"><span class="quick-cat-icon">📍</span><span>マップ</span></a>
-  <a class="quick-cat" href="/events.html"><span class="quick-cat-icon">📅</span><span>イベント</span></a>
-  <a class="quick-cat" href="/jobs.html"><span class="quick-cat-icon">💼</span><span>バイト求人</span></a>
-  <a class="quick-cat" href="/seller.html"><span class="quick-cat-icon">🔑</span><span>出品者</span></a>
-</nav>
+<section class="banner-carousel" aria-label="お知らせ">
+  <div class="banner-track" id="banner-track">
+    <a class="banner-slide" href="#items" style="background-image:url('/images/hero-vegetables-01.jpg')">
+      <p class="banner-eyebrow">TOCHIGI FARM MARKET</p>
+      <p class="banner-title">畑から、まっすぐ食卓へ。</p>
+    </a>
+    <a class="banner-slide" href="/jobs.html" style="background-image:url('/images/strawberry-greenhouse.jpg')">
+      <p class="banner-eyebrow">RECRUIT</p>
+      <p class="banner-title">収穫を手伝うバイト、募集中。</p>
+    </a>
+    <a class="banner-slide" href="#join" style="background-image:url('/images/red-rice-paddy.jpg')">
+      <p class="banner-eyebrow">FOR FARMERS</p>
+      <p class="banner-title">出品・掲載はすべて無料です。</p>
+    </a>
+  </div>
+  <div class="banner-dots" id="banner-dots"></div>
+</section>
+
+<div class="sub-banners">
+  <a class="sub-banner" href="/map.html" style="background-image:url('/images/rice-terrace-01.jpg')">
+    <span>マップで探す</span>
+  </a>
+  <a class="sub-banner" href="/events.html" style="background-image:url('/images/skyberry-tochigi.jpg')">
+    <span>畑のイベント</span>
+  </a>
+</div>
 
 <section class="platform-section" id="items">
   <div class="platform-section-head">
     <h2>新着の出品</h2>
     <a class="see-all" href="/listings.html">すべて見る →</a>
   </div>
-  <div id="items-carousel" class="carousel">
+  <div id="items-grid" class="items-grid">
+    <div class="loading">読み込み中...</div>
+  </div>
+</section>
+
+<section class="area-tags-section">
+  <div class="platform-section-head"><h2>エリアから探す</h2></div>
+  <div class="tabs area-tags" id="municipality-tabs"></div>
+</section>
+
+<section class="platform-section" id="special">
+  <div class="platform-section-head">
+    <h2>わけあり・特価</h2>
+    <a class="see-all" href="/listings.html">すべて見る →</a>
+  </div>
+  <div id="special-carousel" class="carousel">
     <div class="loading">読み込み中...</div>
   </div>
 </section>
@@ -37,7 +74,6 @@
   <div class="platform-section-head" style="max-width:640px;margin:0 auto;padding:0 16px;">
     <h2>掲載中の農家</h2>
   </div>
-  <div class="tabs" id="municipality-tabs"></div>
   <main id="content">
     <div class="loading">読み込み中...</div>
   </main>
@@ -58,23 +94,44 @@
   </div>
 </section>
 
-<div class="recruit-banner">
+<div class="recruit-banner" id="join">
   <p><strong>農家の方へ</strong>出品・イベント・求人の掲載はすべて無料。スマホから写真と一言だけで投稿できます。掲載希望の方は運営者までご連絡ください。</p>
 </div>
 
-<footer class="footer-note">
-  出品・イベントの投稿・閲覧はすべて無料です。購入・お申し込みは各農家と直接やり取りしてください。<br />
-  <span style="font-size:10px;">写真:
+<footer class="site-footer-grouped">
+  <div class="footer-cols">
+    <div class="footer-col">
+      <p class="footer-col-title">利用者の方へ</p>
+      <a href="/listings.html">出品一覧</a>
+      <a href="/events.html">イベント一覧</a>
+      <a href="/jobs.html">バイト・求人一覧</a>
+      <a href="/map.html">マップで探す</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">農家の方へ</p>
+      <a href="/seller.html">出品者ログイン</a>
+      <a href="#join">掲載のご案内</a>
+    </div>
+  </div>
+  <p class="footer-note">出品・イベントの投稿・閲覧はすべて無料です。購入・お申し込みは各農家と直接やり取りしてください。決済・仲介は行っておりません。</p>
+  <p class="photo-credits">
+    写真:
     <a href="https://commons.wikimedia.org/wiki/File:Mount_Amagoi_and_Cabbage_fields.jpg" target="_blank" rel="noopener">Alpsdake</a>,
-    <a href="https://commons.wikimedia.org/wiki/File:Rice_Terrace,_Sanazawanomori.jpg" target="_blank" rel="noopener">Minakami Town</a>
-    (Wikimedia Commons, CC BY-SA 4.0 / CC BY 4.0)
-  </span>
+    <a href="https://commons.wikimedia.org/wiki/File:Rice_Terrace,_Sanazawanomori.jpg" target="_blank" rel="noopener">Minakami Town</a>,
+    <a href="https://commons.wikimedia.org/wiki/File:Strawberry_greenhouse.jpg" target="_blank" rel="noopener">Joi Ito</a>,
+    <a href="https://commons.wikimedia.org/wiki/File:Red_Rice_Paddy_field_in_Japan_003.jpg" target="_blank" rel="noopener">gtknj</a>,
+    <a href="https://commons.wikimedia.org/wiki/File:Skyberry,_special_strawberry_created_in_Tochigi_prefecture.jpg" target="_blank" rel="noopener">Miyuki Meinaka</a>
+    (Wikimedia Commons, CC BY / CC BY-SA)
+  </p>
+  <p class="footer-copyright">© 栃木の直売マルシェ</p>
 </footer>
 
 <script src="/common.js"></script>
 <script>
 let allFarmers = [];
+let allListings = [];
 let currentMunicipality = "";
+let searchQuery = "";
 
 async function loadFarmers() {
   const content = document.getElementById("content");
@@ -82,7 +139,7 @@ async function loadFarmers() {
     const data = await apiFetch("/api/farmers");
     allFarmers = data.farmers || [];
     renderTabs();
-    renderList();
+    renderFarmerList();
   } catch (e) {
     content.innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
   }
@@ -99,36 +156,42 @@ function renderTabs() {
       return `<button class="tab ${active}" data-value="${escapeHtml(value)}">${escapeHtml(m)}</button>`;
     })
     .join("");
-
   tabsEl.querySelectorAll(".tab").forEach((btn) => {
     btn.addEventListener("click", () => {
       currentMunicipality = btn.dataset.value;
       renderTabs();
-      renderList();
+      renderFarmerList();
+      renderItems();
+      renderSpecial();
     });
   });
 }
 
-function renderList() {
-  const content = document.getElementById("content");
-  const filtered = currentMunicipality
-    ? allFarmers.filter((f) => f.municipality === currentMunicipality)
-    : allFarmers;
-
-  if (filtered.length === 0) {
-    content.innerHTML = `<div class="empty-state">この地域の登録農家はまだありません。</div>`;
-    return;
-  }
-
-  content.innerHTML = `<div class="farmer-list">${filtered.map(renderCard).join("")}</div>`;
+function matchesSearch(text) {
+  if (!searchQuery) return true;
+  return (text || "").toLowerCase().includes(searchQuery);
 }
 
-function renderCard(f) {
+function renderFarmerList() {
+  const content = document.getElementById("content");
+  let filtered = currentMunicipality ? allFarmers.filter((f) => f.municipality === currentMunicipality) : allFarmers;
+  filtered = filtered.filter((f) => matchesSearch(f.name) || matchesSearch(f.crops) || matchesSearch(f.municipality));
+  if (filtered.length === 0) {
+    content.innerHTML = `<div class="empty-state">該当する農家が見つかりません。</div>`;
+    return;
+  }
+  content.innerHTML = `<div class="farmer-list">${filtered.map(renderFarmerCard).join("")}</div>`;
+}
+
+function avatarInitial(name) {
+  return (name || "?").trim().charAt(0);
+}
+
+function renderFarmerCard(f) {
   const thumbStyle = f.cover_image_url ? `style="background-image:url('${escapeHtml(f.cover_image_url)}')"` : "";
   const badges = [];
   if (f.has_listing_today) badges.push(`<span class="badge">本日出品あり</span>`);
   if (f.next_event_date) badges.push(`<span class="badge event">${formatDateShort(f.next_event_date)} イベント</span>`);
-
   return `
     <a class="farmer-card" href="/farmer.html?id=${encodeURIComponent(f.id)}">
       <div class="thumb" ${thumbStyle}>${f.cover_image_url ? "" : "🌾"}</div>
@@ -142,30 +205,52 @@ function renderCard(f) {
   `;
 }
 
-async function loadItems() {
-  const el = document.getElementById("items-carousel");
+async function loadListings() {
   try {
     const data = await apiFetch("/api/listings");
-    const listings = (data.listings || []).slice(0, 12);
-    if (listings.length === 0) {
-      el.innerHTML = `<div class="empty-state">まだ出品がありません。</div>`;
-      return;
-    }
-    el.innerHTML = listings
-      .map((l) => {
-        const thumbStyle = l.image_url ? `style="background-image:url('${escapeHtml(l.image_url)}')"` : "";
-        return `
-      <a class="item-card" href="/farmer.html?id=${encodeURIComponent(l.farmer_id)}">
-        <div class="item-photo" ${thumbStyle}>${l.image_url ? "" : "🌱"}${l.is_special ? '<span class="badge special">わけあり</span>' : ""}</div>
-        <p class="item-title">${escapeHtml(l.title)}</p>
-        <p class="item-price">${priceLabel(l.price)}</p>
-        <p class="item-farmer">${escapeHtml(l.farmer_name)}</p>
-      </a>`;
-      })
-      .join("");
+    allListings = data.listings || [];
+    renderItems();
+    renderSpecial();
   } catch (e) {
-    el.innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+    document.getElementById("items-grid").innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+    document.getElementById("special-carousel").innerHTML = "";
   }
+}
+
+function itemCard(l) {
+  const thumbStyle = l.image_url ? `style="background-image:url('${escapeHtml(l.image_url)}')"` : "";
+  return `
+    <a class="item-card" href="/farmer.html?id=${encodeURIComponent(l.farmer_id)}">
+      <div class="item-photo" ${thumbStyle}>${l.image_url ? "" : "🌱"}${l.is_special ? '<span class="badge special">わけあり</span>' : ""}</div>
+      <div class="item-producer"><span class="item-avatar">${escapeHtml(avatarInitial(l.farmer_name))}</span><span class="item-producer-name">${escapeHtml(l.farmer_name)}</span></div>
+      <p class="item-title">${escapeHtml(l.title)}</p>
+      <p class="item-region">${escapeHtml(l.farmer_municipality)}</p>
+      <p class="item-price">${priceLabel(l.price)}</p>
+    </a>`;
+}
+
+function renderItems() {
+  const el = document.getElementById("items-grid");
+  let filtered = currentMunicipality ? allListings.filter((l) => l.farmer_municipality === currentMunicipality) : allListings;
+  filtered = filtered.filter((l) => matchesSearch(l.title) || matchesSearch(l.farmer_name) || matchesSearch(l.comment));
+  const shown = filtered.slice(0, 10);
+  if (shown.length === 0) {
+    el.innerHTML = `<div class="empty-state">まだ出品がありません。</div>`;
+    return;
+  }
+  el.innerHTML = shown.map(itemCard).join("");
+}
+
+function renderSpecial() {
+  const el = document.getElementById("special-carousel");
+  let filtered = allListings.filter((l) => l.is_special);
+  if (currentMunicipality) filtered = filtered.filter((l) => l.farmer_municipality === currentMunicipality);
+  const shown = filtered.slice(0, 12);
+  if (shown.length === 0) {
+    el.innerHTML = `<div class="empty-state">今はわけあり・特価の出品がありません。</div>`;
+    return;
+  }
+  el.innerHTML = shown.map(itemCard).join("");
 }
 
 async function loadEventsWidget() {
@@ -214,10 +299,57 @@ async function loadJobsWidget() {
   }
 }
 
+function initBannerCarousel() {
+  const track = document.getElementById("banner-track");
+  const dotsEl = document.getElementById("banner-dots");
+  const slides = Array.from(track.children);
+  dotsEl.innerHTML = slides.map((_, i) => `<button class="banner-dot ${i === 0 ? "active" : ""}" data-i="${i}" aria-label="${i + 1}枚目"></button>`).join("");
+  const dots = Array.from(dotsEl.children);
+
+  function setActive(i) {
+    dots.forEach((d, di) => d.classList.toggle("active", di === i));
+  }
+  dots.forEach((d) => {
+    d.addEventListener("click", () => {
+      const i = Number(d.dataset.i);
+      slides[i].scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+    });
+  });
+  track.addEventListener(
+    "scroll",
+    () => {
+      const i = Math.round(track.scrollLeft / track.clientWidth);
+      setActive(Math.min(i, slides.length - 1));
+    },
+    { passive: true }
+  );
+
+  let auto = setInterval(() => {
+    const next = (Math.round(track.scrollLeft / track.clientWidth) + 1) % slides.length;
+    slides[next].scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+  }, 5000);
+  track.addEventListener("pointerdown", () => clearInterval(auto), { once: true });
+}
+
+function initSearch() {
+  const input = document.getElementById("search-input");
+  let timer;
+  input.addEventListener("input", () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      searchQuery = input.value.trim().toLowerCase();
+      renderFarmerList();
+      renderItems();
+    }, 150);
+  });
+}
+
 initNav("/");
 initBottomNav("/");
+initBannerCarousel();
+initSearch();
 loadFarmers();
-loadItems();
+loadListings();
 loadEventsWidget();
 loadJobsWidget();
 </script>

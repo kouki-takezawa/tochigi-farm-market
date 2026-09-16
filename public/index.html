@@ -6,19 +6,26 @@
 <title>栃木の直売マルシェ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Yuji+Syuku&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
 <header class="app-header hero">
   <p class="eyebrow">栃木県内限定・産地直送</p>
-  <p class="app-title">畑から、まっすぐ食卓へ。</p>
-  <p class="app-tagline">顔の見える農家から、<br />とれたて野菜と地域のイベントを。</p>
+  <p class="brand-logotype">栃木の直売マルシェ</p>
+  <p class="app-tagline">畑から、まっすぐ食卓へ。</p>
   <div class="view-toggle">
     <button id="tab-list" class="active">リスト</button>
     <a href="/map.html" class="btn" style="flex:1;text-align:center;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.6);text-decoration:none;">マップ</a>
   </div>
 </header>
+<div class="hills-divider" aria-hidden="true">
+  <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
+    <path d="M0,55 C220,15 420,85 700,45 C980,5 1230,75 1440,35 L1440,100 L0,100 Z" fill="#cfe3c8"/>
+    <path d="M0,72 C260,38 520,98 800,62 C1060,30 1300,88 1440,58 L1440,100 L0,100 Z" fill="#a9cf9e"/>
+    <path d="M0,88 C300,64 600,100 900,80 C1150,62 1300,95 1440,78 L1440,100 L0,100 Z" fill="#3f8a4c"/>
+  </svg>
+</div>
 
 <section class="intro-section">
   <img class="intro-image" src="/images/rice-terrace-01.jpg" loading="lazy" alt="栃木の田園風景" />
@@ -68,14 +75,24 @@
   </main>
 </section>
 
-<p class="footer-note">出品・イベントの投稿・閲覧はすべて無料です。購入・お申し込みは各農家と直接やり取りしてください。</p>
-<p class="photo-credits">
-  写真:
-  <a href="https://commons.wikimedia.org/wiki/File:A_woven_basket_filled_with_an_assortment_of_colorful_vegetables.jpg" target="_blank" rel="noopener">Shixart1985</a>,
-  <a href="https://commons.wikimedia.org/wiki/File:Rice_Terrace,_Sanazawanomori.jpg" target="_blank" rel="noopener">Minakami Town</a>,
-  <a href="https://commons.wikimedia.org/wiki/File:Tomatoes_in_basket_2020_G1.jpg" target="_blank" rel="noopener">George Chernilevsky</a>
-  (Wikimedia Commons, CC BY / CC BY-SA / Public Domain)
-</p>
+<div class="hills-divider flip" aria-hidden="true">
+  <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
+    <path d="M0,88 C300,64 600,100 900,80 C1150,62 1300,95 1440,78 L1440,100 L0,100 Z" fill="#ffffff"/>
+    <path d="M0,72 C260,38 520,98 800,62 C1060,30 1300,88 1440,58 L1440,100 L0,100 Z" fill="#e7f0d9"/>
+    <path d="M0,55 C220,15 420,85 700,45 C980,5 1230,75 1440,35 L1440,100 L0,100 Z" fill="#f6efd6"/>
+  </svg>
+</div>
+<footer class="brand-footer">
+  <p class="brand-logotype small">栃木の直売マルシェ</p>
+  <p class="footer-note">出品・イベントの投稿・閲覧はすべて無料です。購入・お申し込みは各農家と直接やり取りしてください。</p>
+  <p class="photo-credits">
+    写真:
+    <a href="https://commons.wikimedia.org/wiki/File:A_woven_basket_filled_with_an_assortment_of_colorful_vegetables.jpg" target="_blank" rel="noopener">Shixart1985</a>,
+    <a href="https://commons.wikimedia.org/wiki/File:Rice_Terrace,_Sanazawanomori.jpg" target="_blank" rel="noopener">Minakami Town</a>,
+    <a href="https://commons.wikimedia.org/wiki/File:Tomatoes_in_basket_2020_G1.jpg" target="_blank" rel="noopener">George Chernilevsky</a>
+    (Wikimedia Commons, CC BY / CC BY-SA / Public Domain)
+  </p>
+</footer>
 
 <script src="/common.js"></script>
 <script>

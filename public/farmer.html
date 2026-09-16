@@ -30,7 +30,7 @@ async function load() {
   }
 }
 
-function render({ farmer, listings, events }) {
+function render({ farmer, listings, events, jobs }) {
   const page = document.getElementById("page");
   document.title = `${farmer.name} | 栃木の直売マルシェ`;
 
@@ -73,7 +73,24 @@ function render({ farmer, listings, events }) {
       ${laborEvents.map(renderEvent).join("")}
     </section>` : ""}
 
+    ${jobs && jobs.length ? `
+    <section class="section">
+      <h2>バイト・求人</h2>
+      ${jobs.map(renderJob).join("")}
+    </section>` : ""}
+
     <p class="footer-note">購入・お申し込みは上記の連絡先から農家に直接ご連絡ください。決済や仲介はサービス側では行いません。</p>
+  `;
+}
+
+function renderJob(j) {
+  return `
+    <div class="job-card" style="margin-bottom:10px;">
+      <p class="job-title">${escapeHtml(j.title)}</p>
+      <p class="job-wage">${escapeHtml(j.wage)}</p>
+      <p class="job-meta">${j.work_date ? escapeHtml(j.work_date) : ""}${j.work_hours ? " ・ " + escapeHtml(j.work_hours) : ""}${j.capacity ? " ・ 募集" + escapeHtml(j.capacity) : ""}</p>
+      ${j.description ? `<p class="job-desc">${escapeHtml(j.description)}</p>` : ""}
+    </div>
   `;
 }
 

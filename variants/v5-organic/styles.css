@@ -32,37 +32,83 @@ img { max-width: 100%; }
 
 .hero {
   position: relative;
-  min-height: 92vh;
-  display: flex;
-  align-items: flex-end;
-  background:
-    linear-gradient(0deg, rgba(74,56,38,0.75) 0%, rgba(74,56,38,0.1) 50%),
-    url("/images/hero-vegetables-01.jpg") center 42%/cover no-repeat;
-  padding: 36px 22px 44px;
+  background: var(--card-bg);
+  padding: 64px 22px 56px;
 }
 
-.hero-inner { width: 100%; color: #fdf6e8; }
+.hero-inner {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+.hero-visual {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.hero-photo {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 380px;
+  width: 100%;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: 0 14px 30px rgba(74,56,38,0.12);
+}
+
+/* Tentenを参考にした縦書きの一言。装飾要素なのでスクリーンリーダーからは隠す */
+.hero-vertical {
+  flex: none;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: "Shippori Mincho", serif;
+  font-size: clamp(14px, 3.4vw, 20px);
+  letter-spacing: 0.2em;
+  line-height: 2;
+  color: var(--terracotta);
+  margin: 6px 2px;
+  opacity: 0.9;
+}
+
+.hero-copy { text-align: center; max-width: 480px; }
+
+.leaf-icon { font-size: 12px; margin-right: 6px; opacity: 0.75; filter: saturate(0.6); }
 
 .kicker {
   font-size: 12px;
   letter-spacing: 0.18em;
-  color: var(--mustard);
+  color: var(--sage);
   font-weight: 700;
   margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .headline {
   font-family: "Shippori Mincho", serif;
-  font-size: 34px;
+  font-size: 30px;
   font-weight: 700;
-  line-height: 1.45;
+  line-height: 1.55;
   margin: 0;
+  color: var(--ink);
   text-wrap: pretty;
 }
 
 .sub {
   font-size: 13px;
-  color: #e8dcc7;
+  color: var(--muted);
   margin: 16px 0 0;
 }
 
@@ -76,8 +122,34 @@ img { max-width: 100%; }
   text-decoration: none;
   font-weight: 700;
   font-size: 14px;
-  box-shadow: 0 8px 20px rgba(192,96,58,0.4);
+  box-shadow: 0 8px 18px rgba(192,96,58,0.22);
 }
+
+@media (min-width: 720px) {
+  .hero-inner { flex-direction: row; align-items: center; text-align: left; gap: 56px; }
+  .hero-visual { width: 52%; }
+  .hero-copy { text-align: left; max-width: none; }
+  .kicker { justify-content: flex-start; }
+}
+
+/* 葉っぱのモチーフをセクションの区切りに控えめに使う */
+.leaf-divider {
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.55;
+  filter: saturate(0.6);
+  padding: 22px 0 0;
+}
+
+/* アンダーライン型のリンク(控えめな二次リンク用) */
+.link-underline {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1px;
+  transition: border-color 0.15s, border-bottom-width 0.15s;
+}
+.link-underline:hover { border-bottom: 2px solid var(--terracotta); }
 
 .intro { padding: 40px 22px; text-align: center; }
 .intro-text {
@@ -220,6 +292,25 @@ section.section h2 { font-family: "Shippori Mincho", serif; font-size: 16px; mar
 .badge.special { background: #f6ddc4; color: var(--terracotta); }
 .badge.labor { background: #dfe9dc; color: var(--sage); }
 
+/* バイト・求人カード */
+.job-card {
+  display: block;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  text-decoration: none;
+  color: inherit;
+  text-align: left;
+  box-shadow: 0 6px 16px rgba(74,56,38,0.06);
+}
+.job-title { font-weight: 700; font-size: 15px; margin: 0 0 6px; }
+.job-wage { font-weight: 700; font-size: 16px; color: var(--terracotta); margin: 0 0 6px; }
+.job-meta { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+.job-desc { font-size: 13px; margin: 0 0 10px; }
+.job-farmer { font-size: 12px; color: var(--muted); margin: 0; }
+
 /* フォーム(post.html / admin.html / seller.html) */
 form.stack { display: flex; flex-direction: column; gap: 14px; }
 label { font-size: 13px; font-weight: 700; display: block; margin-bottom: 5px; }
@@ -264,6 +355,13 @@ textarea { min-height: 80px; resize: vertical; }
   top: 12px;
   right: 12px;
   background: rgba(74,56,38,0.55);
+}
+/* heroは明るい背景になったため、ハンバーガーボタンをインク色で視認性を確保する */
+.hero .hamburger-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  box-shadow: 0 4px 10px rgba(74,56,38,0.14);
 }
 .nav-overlay {
   position: fixed; inset: 0; background: rgba(74,56,38,0.4);

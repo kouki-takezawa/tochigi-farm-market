@@ -14,7 +14,11 @@ export const onRequestGet: PagesFunction<Env> = async ({ params, env }) => {
   if (farmerError) return serverError(farmerError.message);
   if (!farmer) return notFound("農家が見つかりません");
 
-  const [{ data: listings, error: listingsError }, { data: events, error: eventsError }] = await Promise.all([
+  const [
+    { data: listings, error: listingsError },
+    { data: events, error: eventsError },
+    { data: jobs, error: jobsError },
+  ] = await Promise.all([
     supabase
       .from("listings")
       .select("id, image_url, title, comment, price, is_special, created_at")
@@ -25,12 +29,18 @@ export const onRequestGet: PagesFunction<Env> = async ({ params, env }) => {
       .select("id, kind, title, event_date, event_time, location, description, fee, created_at")
       .eq("farmer_id", id)
       .order("event_date", { ascending: true }),
+    supabase
+      .from("jobs")
+      .select("id, title, wage, work_date, work_hours, capacity, description, created_at")
+      .eq("farmer_id", id)
+      .order("created_at", { ascending: false }),
   ]);
 
   if (listingsError) return serverError(listingsError.message);
   if (eventsError) return serverError(eventsError.message);
+  if (jobsError) return serverError(jobsError.message);
 
-  return json({ farmer, listings: listings ?? [], events: events ?? [] });
+  return json({ farmer, listings: listings ?? [], events: events ?? [], jobs: jobs ?? [] });
 };
 
 // PUT /api/farmers/:id -> プロフィール編集(要 manage_token)

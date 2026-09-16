@@ -14,8 +14,11 @@
   <a href="/" class="top-nav-brand">栃木の直売マルシェ</a>
   <div class="top-nav-links">
     <a href="/">農家一覧</a>
+    <a href="/listings.html">出品一覧</a>
+    <a href="/events.html">イベント一覧</a>
+    <a href="/jobs.html">バイト・求人</a>
     <a href="/map.html">マップ</a>
-    <a href="/seller.html">出品者ログイン</a>
+    <a href="/seller.html" class="nav-pill">出品者ログイン</a>
   </div>
 </nav>
 
@@ -42,7 +45,7 @@ async function load() {
   }
 }
 
-function render({ farmer, listings, events }) {
+function render({ farmer, listings, events, jobs }) {
   const page = document.getElementById("page");
   document.title = `${farmer.name} | 栃木の直売マルシェ`;
 
@@ -84,7 +87,24 @@ function render({ farmer, listings, events }) {
       ${laborEvents.map(renderEvent).join("")}
     </section>` : ""}
 
+    ${jobs && jobs.length ? `
+    <section class="section">
+      <h2>バイト・求人</h2>
+      ${jobs.map(renderJob).join("")}
+    </section>` : ""}
+
     <p class="footer-note" style="text-align:center;font-size:12px;color:var(--muted);padding:24px 20px;">購入・お申し込みは上記の連絡先から農家に直接ご連絡ください。決済や仲介はサービス側では行いません。</p>
+  `;
+}
+
+function renderJob(j) {
+  return `
+    <div class="job-card" style="margin-bottom:10px;border:none;border-bottom:1px dashed var(--border);border-radius:0;padding:0 0 16px;">
+      <p class="job-title">${escapeHtml(j.title)}</p>
+      <p class="job-wage">${escapeHtml(j.wage)}</p>
+      <p class="job-meta">${j.work_date ? escapeHtml(j.work_date) : ""}${j.work_hours ? " ・ " + escapeHtml(j.work_hours) : ""}${j.capacity ? " ・ 募集" + escapeHtml(j.capacity) : ""}</p>
+      ${j.description ? `<p class="job-desc">${escapeHtml(j.description)}</p>` : ""}
+    </div>
   `;
 }
 

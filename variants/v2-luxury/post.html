@@ -14,8 +14,11 @@
   <a href="/" class="top-nav-brand">栃木の直売マルシェ</a>
   <div class="top-nav-links">
     <a href="/">農家一覧</a>
+    <a href="/listings.html">出品一覧</a>
+    <a href="/events.html">イベント一覧</a>
+    <a href="/jobs.html">バイト・求人</a>
     <a href="/map.html">マップ</a>
-    <a href="/seller.html">出品者ログイン</a>
+    <a href="/seller.html" class="nav-pill">出品者ログイン</a>
   </div>
 </nav>
 
@@ -34,7 +37,7 @@ const params = new URLSearchParams(location.search);
 const farmerId = params.get("farmer");
 const token = params.get("token");
 
-let state = { farmer: null, listings: [], events: [] };
+let state = { farmer: null, listings: [], events: [], jobs: [] };
 
 async function load() {
   const page = document.getElementById("page");
@@ -165,6 +168,43 @@ function renderAll() {
       <div id="event-list">${state.events.length ? state.events.map(renderEventRow).join("") : `<p class="empty-state">まだ登録がありません。</p>`}</div>
     </div>
 
+    <div class="card">
+      <h3>バイト・求人を追加</h3>
+      <p style="font-size:13px;color:var(--muted);margin-top:-6px;">給与が明確な正式な求人はこちら。単発の手伝い依頼は上の「イベント・人手募集」をご利用ください。</p>
+      <form id="job-form" class="stack">
+        <div>
+          <label>タイトル</label>
+          <input type="text" name="title" required placeholder="例: いちご収穫スタッフ募集" />
+        </div>
+        <div>
+          <label>給与</label>
+          <input type="text" name="wage" required placeholder="例: 時給1200円 / 日給8000円" />
+        </div>
+        <div>
+          <label>勤務日(任意)</label>
+          <input type="text" name="work_date" placeholder="例: 10/1〜10/15の間で応相談" />
+        </div>
+        <div>
+          <label>勤務時間(任意)</label>
+          <input type="text" name="work_hours" placeholder="例: 9:00〜15:00" />
+        </div>
+        <div>
+          <label>募集人数(任意)</label>
+          <input type="text" name="capacity" placeholder="例: 2名" />
+        </div>
+        <div>
+          <label>仕事内容</label>
+          <textarea name="description" placeholder="例: いちごの収穫・パック詰め作業です。未経験歓迎。"></textarea>
+        </div>
+        <button type="submit" class="btn primary block">求人を登録する</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>登録済みバイト・求人</h3>
+      <div id="job-list">${state.jobs.length ? state.jobs.map(renderJobRow).join("") : `<p class="empty-state">まだ登録がありません。</p>`}</div>
+    </div>
+
     <p style="text-align:center;font-size:13px;padding:16px 0 32px;"><a href="/farmer.html?id=${encodeURIComponent(farmerId)}">公開ページを見る →</a></p>
   `;
 
@@ -200,16 +240,35 @@ function renderEventRow(e) {
   `;
 }
 
+function renderJobRow(j) {
+  return `
+    <div class="item-row" data-id="${j.id}">
+      <div>
+        <p style="font-weight:700;margin:0;">${escapeHtml(j.title)}</p>
+        <p style="font-size:13px;color:var(--accent);font-weight:700;margin:2px 0;">${escapeHtml(j.wage)}</p>
+        <p style="font-size:13px;color:var(--muted);margin:0;">${j.work_date ? escapeHtml(j.work_date) : ""}${j.work_hours ? " ・ " + escapeHtml(j.work_hours) : ""}</p>
+      </div>
+      <div class="actions">
+        <button class="btn secondary" data-action="delete-job" data-id="${j.id}">削除</button>
+      </div>
+    </div>
+  `;
+}
+
 function bindEvents() {
   document.getElementById("profile-form").addEventListener("submit", onProfileSubmit);
   document.getElementById("listing-form").addEventListener("submit", onListingSubmit);
   document.getElementById("event-form").addEventListener("submit", onEventSubmit);
+  document.getElementById("job-form").addEventListener("submit", onJobSubmit);
 
   document.querySelectorAll('[data-action="delete-listing"]').forEach((btn) => {
     btn.addEventListener("click", () => onDeleteListing(btn.dataset.id));
   });
   document.querySelectorAll('[data-action="delete-event"]').forEach((btn) => {
     btn.addEventListener("click", () => onDeleteEvent(btn.dataset.id));
+  });
+  document.querySelectorAll('[data-action="delete-job"]').forEach((btn) => {
+    btn.addEventListener("click", () => onDeleteJob(btn.dataset.id));
   });
 
   const coverInput = document.querySelector('input[name="cover_image"]');
@@ -334,6 +393,48 @@ async function onDeleteEvent(id) {
   if (!confirm("この予定を削除しますか？")) return;
   try {
     await apiFetch(`/api/farmers/${encodeURIComponent(farmerId)}/events/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      headers: { "x-manage-token": token },
+    });
+    showToast("削除しました");
+    await load();
+  } catch (e) {
+    showToast(e.message);
+  }
+}
+
+async function onJobSubmit(ev) {
+  ev.preventDefault();
+  const form = ev.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  try {
+    const fd = new FormData(form);
+    await apiFetch(`/api/farmers/${encodeURIComponent(farmerId)}/jobs`, {
+      method: "POST",
+      headers: { "x-manage-token": token },
+      body: JSON.stringify({
+        title: fd.get("title"),
+        wage: fd.get("wage"),
+        work_date: fd.get("work_date") || "",
+        work_hours: fd.get("work_hours") || null,
+        capacity: fd.get("capacity") || null,
+        description: fd.get("description") || "",
+      }),
+    });
+    showToast("求人を登録しました");
+    await load();
+  } catch (e) {
+    showToast(e.message);
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
+async function onDeleteJob(id) {
+  if (!confirm("この求人を削除しますか？")) return;
+  try {
+    await apiFetch(`/api/farmers/${encodeURIComponent(farmerId)}/jobs/${encodeURIComponent(id)}`, {
       method: "DELETE",
       headers: { "x-manage-token": token },
     });

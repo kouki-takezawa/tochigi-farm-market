@@ -41,8 +41,23 @@ create table if not exists events (
   created_at bigint not null
 );
 
+-- バイト・求人募集(events.kind='labor'の単発手伝いとは別に、給与を明示した正式な求人を扱う)
+create table if not exists jobs (
+  id text primary key,
+  farmer_id text not null references farmers(id) on delete cascade,
+  title text not null,
+  wage text not null,
+  work_date text not null default '',
+  work_hours text,
+  capacity text,
+  description text not null default '',
+  created_at bigint not null
+);
+
 create index if not exists idx_listings_farmer on listings(farmer_id, created_at desc);
 create index if not exists idx_events_farmer on events(farmer_id, event_date);
+create index if not exists idx_jobs_farmer on jobs(farmer_id, created_at desc);
+create index if not exists idx_jobs_created on jobs(created_at desc);
 create index if not exists idx_farmers_municipality on farmers(municipality);
 create index if not exists idx_farmers_updated on farmers(updated_at desc);
 
@@ -54,7 +69,9 @@ create index if not exists idx_farmers_updated on farmers(updated_at desc);
 alter table farmers enable row level security;
 alter table listings enable row level security;
 alter table events enable row level security;
+alter table jobs enable row level security;
 
 create policy "Public read farmers" on farmers for select to anon, authenticated using (true);
 create policy "Public read listings" on listings for select to anon, authenticated using (true);
 create policy "Public read events" on events for select to anon, authenticated using (true);
+create policy "Public read jobs" on jobs for select to anon, authenticated using (true);

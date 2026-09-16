@@ -30,53 +30,83 @@ img { max-width: 100%; }
 
 .hero {
   position: relative;
-  min-height: 92vh;
-  display: flex;
-  align-items: flex-end;
-  background:
-    linear-gradient(0deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 50%),
-    url("/images/hero-vegetables-01.jpg") center 42%/cover no-repeat;
-  padding: 32px;
+  background: var(--bg);
+  padding: 40px 32px;
   border-bottom: 3px solid var(--ink);
 }
 
-.hero-inner { width: 100%; color: #fff; }
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+@media (min-width: 860px) {
+  .hero-grid { grid-template-columns: 1.15fr 0.85fr; align-items: center; gap: 48px; }
+}
+
+.hero-text { color: var(--ink); min-width: 0; }
 
 .kicker {
   font-family: "Roboto Mono", monospace;
   font-size: 12px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   color: var(--accent);
-  margin: 0 0 14px;
+  margin: 0 0 18px;
 }
 
 .headline {
-  font-size: 38px;
+  font-size: 42px;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
   margin: 0;
-  max-width: 480px;
+  color: var(--ink);
   text-wrap: pretty;
 }
+@media (min-width: 480px) { .headline { font-size: 54px; } }
+@media (min-width: 860px) { .headline { font-size: 72px; } }
+@media (min-width: 1100px) { .headline { font-size: 88px; } }
 
 .sub {
   font-family: "Roboto Mono", monospace;
   font-size: 12px;
-  color: #ddd;
-  margin: 18px 0 0;
+  color: var(--muted);
+  margin: 22px 0 0;
 }
 
 .cta {
   display: inline-block;
-  margin-top: 26px;
+  margin-top: 28px;
   padding: 12px 24px;
-  border: 1px solid #fff;
-  color: #fff;
+  border: 1px solid var(--ink);
+  color: var(--ink);
   text-decoration: none;
   font-family: "Roboto Mono", monospace;
   font-size: 13px;
 }
-.cta:hover { background: #fff; color: var(--ink); }
+.cta:hover { background: var(--ink); color: #fff; }
+
+.hero-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  border: 3px solid var(--ink);
+  padding: 8px;
+  max-width: 100%;
+}
+.hero-photo {
+  aspect-ratio: 1 / 1;
+  background-image: url("/images/hero-vegetables-01.jpg");
+  background-size: cover;
+  border: 1px solid var(--border);
+  min-width: 0;
+}
+.hero-photo-1 { background-position: 15% 25%; }
+.hero-photo-2 { background-position: 75% 45%; aspect-ratio: 1 / 1.35; align-self: end; }
+.hero-photo-3 { background-position: 40% 85%; aspect-ratio: 1 / 1.35; }
+.hero-photo-4 { background-position: 90% 15%; }
 
 .intro {
   padding: 32px;
@@ -200,7 +230,7 @@ img { max-width: 100%; }
   row-gap: 6px;
 }
 .top-nav-brand { font-size: 13px; font-weight: 700; text-decoration: none; letter-spacing: 0.04em; white-space: nowrap; }
-.top-nav-links { display: flex; flex-wrap: nowrap; }
+.top-nav-links { display: flex; flex-wrap: wrap; row-gap: 4px; }
 .top-nav-links a {
   font-size: 11px; text-decoration: none; color: var(--ink);
   padding: 6px 10px; border-left: 1px solid var(--border);
@@ -256,6 +286,15 @@ section.section h2 { font-size: 15px; font-weight: 700; margin: 0 0 14px; }
 .event-card .sub { font-family: "Roboto Mono", monospace; font-size: 11px; color: var(--muted); margin: 2px 0; }
 
 .badge.special, .badge.labor { color: var(--accent); border-color: var(--accent); }
+
+/* バイト・求人カード */
+.job-card { border: 1px solid var(--border); padding: 16px; margin-bottom: 12px; }
+.job-card:last-child { margin-bottom: 0; }
+.job-title { font-weight: 700; font-size: 14px; margin: 0 0 4px; }
+.job-wage { font-family: "Roboto Mono", monospace; font-weight: 700; font-size: 14px; color: var(--accent); margin: 0 0 4px; }
+.job-meta { font-family: "Roboto Mono", monospace; font-size: 11px; color: var(--muted); margin: 0 0 6px; }
+.job-desc { font-size: 13px; margin: 0 0 6px; }
+.job-farmer { font-family: "Roboto Mono", monospace; font-size: 11px; color: var(--muted); margin: 0; }
 
 /* フォーム(post.html / admin.html / seller.html) */
 form.stack { display: flex; flex-direction: column; gap: 14px; }

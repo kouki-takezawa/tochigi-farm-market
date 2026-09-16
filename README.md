@@ -2,6 +2,32 @@
 
 栃木県内限定・顔の見える直売マルシェ。仕様全文は [SPEC.md](./SPEC.md) を参照。
 
+## デプロイ済みURL
+
+- **本体サイト**: https://tochigi-farm-market.pages.dev
+
+デザイン比較用バリアント(本体と同じSupabaseバックエンドを見ているので、すべて実データで動作する。
+詳細・各ページ構成・片付け方は [variants/README.md](./variants/README.md) を参照):
+
+| バリアント | 参考にしたデザイン | URL |
+|---|---|---|
+| v2-luxury | takenaka-foodware.jp 風(ダーク全面写真ヒーロー・常時スティッキーナビ) | https://tochigi-marche-luxury.pages.dev |
+| v3-mono | tosou.nishizaki.co.jp 風(黒の極太見出し・実写コラージュグリッド) | https://tochigi-marche-mono.pages.dev |
+| v5-organic | tenten.fun 風(縦書きコピー・余白多め・ハンバーガーメニュー) | https://tochigi-marche-organic.pages.dev |
+
+Cloudflareプロジェクト名はそれぞれ `tochigi-farm-market` / `tochigi-marche-luxury` / `tochigi-marche-mono` / `tochigi-marche-organic`。
+再デプロイはリポジトリ直下から以下のコマンド(`npx wrangler pages deploy <ディレクトリ> --project-name <プロジェクト名>`)。
+
+```bash
+npx wrangler pages deploy public --project-name tochigi-farm-market
+npx wrangler pages deploy variants/v2-luxury --project-name tochigi-marche-luxury
+npx wrangler pages deploy variants/v3-mono --project-name tochigi-marche-mono
+npx wrangler pages deploy variants/v5-organic --project-name tochigi-marche-organic
+```
+
+`functions/` はリポジトリ直下(カレントディレクトリ)から自動検出されてバンドルされるため、
+上記はすべてリポジトリのルートで実行すること(`variants/vX-yyy` の中に入って実行しない)。
+
 ## 構成
 
 - **フロントエンド**: ビルド不要の素のHTML/CSS/JS (`public/`)
@@ -11,14 +37,17 @@
 - **ホスティング**: Cloudflare Pages
 - **稼働維持**: GitHub Actionsが3日おきにSupabaseへ軽いクエリを送り、無料プランの自動一時停止(7日間無アクセスでpause)を防止
 
-## MVP範囲
+## 実装範囲
 
 - 農家一覧(市町村タブ絞り込み、更新が新しい順)
-- 農家ページ(出品・イベント表示、LINE/電話への連絡導線)
-- 農家向け投稿・編集画面(出品・イベント・人手募集)
-- 運営者向け管理画面 (`/admin.html`): 農家登録と管理URLの発行
+- 農家ページ(出品・イベント・バイト求人表示、LINE/電話への連絡導線)
+- 農家向け投稿・編集画面(出品・イベント・人手募集・バイト求人)
+- 運営者向け管理画面 (`/admin.html`): 農家登録と管理URLの発行、位置(緯度経度)修正
+- 出品者ログイン (`/seller.html`, PIN方式の仮実装)
+- マップ表示 (`/map.html`, Leaflet + 現在地からの近い順)
+- 全農家横断の一覧: 出品一覧 (`/listings.html`)・イベント一覧 (`/events.html`)・バイト求人一覧 (`/jobs.html`)
 
-農家には認証機能を作らず、代わりに「農家ID + 秘密トークン」を含む管理URL(`/post.html?farmer=...&token=...`)を運営者が発行してLINE等で送る方式にしている(仕様の「知り合いベースで直売」というビジネスモデルに合わせ、登録は運営者が代行する前提)。マップ表示・出品/イベントの横断一覧はMVP後の拡張として未実装。
+農家には認証機能を作らず、代わりに「農家ID + 秘密トークン」を含む管理URL(`/post.html?farmer=...&token=...`)を運営者が発行してLINE等で送る方式にしている(仕様の「知り合いベースで直売」というビジネスモデルに合わせ、登録は運営者が代行する前提)。
 
 ## セットアップ手順
 
@@ -26,6 +55,7 @@
 
 1. https://supabase.com でプロジェクトを新規作成(東京リージョン推奨)
 2. SQL Editorで [`supabase_schema.sql`](./supabase_schema.sql) の内容を実行
+   (既存プロジェクトを流用していて `jobs` テーブルが無い場合は [`supabase_migration_002_jobs.sql`](./supabase_migration_002_jobs.sql) も実行)
 3. 動作確認したい場合は [`seed.sql`](./seed.sql) も実行(デモ用データ。本番では削除してよい)
 4. Project Settings > API から以下を控える
    - `Project URL` → `SUPABASE_URL`

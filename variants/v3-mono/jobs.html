@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>求人一覧 | 栃木の直売マルシェ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<nav class="top-nav">
+  <a href="/" class="top-nav-brand">TOCHIGI MARCHE</a>
+  <div class="top-nav-links">
+    <a href="/">INDEX</a>
+    <a href="/listings.html">出品</a>
+    <a href="/events.html">イベント</a>
+    <a href="/jobs.html" class="active">求人</a>
+    <a href="/map.html">MAP</a>
+    <a href="/seller.html">LOGIN</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>バイト・求人一覧</h1>
+  <p>県内の農家が募集しているアルバイト・お手伝いを新着順に</p>
+</div>
+
+<main class="container" id="content">
+  <div class="loading">読み込み中...</div>
+</main>
+
+<script src="/common.js"></script>
+<script>
+async function load() {
+  const content = document.getElementById("content");
+  try {
+    const data = await apiFetch("/api/jobs");
+    render(data.jobs || []);
+  } catch (e) {
+    content.innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function render(jobs) {
+  const content = document.getElementById("content");
+  if (!jobs.length) {
+    content.innerHTML = `<div class="empty-state">募集中のバイト・求人はまだありません。</div>`;
+    return;
+  }
+  content.innerHTML = jobs.map(renderCard).join("");
+}
+
+function renderCard(j) {
+  return `
+    <a href="/farmer.html?id=${encodeURIComponent(j.farmer_id)}" class="job-card" style="display:block;text-decoration:none;color:inherit;">
+      <p class="job-title">${escapeHtml(j.title)}</p>
+      <p class="job-wage">${escapeHtml(j.wage)}</p>
+      <p class="job-meta">${j.work_date ? escapeHtml(j.work_date) : ""}${j.work_hours ? " ・ " + escapeHtml(j.work_hours) : ""}${j.capacity ? " ・ 募集" + escapeHtml(j.capacity) : ""}</p>
+      ${j.description ? `<p class="job-desc">${escapeHtml(j.description)}</p>` : ""}
+      <p class="job-farmer">🌾 ${escapeHtml(j.farmer_name)}(${escapeHtml(j.farmer_municipality)})</p>
+    </a>
+  `;
+}
+
+load();
+</script>
+</body>
+</html>

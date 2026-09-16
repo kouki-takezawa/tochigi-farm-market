@@ -14,6 +14,8 @@
 
 * { box-sizing: border-box; }
 
+html { scroll-behavior: smooth; }
+
 body {
   margin: 0;
   padding: 0;
@@ -72,6 +74,53 @@ header.app-header.hero .app-tagline {
 
 header.app-header.hero .hamburger-btn {
   background: rgba(0,0,0,0.35);
+}
+
+/* ヒーローはブランド表現に専念させ、機能の切り替え(リスト/マップ)は
+   置かない。ヒーローには「下にスクロールして本編へ」を促すCTAのみ置く */
+.hero-cta {
+  align-self: flex-start;
+  margin-top: 18px;
+  background: #fdf6e3;
+  color: var(--green-dark);
+  border-radius: 999px;
+  padding: 13px 26px;
+}
+
+.hero-cta:hover { background: #fff; }
+
+.hero-cta span {
+  display: inline-block;
+  animation: hero-cta-bounce 1.6s ease-in-out infinite;
+}
+
+@keyframes hero-cta-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+
+/* リスト/マップの切り替えは、実際にリストを表示するFARMERSセクション側に
+   置く。下線タブのような控えめな見た目にして、ヒーローの機能ボタンめいた
+   印象を避ける */
+.view-switch {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin: 2px 0 18px;
+}
+
+.view-switch-item {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  text-decoration: none;
+  padding-bottom: 6px;
+  border-bottom: 2px solid transparent;
+}
+
+.view-switch-item.active {
+  color: var(--green-dark);
+  border-bottom-color: var(--green);
 }
 
 /* ブランドロゴタイプ(筆文字調)。渋温泉サイトの「渋温泉」大書きロゴを参考に、
@@ -251,6 +300,7 @@ header.app-header.hero .hamburger-btn {
 .listing-section {
   padding: 36px 0 0;
   background: var(--card-bg);
+  scroll-margin-top: 16px;
 }
 
 .listing-section .tabs {

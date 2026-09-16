@@ -14,10 +14,7 @@
   <p class="eyebrow">栃木県内限定・産地直送</p>
   <p class="brand-logotype">栃木の直売マルシェ</p>
   <p class="app-tagline">畑から、まっすぐ食卓へ。</p>
-  <div class="view-toggle">
-    <button id="tab-list" class="active">リスト</button>
-    <a href="/map.html" class="btn" style="flex:1;text-align:center;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.6);text-decoration:none;">マップ</a>
-  </div>
+  <a href="#farmers" class="btn hero-cta">産直情報を見る<span aria-hidden="true"> ↓</span></a>
 </header>
 <div class="hills-divider" aria-hidden="true">
   <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
@@ -64,9 +61,13 @@
   </div>
 </section>
 
-<section class="listing-section">
+<section class="listing-section" id="farmers">
   <span class="section-eyebrow center">FARMERS</span>
   <h2 class="section-title center">掲載中の農家</h2>
+  <div class="view-switch">
+    <span class="view-switch-item active">一覧</span>
+    <a href="/map.html" class="view-switch-item">地図</a>
+  </div>
 
   <div class="tabs" id="municipality-tabs"></div>
 

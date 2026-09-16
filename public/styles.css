@@ -875,17 +875,13 @@ header.app-header.appbar .app-title {
 /* バナーカルーセル: scroll-snapで実装(JSのタッチ処理を書かずにスワイプ対応) */
 .banner-carousel { position: relative; padding-top: 14px; }
 .banner-track {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-}
-.banner-track::-webkit-scrollbar { display: none; }
-.banner-slide {
-  flex: none;
-  width: 100%;
-  scroll-snap-align: start;
+  position: relative;
   aspect-ratio: 16/7;
+  overflow: hidden;
+}
+.banner-slide {
+  position: absolute;
+  inset: 0;
   background-position: center;
   background-size: cover;
   display: flex;
@@ -893,8 +889,11 @@ header.app-header.appbar .app-title {
   justify-content: flex-end;
   padding: 18px 20px;
   text-decoration: none;
-  position: relative;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.9s ease;
 }
+.banner-slide.active { opacity: 1; pointer-events: auto; }
 .banner-slide::before {
   content: "";
   position: absolute;

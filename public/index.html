@@ -305,29 +305,20 @@ function initBannerCarousel() {
   const slides = Array.from(track.children);
   dotsEl.innerHTML = slides.map((_, i) => `<button class="banner-dot ${i === 0 ? "active" : ""}" data-i="${i}" aria-label="${i + 1}枚目"></button>`).join("");
   const dots = Array.from(dotsEl.children);
+  let current = 0;
 
-  function setActive(i) {
-    dots.forEach((d, di) => d.classList.toggle("active", di === i));
+  function showSlide(i) {
+    current = (i + slides.length) % slides.length;
+    slides.forEach((s, si) => s.classList.toggle("active", si === current));
+    dots.forEach((d, di) => d.classList.toggle("active", di === current));
   }
-  dots.forEach((d) => {
-    d.addEventListener("click", () => {
-      const i = Number(d.dataset.i);
-      slides[i].scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
-    });
-  });
-  track.addEventListener(
-    "scroll",
-    () => {
-      const i = Math.round(track.scrollLeft / track.clientWidth);
-      setActive(Math.min(i, slides.length - 1));
-    },
-    { passive: true }
-  );
 
-  let auto = setInterval(() => {
-    const next = (Math.round(track.scrollLeft / track.clientWidth) + 1) % slides.length;
-    slides[next].scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
-  }, 5000);
+  dots.forEach((d) => {
+    d.addEventListener("click", () => showSlide(Number(d.dataset.i)));
+  });
+
+  showSlide(0);
+  let auto = setInterval(() => showSlide(current + 1), 5000);
   track.addEventListener("pointerdown", () => clearInterval(auto), { once: true });
 }
 

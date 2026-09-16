@@ -43,15 +43,21 @@
 <script src="/common.js"></script>
 <script>
 const TOCHIGI_CENTER = [36.5658, 139.8836]; // 栃木県庁付近
+const JAPAN_BOUNDS = L.latLngBounds([24, 122], [46, 154]); // 日本全域を覆う範囲。これより外にはパン/ズームアウトできないようにする
 let allFarmers = [];
 let map;
 let markers = [];
 let userLatLng = null;
 
 function initMap() {
-  map = L.map("map").setView(TOCHIGI_CENTER, 10);
+  map = L.map("map", {
+    minZoom: 5,
+    maxBounds: JAPAN_BOUNDS,
+    maxBoundsViscosity: 1.0, // 境界外へのドラッグを完全に止める
+  }).setView(TOCHIGI_CENTER, 10);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 18,
+    noWrap: true, // 世界地図が横に繰り返し表示されるのを防ぐ
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
 }

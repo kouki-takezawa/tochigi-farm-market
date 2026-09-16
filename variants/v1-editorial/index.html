@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>栃木の直売マルシェ | Editorial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<div class="variant-banner">デザイン案 1 / 6 - Editorial　<a href="https://tochigi-farm-market.pages.dev/">本体サイトに戻る</a></div>
+
+<header class="app-header hero">
+  <div class="hero-inner">
+    <p class="kicker">TOCHIGI DIRECT MARKET</p>
+    <h1 class="headline">畑から、<br />まっすぐ。</h1>
+    <p class="sub">栃木県内限定・産地直送マルシェ</p>
+    <a href="#farmers" class="cta">見る ↓</a>
+  </div>
+</header>
+
+<section class="intro">
+  <p class="intro-text">知り合いにだけ売っていた「とれたて」を、少しだけ遠くへ。<br />顔の見える農家から、栃木の野菜とイベント情報を。</p>
+</section>
+
+<section class="farmers" id="farmers">
+  <div class="farmers-head">
+    <span class="tag">No.001 — FARMERS</span>
+    <h2>掲載中の農家</h2>
+  </div>
+  <div class="tabs" id="municipality-tabs"></div>
+  <main id="content">
+    <div class="loading">読み込み中...</div>
+  </main>
+</section>
+
+<footer class="site-footer">
+  <p>出品・イベントの投稿・閲覧はすべて無料です。購入・お申し込みは各農家と直接やり取りしてください。</p>
+  <p class="credit">写真: <a href="https://commons.wikimedia.org/wiki/File:A_woven_basket_filled_with_an_assortment_of_colorful_vegetables.jpg" target="_blank" rel="noopener">Shixart1985</a> (CC BY 2.0, Wikimedia Commons)</p>
+</footer>
+
+<script src="/common.js"></script>
+<script>
+let allFarmers = [];
+let currentMunicipality = "";
+
+async function load() {
+  const content = document.getElementById("content");
+  try {
+    const data = await apiFetch("/api/farmers");
+    allFarmers = data.farmers || [];
+    renderTabs();
+    renderList();
+  } catch (e) {
+    content.innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function renderTabs() {
+  const tabsEl = document.getElementById("municipality-tabs");
+  const municipalities = Array.from(new Set(allFarmers.map((f) => f.municipality)));
+  const tabs = ["すべて", ...municipalities];
+  tabsEl.innerHTML = tabs
+    .map((m) => {
+      const value = m === "すべて" ? "" : m;
+      const active = value === currentMunicipality ? "active" : "";
+      return `<button class="tab ${active}" data-value="${escapeHtml(value)}">${escapeHtml(m)}</button>`;
+    })
+    .join("");
+  tabsEl.querySelectorAll(".tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      currentMunicipality = btn.dataset.value;
+      renderTabs();
+      renderList();
+    });
+  });
+}
+
+function renderList() {
+  const content = document.getElementById("content");
+  const filtered = currentMunicipality ? allFarmers.filter((f) => f.municipality === currentMunicipality) : allFarmers;
+  if (filtered.length === 0) {
+    content.innerHTML = `<div class="empty-state">この地域の登録農家はまだありません。</div>`;
+    return;
+  }
+  content.innerHTML = `<div class="farmer-grid">${filtered.map(renderCard).join("")}</div>`;
+}
+
+function renderCard(f) {
+  const thumbStyle = f.cover_image_url ? `style="background-image:url('${escapeHtml(f.cover_image_url)}')"` : "";
+  const badges = [];
+  if (f.has_listing_today) badges.push(`<span class="badge">本日出品あり</span>`);
+  if (f.next_event_date) badges.push(`<span class="badge event">${formatDateShort(f.next_event_date)} イベント</span>`);
+  return `
+    <a class="farmer-card" href="https://tochigi-farm-market.pages.dev/farmer.html?id=${encodeURIComponent(f.id)}">
+      <div class="thumb" ${thumbStyle}>${f.cover_image_url ? "" : "🌾"}</div>
+      <div class="info">
+        <p class="name">${escapeHtml(f.name)}</p>
+        <p class="location">${escapeHtml(f.municipality)}</p>
+        <p class="crops">${escapeHtml(f.crops)}</p>
+        <div class="badges">${badges.join("")}</div>
+      </div>
+    </a>
+  `;
+}
+
+initNav("/");
+load();
+</script>
+</body>
+</html>

@@ -641,8 +641,11 @@ body.has-bottom-nav { padding-bottom: 64px; }
 .sub-banner span { position: relative; z-index: 1; color: #fff; font-size: 13px; font-weight: 700; text-shadow: 0 1px 6px rgba(0,0,0,0.4); }
 
 /* 出品グリッド(新着の出品)。コンテナ幅に応じて自動で列数が増える */
+/* 1列6件 x 2列(=12件)を基本形にする。狭い画面では列数を落として
+   読みやすさを優先し、広い画面(720px〜)で6列になる */
 .items-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-@media (min-width: 520px) { .items-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
+@media (min-width: 520px) { .items-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 720px) { .items-grid { grid-template-columns: repeat(6, 1fr); } }
 .items-grid .item-card, .carousel .item-card { width: auto; }
 .carousel .item-card { width: 148px; }
 
@@ -659,8 +662,44 @@ body.has-bottom-nav { padding-bottom: 64px; }
 
 /* エリアから探す: タグ型の絞り込み(ポケマルの「旬のキーワード」相当) */
 .area-tags-section { max-width: 1080px; margin: 0 auto; padding: 22px 16px 4px; }
-.area-tags { padding: 0; background: transparent; border: none; }
-.area-tags .tab { border-radius: 999px; }
+
+/* 「市町村を選ぶ」ボタン: 押すまでタグ一覧を隠しておく */
+.area-tags-toggle {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.area-tags-toggle:hover { border-color: var(--green); color: var(--green-dark); }
+
+/* エリアタグ: 開いたら1列6件 x 最大10列のグリッドで表示し、
+   それ以上はスクロールできるようにしておく(将来タグが増えても崩れない) */
+.area-tags[hidden] { display: none; }
+.area-tags {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  overflow-x: visible;
+  overflow-y: auto;
+  max-height: 440px;
+  padding: 14px;
+  margin-top: 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+@media (min-width: 480px) { .area-tags { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 720px) { .area-tags { grid-template-columns: repeat(6, 1fr); } }
+.area-tags .tab {
+  border-radius: 999px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 /* グループ化フッター(利用者向け/農家向けにリンクを分ける構成をポケマルから踏襲) */
 .site-footer-grouped { padding: 28px 16px 20px; max-width: 1080px; margin: 0 auto; }

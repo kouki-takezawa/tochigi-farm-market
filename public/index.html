@@ -13,7 +13,7 @@
 <header class="site-nav">
   <a href="/" class="site-logo">栃木の直売マルシェ</a>
   <nav class="site-nav-links">
-    <a href="/" class="current">農家一覧</a>
+    <a href="/" class="current">ホーム</a>
     <a href="/listings.html">出品一覧</a>
     <a href="/events.html">イベント</a>
     <a href="/map.html">マップ</a>
@@ -63,8 +63,11 @@
 </section>
 
 <section class="area-tags-section">
-  <div class="platform-section-head"><h2>エリアから探す</h2></div>
-  <div class="tabs area-tags" id="municipality-tabs"></div>
+  <div class="platform-section-head">
+    <h2>エリアから探す</h2>
+    <button class="area-tags-toggle" id="area-toggle" aria-expanded="false">市町村を選ぶ ▾</button>
+  </div>
+  <div class="tabs area-tags" id="municipality-tabs" hidden></div>
 </section>
 
 <section class="platform-section" id="special" hidden>
@@ -73,15 +76,6 @@
     <a class="see-all" href="/listings.html">すべて見る →</a>
   </div>
   <div id="special-carousel" class="carousel"></div>
-</section>
-
-<section class="listing-section" id="farmers">
-  <div class="platform-section-head" style="max-width:1080px;margin:0 auto;padding:0 16px;">
-    <h2>掲載中の農家</h2>
-  </div>
-  <main id="content">
-    <div class="skeleton-grid" style="padding:20px 16px;max-width:1080px;margin:0 auto;"></div>
-  </main>
 </section>
 
 <section class="widgets-row">
@@ -138,18 +132,17 @@ let allListings = [];
 let currentMunicipality = "";
 let searchQuery = "";
 
-document.getElementById("items-grid").innerHTML = skeletonCards(5);
-document.querySelector("#content .skeleton-grid").innerHTML = skeletonCards(4);
+document.getElementById("items-grid").innerHTML = skeletonCards(6);
 
-async function loadFarmers() {
-  const content = document.getElementById("content");
+// 農家一覧はTOPには表示しないが、「エリアから探す」の市町村タグを
+// 作るためにデータだけは裏で取得しておく(絞り込みは出品側に効く)
+async function loadMunicipalities() {
   try {
     const data = await apiFetch("/api/farmers");
     allFarmers = data.farmers || [];
     renderTabs();
-    renderFarmerList();
   } catch (e) {
-    content.innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+    // タグが作れないだけなので、致命的なエラー表示はしない
   }
 }
 
@@ -168,10 +161,20 @@ function renderTabs() {
     btn.addEventListener("click", () => {
       currentMunicipality = btn.dataset.value;
       renderTabs();
-      renderFarmerList();
       renderItems();
       renderSpecial();
     });
+  });
+}
+
+function initAreaToggle() {
+  const toggle = document.getElementById("area-toggle");
+  const panel = document.getElementById("municipality-tabs");
+  toggle.addEventListener("click", () => {
+    const willOpen = panel.hidden;
+    panel.hidden = !willOpen;
+    toggle.setAttribute("aria-expanded", String(willOpen));
+    toggle.textContent = willOpen ? "閉じる ▴" : "市町村を選ぶ ▾";
   });
 }
 
@@ -180,43 +183,13 @@ function matchesSearch(text) {
   return (text || "").toLowerCase().includes(searchQuery);
 }
 
-function updateResultCount(farmerCount, itemCount) {
+function updateResultCount(itemCount) {
   const el = document.getElementById("result-count");
   if (!searchQuery) {
     el.textContent = "";
     return;
   }
-  el.textContent = `「${searchQuery}」の検索結果: 農家 ${farmerCount}件 / 出品 ${itemCount}件`;
-}
-
-function renderFarmerList() {
-  const content = document.getElementById("content");
-  let filtered = currentMunicipality ? allFarmers.filter((f) => f.municipality === currentMunicipality) : allFarmers;
-  filtered = filtered.filter((f) => matchesSearch(f.name) || matchesSearch(f.crops) || matchesSearch(f.municipality));
-  updateResultCount(filtered.length, document.querySelectorAll("#items-grid .item-card").length);
-  if (filtered.length === 0) {
-    content.innerHTML = `<div class="empty-state">該当する農家が見つかりません。</div>`;
-    return;
-  }
-  content.innerHTML = `<div class="farmer-list">${filtered.map(renderFarmerCard).join("")}</div>`;
-}
-
-function renderFarmerCard(f) {
-  const thumbStyle = f.cover_image_url ? `style="background-image:url('${escapeHtml(f.cover_image_url)}')"` : "";
-  const badges = [];
-  if (f.has_listing_today) badges.push(`<span class="badge">本日出品あり</span>`);
-  if (f.next_event_date) badges.push(`<span class="badge event">${formatDateShort(f.next_event_date)} イベント</span>`);
-  return `
-    <a class="farmer-card" href="/farmer.html?id=${encodeURIComponent(f.id)}">
-      <div class="thumb" role="img" aria-label="${escapeHtml(f.name)}の写真" ${thumbStyle}></div>
-      <div class="info">
-        <p class="name">${escapeHtml(f.name)}</p>
-        <p class="location">${escapeHtml(f.municipality)}</p>
-        <p class="crops">${escapeHtml(f.crops)}</p>
-        <div class="badges">${badges.join("")}</div>
-      </div>
-    </a>
-  `;
+  el.textContent = `「${searchQuery}」の検索結果: 出品 ${itemCount}件`;
 }
 
 async function loadListings() {
@@ -247,13 +220,14 @@ function renderItems() {
   const el = document.getElementById("items-grid");
   let filtered = currentMunicipality ? allListings.filter((l) => l.farmer_municipality === currentMunicipality) : allListings;
   filtered = filtered.filter((l) => matchesSearch(l.title) || matchesSearch(l.farmer_name) || matchesSearch(l.comment));
-  const shown = filtered.slice(0, 10);
+  // 1列6件 x 2列(=12件)まで表示。それ以上は出品一覧ページへ
+  const shown = filtered.slice(0, 12);
   if (shown.length === 0) {
     el.innerHTML = `<div class="empty-state">まだ出品がありません。</div>`;
   } else {
     el.innerHTML = shown.map(itemCard).join("");
   }
-  updateResultCount(document.querySelectorAll("#content .farmer-card").length, filtered.length);
+  updateResultCount(filtered.length);
 }
 
 function renderSpecial() {
@@ -366,7 +340,6 @@ function initSearch() {
     clearTimeout(timer);
     timer = setTimeout(() => {
       searchQuery = input.value.trim().toLowerCase();
-      renderFarmerList();
       renderItems();
       renderSpecial();
     }, 150);
@@ -375,8 +348,9 @@ function initSearch() {
 
 initBottomNav("/");
 initBannerCarousel();
+initAreaToggle();
 initSearch();
-loadFarmers();
+loadMunicipalities();
 loadListings();
 loadEventsWidget();
 loadJobsWidget();

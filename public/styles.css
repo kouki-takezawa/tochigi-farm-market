@@ -684,11 +684,11 @@ header.app-header.appbar .app-title {
 .search-bar input::placeholder { color: var(--muted); }
 
 /* バナーカルーセル: scroll-snapで実装(JSのタッチ処理を書かずにスワイプ対応) */
-.banner-carousel { position: relative; max-width: 640px; margin: 0 auto; padding-top: 14px; }
+.banner-carousel { position: relative; padding-top: 14px; }
 .banner-track {
   position: relative;
-  aspect-ratio: 16/6.5;
-  max-height: 260px;
+  aspect-ratio: 16/5;
+  max-height: 220px;
   overflow: hidden;
 }
 .banner-slide {

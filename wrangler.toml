@@ -1,0 +1,12 @@
+name = "tochigi-farm-market"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "public"
+
+# 画像保存用 R2バケット(事前に `wrangler r2 bucket create tochigi-farm-market-images` で作成)
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "tochigi-farm-market-images"
+
+# SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / ADMIN_SECRET は
+# `wrangler pages secret put <NAME>` またはCloudflareダッシュボードの
+# Pages > Settings > Environment variables で設定してください(Secretsに含めるためwrangler.tomlには書かない)。

@@ -1,0 +1,37 @@
+name: Keep Supabase alive
+
+# Supabaseの無料プランは7日間アクセスがないとプロジェクトが自動で一時停止(pause)される。
+# それより短い間隔で軽いクエリを打ち、一時停止を防ぐための定期実行ワークフロー。
+on:
+  schedule:
+    - cron: "0 3 */3 * *" # 3日ごとにUTC 3:00(JST正午ごろ)に実行
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "SUPABASE_URL / SUPABASE_ANON_KEY がリポジトリのSecretsに設定されていません。README.mdの手順を確認してください。"
+            exit 1
+          fi
+
+          http_status=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            "$SUPABASE_URL/rest/v1/farmers?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+
+          echo "HTTP status: $http_status"
+          cat /tmp/response.json
+
+          if [ "$http_status" -ge 400 ]; then
+            echo "Supabaseへの疎通確認に失敗しました"
+            exit 1
+          fi
+
+          echo "Supabase is alive."

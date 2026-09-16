@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>運営管理 | 栃木の直売マルシェ</title>
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<header class="app-header">
+  <p class="app-title">運営管理画面</p>
+  <p class="app-tagline">農家の新規登録・管理用URLの発行(運営者専用)</p>
+</header>
+
+<div class="container" style="padding-top:16px;">
+  <div class="card">
+    <h3>管理者シークレット</h3>
+    <form id="secret-form" class="stack">
+      <input type="password" id="admin-secret" placeholder="Cloudflare Pagesに設定したADMIN_SECRET" />
+      <button type="submit" class="btn primary block">保存してログイン</button>
+    </form>
+  </div>
+
+  <div id="app" style="display:none;">
+    <div class="card">
+      <h3>新しい農家を登録</h3>
+      <form id="create-form" class="stack">
+        <div><label>農家名</label><input type="text" name="name" required /></div>
+        <div><label>所在地(市町村)</label><input type="text" name="municipality" required placeholder="例: 宇都宮市" /></div>
+        <div><label>作っているもの</label><input type="text" name="crops" placeholder="例: トマト・きゅうり" /></div>
+        <div><label>紹介文</label><textarea name="description"></textarea></div>
+        <div><label>LINE公式URL(任意)</label><input type="url" name="line_url" /></div>
+        <div><label>電話番号(任意)</label><input type="tel" name="phone" /></div>
+        <button type="submit" class="btn primary block">登録して管理URLを発行</button>
+      </form>
+      <div id="create-result"></div>
+    </div>
+
+    <div class="card">
+      <h3>管理URLの再発行</h3>
+      <p style="font-size:13px;color:var(--muted);">農家IDが分かっている場合、管理用URLを再取得できます(URLを紛失した場合用)。</p>
+      <form id="reissue-form" class="stack">
+        <input type="text" name="id" placeholder="農家ID(例: farmer-xxxx)" required />
+        <button type="submit" class="btn secondary block">管理URLを取得</button>
+      </form>
+      <div id="reissue-result"></div>
+    </div>
+
+    <div class="card">
+      <h3>登録済み農家一覧</h3>
+      <div id="farmer-list">読み込み中...</div>
+    </div>
+  </div>
+</div>
+
+<script src="/common.js"></script>
+<script>
+function getSecret() { return localStorage.getItem("admin_secret") || ""; }
+
+document.getElementById("secret-form").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  const value = document.getElementById("admin-secret").value.trim();
+  if (!value) return;
+  localStorage.setItem("admin_secret", value);
+  init();
+});
+
+async function adminFetch(path, options = {}) {
+  return apiFetch(path, {
+    ...options,
+    headers: { "x-admin-secret": getSecret(), ...(options.headers || {}) },
+  });
+}
+
+async function init() {
+  if (!getSecret()) return;
+  document.getElementById("app").style.display = "block";
+  await loadFarmerList();
+}
+
+async function loadFarmerList() {
+  const el = document.getElementById("farmer-list");
+  try {
+    const data = await apiFetch("/api/farmers");
+    const farmers = data.farmers || [];
+    el.innerHTML = farmers.length
+      ? farmers.map((f) => `<div class="item-row"><div><b>${escapeHtml(f.name)}</b><br><span style="font-size:12px;color:var(--muted);">${escapeHtml(f.municipality)} ・ ${escapeHtml(f.id)}</span></div></div>`).join("")
+      : `<p class="empty-state">まだ登録農家がいません。</p>`;
+  } catch (e) {
+    el.innerHTML = `<p class="error-message">${escapeHtml(e.message)}</p>`;
+  }
+}
+
+document.getElementById("create-form").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const form = ev.target;
+  const fd = new FormData(form);
+  const resultEl = document.getElementById("create-result");
+  resultEl.innerHTML = "";
+  try {
+    const data = await adminFetch("/api/farmers", {
+      method: "POST",
+      body: JSON.stringify({
+        name: fd.get("name"),
+        municipality: fd.get("municipality"),
+        crops: fd.get("crops"),
+        description: fd.get("description"),
+        line_url: fd.get("line_url") || null,
+        phone: fd.get("phone") || null,
+      }),
+    });
+    const fullUrl = `${location.origin}${data.manage_url}`;
+    resultEl.innerHTML = `
+      <div class="card" style="background:var(--green-light);margin-top:12px;">
+        <p style="font-weight:700;margin:0 0 6px;">登録しました。この管理URLを農家にLINE等で送ってください:</p>
+        <p style="word-break:break-all;font-size:13px;">${escapeHtml(fullUrl)}</p>
+      </div>
+    `;
+    form.reset();
+    await loadFarmerList();
+  } catch (e) {
+    resultEl.innerHTML = `<p class="error-message">${escapeHtml(e.message)}</p>`;
+  }
+});
+
+document.getElementById("reissue-form").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const form = ev.target;
+  const id = new FormData(form).get("id");
+  const resultEl = document.getElementById("reissue-result");
+  resultEl.innerHTML = "";
+  try {
+    const data = await adminFetch(`/api/admin/farmers/${encodeURIComponent(id)}`);
+    const fullUrl = `${location.origin}${data.manage_url}`;
+    resultEl.innerHTML = `<p style="word-break:break-all;font-size:13px;">${escapeHtml(data.name)} の管理URL:<br>${escapeHtml(fullUrl)}</p>`;
+  } catch (e) {
+    resultEl.innerHTML = `<p class="error-message">${escapeHtml(e.message)}</p>`;
+  }
+});
+
+init();
+</script>
+</body>
+</html>

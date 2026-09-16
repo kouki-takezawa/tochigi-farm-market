@@ -6,27 +6,25 @@
 
 - **本体サイト**: https://tochigi-farm-market.pages.dev
 
-デザイン比較用バリアント(本体と同じSupabaseバックエンドを見ているので、すべて実データで動作する。
-詳細・各ページ構成・片付け方は [variants/README.md](./variants/README.md) を参照):
+デザイン比較用に作っていた `variants/`(v2-luxury / v3-mono / v5-organic)は比較検討の結果すべて削除し、
+本体サイト(`public/`)に1本化した。トップページはHP(ブランドサイト)的な読み物構成ではなく、
+検索・絞り込み・新着出品カルーセル・下部タブバーを備えたマルシェ=プラットフォームとしてのUIを採用している
+(参考: ポケットマルシェ等の産直プラットフォームアプリ)。
 
-| バリアント | 参考にしたデザイン | URL |
-|---|---|---|
-| v2-luxury | takenaka-foodware.jp 風(ダーク全面写真ヒーロー・常時スティッキーナビ) | https://tochigi-marche-luxury.pages.dev |
-| v3-mono | tosou.nishizaki.co.jp 風(黒の極太見出し・実写コラージュグリッド) | https://tochigi-marche-mono.pages.dev |
-| v5-organic | tenten.fun 風(縦書きコピー・余白多め・ハンバーガーメニュー) | https://tochigi-marche-organic.pages.dev |
-
-Cloudflareプロジェクト名はそれぞれ `tochigi-farm-market` / `tochigi-marche-luxury` / `tochigi-marche-mono` / `tochigi-marche-organic`。
-再デプロイはリポジトリ直下から以下のコマンド(`npx wrangler pages deploy <ディレクトリ> --project-name <プロジェクト名>`)。
+再デプロイはリポジトリ直下から以下のコマンド。
 
 ```bash
 npx wrangler pages deploy public --project-name tochigi-farm-market
-npx wrangler pages deploy variants/v2-luxury --project-name tochigi-marche-luxury
-npx wrangler pages deploy variants/v3-mono --project-name tochigi-marche-mono
-npx wrangler pages deploy variants/v5-organic --project-name tochigi-marche-organic
 ```
 
-`functions/` はリポジトリ直下(カレントディレクトリ)から自動検出されてバンドルされるため、
-上記はすべてリポジトリのルートで実行すること(`variants/vX-yyy` の中に入って実行しない)。
+過去に作成した `tochigi-marche-luxury` / `tochigi-marche-mono` / `tochigi-marche-organic` のCloudflare Pages
+プロジェクトは、現在は不要になったため以下で削除できる(ダッシュボードからでも可)。
+
+```bash
+npx wrangler pages project delete tochigi-marche-luxury
+npx wrangler pages project delete tochigi-marche-mono
+npx wrangler pages project delete tochigi-marche-organic
+```
 
 ## 構成
 

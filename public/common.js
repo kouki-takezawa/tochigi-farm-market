@@ -117,6 +117,31 @@ function initNav(activeHref) {
   });
 }
 
+// アプリ的な下部タブバー(ポケットマルシェ等のプラットフォームUIを参考に、
+// 「読み物サイト」ではなく「使うプラットフォーム」であることを常時示すための主要導線)。
+// initNav() のハンバーガー(副次的な導線: 出品者ログイン等)とは役割を分けている。
+function initBottomNav(activeHref) {
+  const items = [
+    { href: "/", label: "ホーム", icon: "🏠" },
+    { href: "/listings.html", label: "出品", icon: "🥬" },
+    { href: "/map.html", label: "マップ", icon: "📍" },
+    { href: "/events.html", label: "イベント", icon: "📅" },
+    { href: "/jobs.html", label: "求人", icon: "💼" },
+  ];
+
+  const nav = document.createElement("nav");
+  nav.className = "bottom-nav";
+  nav.setAttribute("aria-label", "主要メニュー");
+  nav.innerHTML = items
+    .map((it) => {
+      const active = it.href === activeHref ? "active" : "";
+      return `<a class="bottom-nav-item ${active}" href="${it.href}"><span class="bottom-nav-icon" aria-hidden="true">${it.icon}</span><span class="bottom-nav-label">${escapeHtml(it.label)}</span></a>`;
+    })
+    .join("");
+  document.body.appendChild(nav);
+  document.body.classList.add("has-bottom-nav");
+}
+
 async function uploadImage(fileInput, farmerId, token) {
   const file = fileInput.files[0];
   if (!file) return null;

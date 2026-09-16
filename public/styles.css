@@ -705,3 +705,142 @@ textarea { min-height: 80px; resize: vertical; }
 }
 
 .image-preview.show { display: block; }
+
+/* ============================================================
+   プラットフォームUI(ポケットマルシェ等を参考に、読み物サイトではなく
+   使うプラットフォームとして機能する画面を優先する)
+   ============================================================ */
+
+/* 下部タブバー: 常時表示される主要導線。固定表示のため、本文側に
+   隠れないよう余白を確保する(has-bottom-nav) */
+body.has-bottom-nav { padding-bottom: 64px; }
+
+.bottom-nav {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 1500; /* Leaflet(最大1000)より上、トーストより下 */
+  display: flex;
+  background: #fff;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 16px rgba(20,40,20,0.06);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 2px 6px;
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 10px;
+}
+.bottom-nav-icon { font-size: 19px; line-height: 1; }
+.bottom-nav-item.active { color: var(--green-dark); font-weight: 700; }
+
+/* コンパクトなアプリバー(読み物としての大きな写真ヒーローの代わり) */
+header.app-header.appbar {
+  min-height: 0;
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  padding: 18px 16px 16px;
+}
+header.app-header.appbar .app-title {
+  font-family: "Shippori Mincho", serif;
+  font-size: 19px;
+}
+
+/* カテゴリ/クイックアクセス チップ列(ポケットマルシェの「カテゴリから探す」を参考) */
+.quick-cats {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 16px 16px 4px;
+  max-width: 640px;
+  margin: 0 auto;
+  -webkit-overflow-scrolling: touch;
+}
+.quick-cats::-webkit-scrollbar { display: none; }
+.quick-cat {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 68px;
+  text-decoration: none;
+  color: var(--text);
+}
+.quick-cat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--green-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+.quick-cat span:last-child { font-size: 11px; text-align: center; }
+
+/* セクション見出し(カルーセル/グリッドの上) */
+.platform-section { max-width: 640px; margin: 0 auto; padding: 22px 16px 4px; }
+.platform-section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.platform-section-head h2 { font-size: 17px; margin: 0; }
+.platform-section-head .see-all { font-size: 12px; color: var(--green-dark); text-decoration: none; white-space: nowrap; }
+
+/* 新着出品カルーセル(横スクロール、ポケットマルシェの「今が旬」相当) */
+.carousel { display: flex; gap: 12px; overflow-x: auto; padding: 2px 16px 14px; margin: 0 -16px; -webkit-overflow-scrolling: touch; }
+.carousel::-webkit-scrollbar { display: none; }
+.item-card {
+  flex: none;
+  width: 148px;
+  text-decoration: none;
+  color: inherit;
+}
+.item-photo {
+  position: relative;
+  width: 148px;
+  height: 148px;
+  border-radius: var(--radius);
+  background: var(--green-light) center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  box-shadow: 0 4px 14px rgba(20,40,20,0.08);
+}
+.item-photo .badge { position: absolute; left: 8px; top: 8px; }
+.item-title { font-size: 13px; font-weight: 700; margin: 8px 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-price { font-size: 13px; font-weight: 700; color: var(--green-dark); margin: 0 0 2px; }
+.item-farmer { font-size: 11px; color: var(--muted); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 農家一覧を2カラムグリッド化(横並びで見つけやすく) */
+@media (min-width: 460px) {
+  .farmer-list { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+}
+
+/* イベント/求人のコンパクトウィジェット(横並びカード。詳細ページは別途一覧へ) */
+.widgets-row { display: flex; flex-direction: column; gap: 14px; max-width: 640px; margin: 0 auto; padding: 22px 16px 4px; }
+@media (min-width: 640px) { .widgets-row { flex-direction: row; } }
+.widget-card { flex: 1; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.widget-card .platform-section-head { margin-bottom: 10px; }
+.mini-row { display: flex; justify-content: space-between; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--border); text-decoration: none; color: inherit; font-size: 13px; }
+.mini-row:last-child { border-bottom: none; }
+.mini-row .mini-date { color: var(--green-dark); font-weight: 700; flex: none; }
+.mini-row .mini-title { flex: 1; margin: 0 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mini-row .mini-wage { color: var(--orange); font-weight: 700; flex: none; }
+
+/* 出品者募集バナー(プラットフォームとしての「出品側を増やす」導線) */
+.recruit-banner {
+  max-width: 640px;
+  margin: 22px auto 0;
+  padding: 18px 16px;
+  background: var(--green-light);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.recruit-banner p { margin: 0; font-size: 13px; color: var(--text); flex: 1; }
+.recruit-banner strong { display: block; font-size: 14px; margin-bottom: 2px; }

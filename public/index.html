@@ -6,64 +6,69 @@
 <title>栃木の直売マルシェ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Yuji+Syuku&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-<header class="app-header hero">
-  <p class="eyebrow">栃木県内限定・産地直送</p>
-  <p class="brand-logotype">栃木の直売マルシェ</p>
-  <p class="app-tagline">畑から、まっすぐ食卓へ。</p>
-  <a href="#farmers" class="btn hero-cta">産直情報を見る<span aria-hidden="true"> ↓</span></a>
+<header class="app-header appbar">
+  <p class="app-title">栃木の直売マルシェ</p>
+  <p class="app-tagline">畑から、まっすぐ食卓へ。栃木県内限定の直売プラットフォーム。</p>
 </header>
-<div class="hills-divider" aria-hidden="true">
-  <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
-    <path d="M0,55 C220,15 420,85 700,45 C980,5 1230,75 1440,35 L1440,100 L0,100 Z" fill="#cfe3c8"/>
-    <path d="M0,72 C260,38 520,98 800,62 C1060,30 1300,88 1440,58 L1440,100 L0,100 Z" fill="#a9cf9e"/>
-    <path d="M0,88 C300,64 600,100 900,80 C1150,62 1300,95 1440,78 L1440,100 L0,100 Z" fill="#3f8a4c"/>
-  </svg>
-</div>
 
-<section class="intro-section">
-  <img class="intro-image" src="/images/rice-terrace-01.jpg" loading="lazy" alt="栃木の田園風景" />
-  <div class="intro-text">
-    <span class="section-eyebrow">OUR STORY</span>
-    <h2 class="section-title">田んぼと畑の恵みを、そのまま食卓へ。</h2>
-    <p class="section-body">栃木県内の小さな農家が、丹精込めて育てた野菜やお米。知り合いだけに届けていた「とれたて」を、少しだけ遠くへ。顔の見える距離感のまま、あなたの食卓に。</p>
+<nav class="quick-cats" aria-label="かんたんメニュー">
+  <a class="quick-cat" href="/listings.html"><span class="quick-cat-icon">🥬</span><span>出品一覧</span></a>
+  <a class="quick-cat" href="/map.html"><span class="quick-cat-icon">📍</span><span>マップ</span></a>
+  <a class="quick-cat" href="/events.html"><span class="quick-cat-icon">📅</span><span>イベント</span></a>
+  <a class="quick-cat" href="/jobs.html"><span class="quick-cat-icon">💼</span><span>バイト求人</span></a>
+  <a class="quick-cat" href="/seller.html"><span class="quick-cat-icon">🔑</span><span>出品者</span></a>
+</nav>
+
+<section class="platform-section" id="items">
+  <div class="platform-section-head">
+    <h2>新着の出品</h2>
+    <a class="see-all" href="/listings.html">すべて見る →</a>
+  </div>
+  <div id="items-carousel" class="carousel">
+    <div class="loading">読み込み中...</div>
   </div>
 </section>
 
 <section class="listing-section" id="farmers">
-  <span class="section-eyebrow center">FARMERS</span>
-  <h2 class="section-title center">掲載中の農家</h2>
-  <div class="view-switch">
-    <span class="view-switch-item active">一覧</span>
-    <a href="/map.html" class="view-switch-item">地図</a>
+  <div class="platform-section-head" style="max-width:640px;margin:0 auto;padding:0 16px;">
+    <h2>掲載中の農家</h2>
   </div>
-
   <div class="tabs" id="municipality-tabs"></div>
-
   <main id="content">
     <div class="loading">読み込み中...</div>
   </main>
 </section>
 
-<div class="hills-divider flip" aria-hidden="true">
-  <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
-    <path d="M0,88 C300,64 600,100 900,80 C1150,62 1300,95 1440,78 L1440,100 L0,100 Z" fill="#ffffff"/>
-    <path d="M0,72 C260,38 520,98 800,62 C1060,30 1300,88 1440,58 L1440,100 L0,100 Z" fill="#e7f0d9"/>
-    <path d="M0,55 C220,15 420,85 700,45 C980,5 1230,75 1440,35 L1440,100 L0,100 Z" fill="#f6efd6"/>
-  </svg>
+<section class="widgets-row">
+  <div class="widget-card">
+    <div class="platform-section-head"><h2>近日のイベント</h2><a class="see-all" href="/events.html">すべて →</a></div>
+    <div id="events-widget">
+      <div class="loading">読み込み中...</div>
+    </div>
+  </div>
+  <div class="widget-card">
+    <div class="platform-section-head"><h2>募集中の求人</h2><a class="see-all" href="/jobs.html">すべて →</a></div>
+    <div id="jobs-widget">
+      <div class="loading">読み込み中...</div>
+    </div>
+  </div>
+</section>
+
+<div class="recruit-banner">
+  <p><strong>農家の方へ</strong>出品・イベント・求人の掲載はすべて無料。スマホから写真と一言だけで投稿できます。掲載希望の方は運営者までご連絡ください。</p>
 </div>
-<footer class="brand-footer">
-  <p class="brand-logotype small">栃木の直売マルシェ</p>
-  <p class="footer-note">出品・イベントの投稿・閲覧はすべて無料です。購入・お申し込みは各農家と直接やり取りしてください。</p>
-  <p class="photo-credits">
-    写真:
+
+<footer class="footer-note">
+  出品・イベントの投稿・閲覧はすべて無料です。購入・お申し込みは各農家と直接やり取りしてください。<br />
+  <span style="font-size:10px;">写真:
     <a href="https://commons.wikimedia.org/wiki/File:Mount_Amagoi_and_Cabbage_fields.jpg" target="_blank" rel="noopener">Alpsdake</a>,
     <a href="https://commons.wikimedia.org/wiki/File:Rice_Terrace,_Sanazawanomori.jpg" target="_blank" rel="noopener">Minakami Town</a>
     (Wikimedia Commons, CC BY-SA 4.0 / CC BY 4.0)
-  </p>
+  </span>
 </footer>
 
 <script src="/common.js"></script>
@@ -71,7 +76,7 @@
 let allFarmers = [];
 let currentMunicipality = "";
 
-async function load() {
+async function loadFarmers() {
   const content = document.getElementById("content");
   try {
     const data = await apiFetch("/api/farmers");
@@ -137,8 +142,84 @@ function renderCard(f) {
   `;
 }
 
+async function loadItems() {
+  const el = document.getElementById("items-carousel");
+  try {
+    const data = await apiFetch("/api/listings");
+    const listings = (data.listings || []).slice(0, 12);
+    if (listings.length === 0) {
+      el.innerHTML = `<div class="empty-state">まだ出品がありません。</div>`;
+      return;
+    }
+    el.innerHTML = listings
+      .map((l) => {
+        const thumbStyle = l.image_url ? `style="background-image:url('${escapeHtml(l.image_url)}')"` : "";
+        return `
+      <a class="item-card" href="/farmer.html?id=${encodeURIComponent(l.farmer_id)}">
+        <div class="item-photo" ${thumbStyle}>${l.image_url ? "" : "🌱"}${l.is_special ? '<span class="badge special">わけあり</span>' : ""}</div>
+        <p class="item-title">${escapeHtml(l.title)}</p>
+        <p class="item-price">${priceLabel(l.price)}</p>
+        <p class="item-farmer">${escapeHtml(l.farmer_name)}</p>
+      </a>`;
+      })
+      .join("");
+  } catch (e) {
+    el.innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+async function loadEventsWidget() {
+  const el = document.getElementById("events-widget");
+  try {
+    const data = await apiFetch("/api/events");
+    const events = (data.events || []).slice(0, 4);
+    if (events.length === 0) {
+      el.innerHTML = `<div class="empty-state">開催予定のイベントはまだありません。</div>`;
+      return;
+    }
+    el.innerHTML = events
+      .map(
+        (e) => `
+      <a class="mini-row" href="/farmer.html?id=${encodeURIComponent(e.farmer_id)}">
+        <span class="mini-date">${formatDateShort(e.event_date)}</span>
+        <span class="mini-title">${escapeHtml(e.title)}</span>
+      </a>`
+      )
+      .join("");
+  } catch (e) {
+    el.innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+async function loadJobsWidget() {
+  const el = document.getElementById("jobs-widget");
+  try {
+    const data = await apiFetch("/api/jobs");
+    const jobs = (data.jobs || []).slice(0, 4);
+    if (jobs.length === 0) {
+      el.innerHTML = `<div class="empty-state">募集中の求人はまだありません。</div>`;
+      return;
+    }
+    el.innerHTML = jobs
+      .map(
+        (j) => `
+      <a class="mini-row" href="/farmer.html?id=${encodeURIComponent(j.farmer_id)}">
+        <span class="mini-title">${escapeHtml(j.title)}</span>
+        <span class="mini-wage">${escapeHtml(j.wage)}</span>
+      </a>`
+      )
+      .join("");
+  } catch (e) {
+    el.innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
 initNav("/");
-load();
+initBottomNav("/");
+loadFarmers();
+loadItems();
+loadEventsWidget();
+loadJobsWidget();
 </script>
 </body>
 </html>

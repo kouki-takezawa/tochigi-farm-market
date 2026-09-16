@@ -51,13 +51,14 @@ header.app-header {
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
+  z-index: 1010; /* Leafletのコントロール(最大z-index:1000)より上に表示するため */
 }
 
 .hamburger-btn-floating {
   position: fixed;
   top: 12px;
   right: 12px;
-  z-index: 150;
+  z-index: 1010;
   background: rgba(0,0,0,0.45);
   border-color: rgba(255,255,255,0.7);
 }
@@ -66,7 +67,8 @@ header.app-header {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
-  z-index: 200;
+  /* Leafletの地図コントロールがz-index:1000まで使うため、それより確実に上に来る値にする */
+  z-index: 2000;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s;
@@ -452,7 +454,7 @@ textarea { min-height: 80px; resize: vertical; }
   opacity: 0;
   transition: opacity 0.2s;
   pointer-events: none;
-  z-index: 100;
+  z-index: 2000; /* Leafletのコントロール(最大z-index:1000)より上に表示するため */
 }
 
 .toast.show { opacity: 1; }

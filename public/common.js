@@ -81,7 +81,7 @@ function initNav(activeHref) {
   }
 
   const links = [
-    { href: "/", label: "農家一覧(購入者)" },
+    { href: "/", label: "農家一覧" },
     { href: "/map.html", label: "マップ" },
     { href: "/seller.html", label: isSellerLoggedIn() ? "出品者ページ" : "出品者ログイン" },
   ];

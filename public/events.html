@@ -7,34 +7,71 @@
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-<header class="app-header">
-  <p class="app-title">イベント一覧</p>
-  <p class="app-tagline">県内の農家で開催予定のイベントを日付順に</p>
+<header class="site-nav">
+  <a href="/" class="site-logo">栃木の直売マルシェ</a>
+  <nav class="site-nav-links">
+    <a href="/">農家一覧</a>
+    <a href="/listings.html">出品一覧</a>
+    <a href="/events.html" class="current">イベント</a>
+    <a href="/map.html">マップ</a>
+    <a href="/jobs.html">バイト求人</a>
+  </nav>
+  <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
 </header>
 
-<main class="container" style="padding-top:16px;" id="content">
-  <div class="loading">読み込み中...</div>
+<div class="page-title-strip">
+  <h1>イベント一覧</h1>
+  <p>県内の農家で開催予定のイベントを日付順に</p>
+</div>
+
+<div class="search-strip">
+  <label class="search-bar">
+    <input type="search" id="search-input" placeholder="イベント名・農家名・市町村で探す" />
+  </label>
+</div>
+<p class="result-count" id="result-count" aria-live="polite"></p>
+
+<main class="container wide" style="padding-top:16px;" id="content">
+  <div class="skeleton-grid"></div>
 </main>
 
 <script src="/common.js"></script>
 <script>
+let allEvents = [];
+let searchQuery = "";
+
+document.querySelector("#content .skeleton-grid").innerHTML = skeletonCards(6);
+
 async function load() {
-  const content = document.getElementById("content");
   try {
     const data = await apiFetch("/api/events");
-    render((data.events || []).filter((e) => e.kind !== "labor"));
+    allEvents = (data.events || []).filter((e) => e.kind !== "labor");
+    render();
   } catch (e) {
-    content.innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+    document.getElementById("content").innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
   }
 }
 
-function render(events) {
+function render() {
   const content = document.getElementById("content");
-  if (!events.length) {
-    content.innerHTML = `<div class="empty-state">開催予定のイベントはまだありません。</div>`;
+  const q = searchQuery;
+  const filtered = q
+    ? allEvents.filter(
+        (e) =>
+          (e.title || "").toLowerCase().includes(q) ||
+          (e.farmer_name || "").toLowerCase().includes(q) ||
+          (e.farmer_municipality || "").toLowerCase().includes(q) ||
+          (e.location || "").toLowerCase().includes(q)
+      )
+    : allEvents;
+
+  document.getElementById("result-count").textContent = q ? `「${q}」の検索結果: ${filtered.length}件` : "";
+
+  if (!filtered.length) {
+    content.innerHTML = `<div class="empty-state">${q ? "該当するイベントが見つかりません。" : "開催予定のイベントはまだありません。"}</div>`;
     return;
   }
-  content.innerHTML = `<div style="display:flex;flex-direction:column;">${events.map(renderRow).join("")}</div>`;
+  content.innerHTML = `<div class="list-grid">${filtered.map(renderRow).join("")}</div>`;
 }
 
 function renderRow(e) {
@@ -52,7 +89,11 @@ function renderRow(e) {
   `;
 }
 
-initNav("/events.html");
+document.getElementById("search-input").addEventListener("input", (ev) => {
+  searchQuery = ev.target.value.trim().toLowerCase();
+  render();
+});
+
 initBottomNav("/events.html");
 load();
 </script>

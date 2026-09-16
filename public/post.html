@@ -7,10 +7,22 @@
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-<header class="app-header">
-  <p class="app-title">農家の投稿・編集画面</p>
-  <p class="app-tagline">このページのURLはブックマークして、いつでも更新できるようにしてください</p>
+<header class="site-nav">
+  <a href="/" class="site-logo">栃木の直売マルシェ</a>
+  <nav class="site-nav-links">
+    <a href="/">農家一覧</a>
+    <a href="/listings.html">出品一覧</a>
+    <a href="/events.html">イベント</a>
+    <a href="/map.html">マップ</a>
+    <a href="/jobs.html">バイト求人</a>
+  </nav>
+  <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
 </header>
+
+<div class="page-title-strip">
+  <h1>農家の投稿・編集画面</h1>
+  <p>このページのURLはブックマークして、いつでも更新できるようにしてください</p>
+</div>
 
 <div class="container" id="page" style="padding-top:16px;">
   <div class="loading">読み込み中...</div>
@@ -23,6 +35,18 @@ const farmerId = params.get("farmer");
 const token = params.get("token");
 
 let state = { farmer: null, listings: [], events: [], jobs: [] };
+
+// 入力途中でうっかりページを離れて内容が消えるのを防ぐ(保存に成功して
+// 画面を再描画した時点でクリーンな状態に戻す)
+let formDirty = false;
+document.addEventListener("input", (ev) => {
+  if (ev.target.closest("#page")) formDirty = true;
+});
+window.addEventListener("beforeunload", (ev) => {
+  if (!formDirty) return;
+  ev.preventDefault();
+  ev.returnValue = "";
+});
 
 async function load() {
   const page = document.getElementById("page");
@@ -40,6 +64,7 @@ async function load() {
 }
 
 function renderAll() {
+  formDirty = false;
   const page = document.getElementById("page");
   page.innerHTML = `
     <div class="card">
@@ -430,7 +455,7 @@ async function onDeleteJob(id) {
   }
 }
 
-initNav("/seller.html");
+initBottomNav(null);
 load();
 </script>
 </body>

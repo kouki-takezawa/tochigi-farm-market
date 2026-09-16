@@ -16,14 +16,22 @@
 </style>
 </head>
 <body>
-<header class="app-header">
-  <p class="app-title">栃木の直売マルシェ</p>
-  <p class="app-tagline">マップで近くの農家を探す</p>
-  <div class="view-toggle">
-    <a href="/" class="btn" style="flex:1;text-align:center;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.6);text-decoration:none;">リスト</a>
-    <button class="active">マップ</button>
-  </div>
+<header class="site-nav">
+  <a href="/" class="site-logo">栃木の直売マルシェ</a>
+  <nav class="site-nav-links">
+    <a href="/">農家一覧</a>
+    <a href="/listings.html">出品一覧</a>
+    <a href="/events.html">イベント</a>
+    <a href="/map.html" class="current">マップ</a>
+    <a href="/jobs.html">バイト求人</a>
+  </nav>
+  <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
 </header>
+
+<div class="page-title-strip">
+  <h1>マップ</h1>
+  <p>現在地または市町村から、近くの農家を探せます</p>
+</div>
 
 <div class="locate-row">
   <button id="locate-btn" class="btn primary">現在地から探す</button>
@@ -36,7 +44,11 @@
 <div id="map"></div>
 
 <div id="distance-list" class="distance-list">
-  <div class="loading">読み込み中...</div>
+  <div class="skeleton-row" style="padding:0 16px;">
+    <div class="skeleton-card"><div class="sk-line w60"></div><div class="sk-line w40"></div></div>
+    <div class="skeleton-card"><div class="sk-line w60"></div><div class="sk-line w40"></div></div>
+    <div class="skeleton-card"><div class="sk-line w60"></div><div class="sk-line w40"></div></div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -179,7 +191,7 @@ function renderList() {
       .map(
         (f) => `
       <a class="farmer-card" href="/farmer.html?id=${encodeURIComponent(f.id)}">
-        <div class="thumb" ${f.cover_image_url ? `style="background-image:url('${escapeHtml(f.cover_image_url)}')"` : ""}></div>
+        <div class="thumb" role="img" aria-label="${escapeHtml(f.name)}の写真" ${f.cover_image_url ? `style="background-image:url('${escapeHtml(f.cover_image_url)}')"` : ""}></div>
         <div class="info">
           <p class="name">${escapeHtml(f.name)}</p>
           <p class="location">${escapeHtml(f.municipality)}${f._distance != null ? ` ・ 現在地から約${f._distance.toFixed(1)}km` : ""}</p>
@@ -216,7 +228,6 @@ document.getElementById("locate-btn").addEventListener("click", () => {
   );
 });
 
-initNav("/map.html");
 initBottomNav("/map.html");
 load();
 </script>

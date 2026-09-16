@@ -7,10 +7,22 @@
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-<header class="app-header">
-  <p class="app-title">運営管理画面</p>
-  <p class="app-tagline">農家の新規登録・管理用URLの発行(運営者専用)</p>
+<header class="site-nav">
+  <a href="/" class="site-logo">栃木の直売マルシェ</a>
+  <nav class="site-nav-links">
+    <a href="/">農家一覧</a>
+    <a href="/listings.html">出品一覧</a>
+    <a href="/events.html">イベント</a>
+    <a href="/map.html">マップ</a>
+    <a href="/jobs.html">バイト求人</a>
+  </nav>
+  <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
 </header>
+
+<div class="page-title-strip">
+  <h1>運営管理画面</h1>
+  <p>農家の新規登録・管理用URLの発行(運営者専用)</p>
+</div>
 
 <div class="container" style="padding-top:16px;">
   <div class="card">
@@ -197,7 +209,7 @@ document.getElementById("reissue-form").addEventListener("submit", async (ev) =>
   }
 });
 
-initNav(null);
+initBottomNav(null);
 init();
 </script>
 </body>

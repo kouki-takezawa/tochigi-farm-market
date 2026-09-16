@@ -33,12 +33,9 @@ a { color: var(--green-dark); }
   padding: 0 16px 40px;
 }
 
-header.app-header {
-  background: linear-gradient(135deg, var(--green), var(--green-dark));
-  color: #fff;
-  padding: 20px 16px 16px;
-  position: relative;
-}
+/* 一覧系ページ用の広いコンテナ。フォーム(.container単体)は読みやすさ優先で
+   640pxのまま残し、カード一覧だけ横幅を活かして縦に長くなりすぎないようにする */
+.container.wide { max-width: 1080px; }
 
 .photo-credits {
   text-align: center;
@@ -57,139 +54,34 @@ header.app-header {
 }
 
 .listing-section .tabs {
-  max-width: 640px;
+  max-width: 1080px;
   margin: 0 auto;
 }
 
-.hamburger-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.6);
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-  font-size: 16px;
-  line-height: 1;
-  cursor: pointer;
-  z-index: 1010; /* Leafletのコントロール(最大z-index:1000)より上に表示するため */
+/* 出品/イベント/求人の横断一覧ページ用グリッド。カードが縦一列に並ぶだけだと
+   広い画面で縦に長くなりすぎるため、幅に応じて2〜3列に自動で折り返す */
+.list-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
 }
+@media (min-width: 640px) {
+  .list-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+}
+.list-grid .listing-card,
+.list-grid .event-card,
+.list-grid .job-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  background: var(--card-bg);
+}
+.list-grid .listing-card:last-child, .list-grid .event-card:last-child { border-bottom: 1px solid var(--border); }
 
-.hamburger-btn-floating {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  z-index: 1010;
-  background: rgba(0,0,0,0.45);
-  border-color: rgba(255,255,255,0.7);
-}
-
-.nav-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  /* Leafletの地図コントロールがz-index:1000まで使うため、それより確実に上に来る値にする */
-  z-index: 2000;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-
-.nav-overlay.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.nav-drawer {
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 100%;
-  width: 78%;
-  max-width: 280px;
-  background: #fff;
-  transform: translateX(100%);
-  transition: transform 0.2s;
-  display: flex;
-  flex-direction: column;
-}
-
-.nav-overlay.open .nav-drawer {
-  transform: translateX(0);
-}
-
-.nav-drawer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid var(--border);
-  font-weight: 700;
-}
-
-.nav-close {
-  border: none;
-  background: none;
-  font-size: 18px;
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.nav-drawer ul {
-  list-style: none;
-  margin: 0;
-  padding: 8px 0;
-}
-
-.nav-drawer a {
-  display: block;
-  padding: 14px 20px;
-  color: var(--text);
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.nav-drawer a.active {
-  color: var(--green-dark);
-  font-weight: 700;
-  background: var(--green-light);
-}
-
-header.app-header .app-title {
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0;
-}
-
-header.app-header .app-tagline {
-  font-size: 13px;
-  opacity: 0.9;
-  margin: 4px 0 0;
-}
-
-.view-toggle {
-  display: flex;
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.view-toggle button {
-  flex: 1;
-  padding: 8px 0;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.6);
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-  font-size: 13px;
-}
-
-.view-toggle button.active {
-  background: #fff;
-  color: var(--green-dark);
-  font-weight: 700;
-}
+/* ページ見出しの帯(白ヘッダーの下、各ページ固有のタイトル+説明) */
+.page-title-strip { max-width: 1080px; margin: 0 auto; padding: 20px 16px 4px; }
+.page-title-strip h1 { font-size: 20px; margin: 0 0 4px; }
+.page-title-strip p { font-size: 13px; color: var(--muted); margin: 0; }
 
 .tabs {
   display: flex;
@@ -225,7 +117,7 @@ header.app-header .app-tagline {
   flex-direction: column;
   gap: 14px;
   padding: 20px 16px 16px;
-  max-width: 640px;
+  max-width: 1080px;
   margin: 0 auto;
 }
 
@@ -551,8 +443,8 @@ body.has-bottom-nav { padding-bottom: 64px; }
 .bottom-nav-item.active { color: var(--green-dark); font-weight: 700; }
 
 /* 企業サイト風の白ヘッダー(coconala.com等を参考): ロゴ+横並びテキストナビ。
-   狭い画面ではテキストナビを隠し、initNav()が差し込むハンバーガーに切り替える */
-header.app-header.site-nav {
+   860px未満ではテキストナビを隠し、出品者ログインのリンクのみ常時表示する */
+.site-nav {
   min-height: 0;
   background: #fff;
   color: var(--text);
@@ -573,20 +465,15 @@ header.app-header.site-nav {
   white-space: nowrap;
 }
 .site-nav-links { display: none; }
-.site-nav-cta { display: none; }
+/* 出品者ログインへの導線は、下部タブバーがカバーしない項目なので
+   ハンバーガーに頼らず常時右上に表示する(狭い画面でも見える) */
+.site-nav-cta { display: inline-block; font-size: 12px; font-weight: 700; color: var(--green-dark); text-decoration: none; white-space: nowrap; flex: none; }
 @media (min-width: 860px) {
-  header.app-header.site-nav { padding: 16px 32px; }
+  .site-nav { padding: 16px 32px; }
   .site-nav-links { display: flex; align-items: center; gap: 28px; margin: 0 auto 0 40px; }
   .site-nav-links a { font-size: 14px; font-weight: 600; color: var(--text); text-decoration: none; }
   .site-nav-links a:hover, .site-nav-links a.current { color: var(--green-dark); }
-  .site-nav-cta { display: inline-block; font-size: 13px; font-weight: 700; color: var(--green-dark); text-decoration: none; white-space: nowrap; }
-  header.app-header.site-nav .hamburger-btn { display: none; }
-}
-/* 白背景のヘッダーなので、ハンバーガーボタンは濃色でコントラストを確保する */
-header.app-header.site-nav .hamburger-btn {
-  border-color: var(--border);
-  background: var(--bg);
-  color: var(--text);
+  .site-nav-cta { font-size: 13px; }
 }
 
 /* 検索バー用の帯(白ヘッダーの下、ヒーローの上に配置) */
@@ -594,7 +481,7 @@ header.app-header.site-nav .hamburger-btn {
 .search-strip .search-bar { max-width: 520px; margin: 0 auto; background: #fff; }
 
 /* セクション見出し(カルーセル/グリッドの上) */
-.platform-section { max-width: 640px; margin: 0 auto; padding: 22px 16px 4px; }
+.platform-section { max-width: 1080px; margin: 0 auto; padding: 22px 16px 4px; }
 .platform-section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
 .platform-section-head h2 { font-size: 17px; margin: 0; }
 .platform-section-head .see-all { font-size: 12px; color: var(--green-dark); text-decoration: none; white-space: nowrap; }
@@ -625,13 +512,14 @@ header.app-header.site-nav .hamburger-btn {
 .item-price { font-size: 13px; font-weight: 700; color: var(--green-dark); margin: 0 0 2px; }
 .item-farmer { font-size: 11px; color: var(--muted); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* 農家一覧を2カラムグリッド化(横並びで見つけやすく) */
+/* 農家一覧をグリッド化。幅の許す限り列数を自動で増やし、広い画面でも
+   縦にだけ長く伸びないようにする */
 @media (min-width: 460px) {
-  .farmer-list { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .farmer-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
 }
 
 /* イベント/求人のコンパクトウィジェット(横並びカード。詳細ページは別途一覧へ) */
-.widgets-row { display: flex; flex-direction: column; gap: 14px; max-width: 640px; margin: 0 auto; padding: 22px 16px 4px; }
+.widgets-row { display: flex; flex-direction: column; gap: 14px; max-width: 1080px; margin: 0 auto; padding: 22px 16px 4px; }
 @media (min-width: 640px) { .widgets-row { flex-direction: row; } }
 .widget-card { flex: 1; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
 .widget-card .platform-section-head { margin-bottom: 10px; }
@@ -643,7 +531,7 @@ header.app-header.site-nav .hamburger-btn {
 
 /* 出品者募集バナー(プラットフォームとしての「出品側を増やす」導線) */
 .recruit-banner {
-  max-width: 640px;
+  max-width: 1080px;
   margin: 22px auto 0;
   padding: 18px 16px;
   background: var(--green-light);
@@ -702,10 +590,10 @@ header.app-header.site-nav .hamburger-btn {
   background-position: center;
   background-size: cover;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 24px;
+  align-items: flex-end;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 24px 60px 28px 28px;
   text-decoration: none;
   opacity: 0;
   pointer-events: none;
@@ -716,17 +604,17 @@ header.app-header.site-nav .hamburger-btn {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.4) 100%);
+  background: linear-gradient(0deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%);
 }
 .banner-title {
   position: relative;
   z-index: 1;
   color: #fff;
   margin: 0;
-  max-width: 18em;
+  max-width: 16em;
   font-family: "Shippori Mincho", serif;
   font-weight: 700;
-  font-size: clamp(20px, 4.2vw, 40px);
+  font-size: clamp(18px, 3.4vw, 32px);
   line-height: 1.5;
   text-shadow: 0 2px 16px rgba(0,0,0,0.45);
 }
@@ -735,7 +623,7 @@ header.app-header.site-nav .hamburger-btn {
 .banner-dot.active { background: var(--green); width: 16px; border-radius: 4px; }
 
 /* サブバナー: 2枚横並び */
-.sub-banners { display: flex; gap: 10px; max-width: 640px; margin: 14px auto 0; padding: 0 16px; }
+.sub-banners { display: flex; gap: 10px; max-width: 1080px; margin: 14px auto 0; padding: 0 16px; }
 .sub-banner {
   flex: 1;
   aspect-ratio: 4/3;
@@ -752,10 +640,9 @@ header.app-header.site-nav .hamburger-btn {
 .sub-banner::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.5) 100%); }
 .sub-banner span { position: relative; z-index: 1; color: #fff; font-size: 13px; font-weight: 700; text-shadow: 0 1px 6px rgba(0,0,0,0.4); }
 
-/* 出品グリッド(新着の出品) */
+/* 出品グリッド(新着の出品)。コンテナ幅に応じて自動で列数が増える */
 .items-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-@media (min-width: 520px) { .items-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 720px) { .items-grid { grid-template-columns: repeat(5, 1fr); } }
+@media (min-width: 520px) { .items-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
 .items-grid .item-card, .carousel .item-card { width: auto; }
 .carousel .item-card { width: 148px; }
 
@@ -771,12 +658,12 @@ header.app-header.site-nav .hamburger-btn {
 .item-region { font-size: 11px; color: var(--muted); margin: 0 0 2px; }
 
 /* エリアから探す: タグ型の絞り込み(ポケマルの「旬のキーワード」相当) */
-.area-tags-section { max-width: 640px; margin: 0 auto; padding: 22px 16px 4px; }
+.area-tags-section { max-width: 1080px; margin: 0 auto; padding: 22px 16px 4px; }
 .area-tags { padding: 0; background: transparent; border: none; }
 .area-tags .tab { border-radius: 999px; }
 
 /* グループ化フッター(利用者向け/農家向けにリンクを分ける構成をポケマルから踏襲) */
-.site-footer-grouped { padding: 28px 16px 20px; max-width: 640px; margin: 0 auto; }
+.site-footer-grouped { padding: 28px 16px 20px; max-width: 1080px; margin: 0 auto; }
 .footer-cols { display: flex; gap: 32px; flex-wrap: wrap; margin-bottom: 20px; }
 .footer-col-title { font-size: 12px; font-weight: 700; color: var(--text); margin: 0 0 10px; }
 .footer-col { display: flex; flex-direction: column; gap: 8px; }
@@ -785,3 +672,67 @@ header.app-header.site-nav .hamburger-btn {
 .site-footer-grouped .footer-note { padding: 0; text-align: left; border-top: 1px solid var(--border); padding-top: 16px; }
 .site-footer-grouped .photo-credits { padding: 8px 0 0; text-align: left; }
 .footer-copyright { font-size: 11px; color: var(--muted); margin: 12px 0 0; }
+
+/* ============================================================
+   仕上げ: ローディング表現・空写真のプレースホルダー・
+   バナー一時停止・生産者アバターの配色バリエーション等
+   ============================================================ */
+
+/* スケルトン: 「読み込み中...」の文字だけでなく、カードの形をした
+   プレースホルダーを薄いシマーで表示する */
+.skeleton-row, .skeleton-grid { display: flex; flex-direction: column; gap: 14px; }
+.skeleton-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+.skeleton-card { border-radius: var(--radius); overflow: hidden; }
+.skeleton-card .sk-photo { aspect-ratio: 1; border-radius: var(--radius); }
+.skeleton-card .sk-line { height: 10px; border-radius: 4px; margin-top: 8px; }
+.skeleton-card .sk-line.w60 { width: 60%; }
+.skeleton-card .sk-line.w40 { width: 40%; }
+.sk-photo, .sk-line {
+  background: linear-gradient(90deg, var(--border) 25%, #f2f0e8 37%, var(--border) 63%);
+  background-size: 400% 100%;
+  animation: sk-shimmer 1.4s ease infinite;
+}
+@keyframes sk-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk-photo, .sk-line { animation: none; }
+}
+
+/* 写真が未設定のときのプレースホルダー: 絵文字は使わず、
+   「意図的な空欄」と分かる程度の斜めストライプ模様だけを敷く
+   (バッジ等の子要素があると:emptyにならず適用されないのを利用し、
+   わけありバッジ付きのitem-photoには重ねて描画されないようにしている) */
+.thumb:empty, .cover:empty, .item-photo:empty {
+  background-image: repeating-linear-gradient(135deg, var(--green-light), var(--green-light) 8px, #fff 8px, #fff 16px) !important;
+}
+
+/* バナーの一時停止ボタン(自動再生を止める手段を用意する) */
+.banner-pause {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* mini-row: flexアイテムの内容がellipsisで正しく縮むよう min-width:0 を明示 */
+.mini-row .mini-title { min-width: 0; }
+
+/* 生産者アバター: 農家名から色を決め、同名は常に同じ色・別名は見分けやすい色になる */
+.item-avatar.c1 { background: var(--green); }
+.item-avatar.c2 { background: var(--orange); }
+.item-avatar.c3 { background: #3b5bdb; }
+.item-avatar.c4 { background: #a05a3c; }
+.item-avatar.c5 { background: #7a5fc7; }
+
+/* 検索結果件数の表示 */
+.result-count { font-size: 12px; color: var(--muted); margin: 4px 0 10px; max-width: 1080px; margin-left: auto; margin-right: auto; padding: 0 16px; }

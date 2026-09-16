@@ -7,10 +7,22 @@
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-<header class="app-header">
-  <p class="app-title">出品者ページ</p>
-  <p class="app-tagline">農家の方はこちらから出品・イベントを管理します</p>
+<header class="site-nav">
+  <a href="/" class="site-logo">栃木の直売マルシェ</a>
+  <nav class="site-nav-links">
+    <a href="/">農家一覧</a>
+    <a href="/listings.html">出品一覧</a>
+    <a href="/events.html">イベント</a>
+    <a href="/map.html">マップ</a>
+    <a href="/jobs.html">バイト求人</a>
+  </nav>
+  <a href="/seller.html" class="site-nav-cta current">出品者ログイン</a>
 </header>
+
+<div class="page-title-strip">
+  <h1>出品者ページ</h1>
+  <p>農家の方はこちらから出品・イベントを管理します</p>
+</div>
 
 <div class="container" id="page" style="padding-top:16px;"></div>
 
@@ -23,9 +35,11 @@ function render() {
   if (!isSellerLoggedIn()) {
     page.innerHTML = `
       <div class="card">
+        <span class="badge event" style="margin-bottom:10px;display:inline-block;">試験運用中の簡易ログインです</span>
         <h3>出品者ログイン</h3>
         <p style="font-size:13px;color:var(--muted);">
-          現在は簡易ログインです(今後メールアドレスでのアカウント作成に対応予定)。
+          こちらは正式なアカウント認証ではありません(今後メールアドレスでのアカウント作成に置き換え予定)。
+          出品・編集の実際の操作は、運営者から届く農家ごとの「管理用URL」で行います。
           ログインコードは運営者からお知らせします。
         </p>
         <form id="login-form" class="stack">
@@ -95,7 +109,7 @@ function render() {
   });
 }
 
-initNav("/seller.html");
+initBottomNav(null);
 render();
 </script>
 </body>

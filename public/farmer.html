@@ -7,6 +7,17 @@
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
+<header class="site-nav">
+  <a href="/" class="site-logo">栃木の直売マルシェ</a>
+  <nav class="site-nav-links">
+    <a href="/">農家一覧</a>
+    <a href="/listings.html">出品一覧</a>
+    <a href="/events.html">イベント</a>
+    <a href="/map.html">マップ</a>
+    <a href="/jobs.html">バイト求人</a>
+  </nav>
+  <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
+</header>
 <div class="container" style="padding:0" id="page">
   <div class="loading">読み込み中...</div>
 </div>
@@ -49,7 +60,7 @@ function render({ farmer, listings, events, jobs }) {
 
   page.innerHTML = `
     <a href="/" style="display:block;padding:12px 16px;font-size:13px;color:var(--muted);text-decoration:none;">← 一覧に戻る</a>
-    <div class="cover" ${coverStyle}></div>
+    <div class="cover" role="img" aria-label="${escapeHtml(farmer.name)}のカバー写真" ${coverStyle}></div>
     <div class="farmer-header">
       <h1>${escapeHtml(farmer.name)}</h1>
       <p class="meta">${escapeHtml(farmer.municipality)} ・ ${escapeHtml(farmer.crops)}</p>
@@ -98,7 +109,7 @@ function renderListing(l) {
   const thumbStyle = l.image_url ? `style="background-image:url('${escapeHtml(l.image_url)}')"` : "";
   return `
     <div class="listing-card">
-      <div class="thumb" ${thumbStyle}></div>
+      <div class="thumb" role="img" aria-label="${escapeHtml(l.title)}の写真" ${thumbStyle}></div>
       <div class="info" style="flex:1;">
         <p class="title">${escapeHtml(l.title)} ${l.is_special ? `<span class="badge special">わけあり・特価</span>` : ""}</p>
         <p class="comment">${escapeHtml(l.comment)}</p>
@@ -122,7 +133,6 @@ function renderEvent(e) {
   `;
 }
 
-initNav(null);
 initBottomNav(null);
 load();
 </script>

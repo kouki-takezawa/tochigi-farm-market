@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-<header class="app-header site-nav">
+<header class="site-nav">
   <a href="/" class="site-logo">栃木の直売マルシェ</a>
   <nav class="site-nav-links">
     <a href="/" class="current">農家一覧</a>
@@ -27,6 +27,7 @@
     <input type="search" id="search-input" placeholder="農家名・作物・出品名で探す" />
   </label>
 </div>
+<p class="result-count" id="result-count" aria-live="polite"></p>
 
 <section class="banner-carousel" aria-label="お知らせ">
   <div class="banner-track" id="banner-track">
@@ -39,6 +40,7 @@
     <a class="banner-slide" href="#join" style="background-image:url('/images/red-rice-paddy.jpg')">
       <p class="banner-title">出品・掲載は、すべて無料です。</p>
     </a>
+    <button class="banner-pause" id="banner-pause" aria-label="自動再生を一時停止">❚❚</button>
   </div>
   <div class="banner-dots" id="banner-dots"></div>
 </section>
@@ -57,9 +59,7 @@
     <h2>新着の出品</h2>
     <a class="see-all" href="/listings.html">すべて見る →</a>
   </div>
-  <div id="items-grid" class="items-grid">
-    <div class="loading">読み込み中...</div>
-  </div>
+  <div id="items-grid" class="skeleton-grid"></div>
 </section>
 
 <section class="area-tags-section">
@@ -67,22 +67,20 @@
   <div class="tabs area-tags" id="municipality-tabs"></div>
 </section>
 
-<section class="platform-section" id="special">
+<section class="platform-section" id="special" hidden>
   <div class="platform-section-head">
     <h2>わけあり・特価</h2>
     <a class="see-all" href="/listings.html">すべて見る →</a>
   </div>
-  <div id="special-carousel" class="carousel">
-    <div class="loading">読み込み中...</div>
-  </div>
+  <div id="special-carousel" class="carousel"></div>
 </section>
 
 <section class="listing-section" id="farmers">
-  <div class="platform-section-head" style="max-width:640px;margin:0 auto;padding:0 16px;">
+  <div class="platform-section-head" style="max-width:1080px;margin:0 auto;padding:0 16px;">
     <h2>掲載中の農家</h2>
   </div>
   <main id="content">
-    <div class="loading">読み込み中...</div>
+    <div class="skeleton-grid" style="padding:20px 16px;max-width:1080px;margin:0 auto;"></div>
   </main>
 </section>
 
@@ -140,6 +138,9 @@ let allListings = [];
 let currentMunicipality = "";
 let searchQuery = "";
 
+document.getElementById("items-grid").innerHTML = skeletonCards(5);
+document.querySelector("#content .skeleton-grid").innerHTML = skeletonCards(4);
+
 async function loadFarmers() {
   const content = document.getElementById("content");
   try {
@@ -179,19 +180,25 @@ function matchesSearch(text) {
   return (text || "").toLowerCase().includes(searchQuery);
 }
 
+function updateResultCount(farmerCount, itemCount) {
+  const el = document.getElementById("result-count");
+  if (!searchQuery) {
+    el.textContent = "";
+    return;
+  }
+  el.textContent = `「${searchQuery}」の検索結果: 農家 ${farmerCount}件 / 出品 ${itemCount}件`;
+}
+
 function renderFarmerList() {
   const content = document.getElementById("content");
   let filtered = currentMunicipality ? allFarmers.filter((f) => f.municipality === currentMunicipality) : allFarmers;
   filtered = filtered.filter((f) => matchesSearch(f.name) || matchesSearch(f.crops) || matchesSearch(f.municipality));
+  updateResultCount(filtered.length, document.querySelectorAll("#items-grid .item-card").length);
   if (filtered.length === 0) {
     content.innerHTML = `<div class="empty-state">該当する農家が見つかりません。</div>`;
     return;
   }
   content.innerHTML = `<div class="farmer-list">${filtered.map(renderFarmerCard).join("")}</div>`;
-}
-
-function avatarInitial(name) {
-  return (name || "?").trim().charAt(0);
 }
 
 function renderFarmerCard(f) {
@@ -201,7 +208,7 @@ function renderFarmerCard(f) {
   if (f.next_event_date) badges.push(`<span class="badge event">${formatDateShort(f.next_event_date)} イベント</span>`);
   return `
     <a class="farmer-card" href="/farmer.html?id=${encodeURIComponent(f.id)}">
-      <div class="thumb" ${thumbStyle}></div>
+      <div class="thumb" role="img" aria-label="${escapeHtml(f.name)}の写真" ${thumbStyle}></div>
       <div class="info">
         <p class="name">${escapeHtml(f.name)}</p>
         <p class="location">${escapeHtml(f.municipality)}</p>
@@ -228,8 +235,8 @@ function itemCard(l) {
   const thumbStyle = l.image_url ? `style="background-image:url('${escapeHtml(l.image_url)}')"` : "";
   return `
     <a class="item-card" href="/farmer.html?id=${encodeURIComponent(l.farmer_id)}">
-      <div class="item-photo" ${thumbStyle}>${l.is_special ? '<span class="badge special">わけあり</span>' : ""}</div>
-      <div class="item-producer"><span class="item-avatar">${escapeHtml(avatarInitial(l.farmer_name))}</span><span class="item-producer-name">${escapeHtml(l.farmer_name)}</span></div>
+      <div class="item-photo" role="img" aria-label="${escapeHtml(l.title)}の写真" ${thumbStyle}>${l.is_special ? '<span class="badge special">わけあり</span>' : ""}</div>
+      <div class="item-producer"><span class="item-avatar ${avatarColorClass(l.farmer_name)}">${escapeHtml((l.farmer_name || "?").trim().charAt(0))}</span><span class="item-producer-name">${escapeHtml(l.farmer_name)}</span></div>
       <p class="item-title">${escapeHtml(l.title)}</p>
       <p class="item-region">${escapeHtml(l.farmer_municipality)}</p>
       <p class="item-price">${priceLabel(l.price)}</p>
@@ -243,20 +250,23 @@ function renderItems() {
   const shown = filtered.slice(0, 10);
   if (shown.length === 0) {
     el.innerHTML = `<div class="empty-state">まだ出品がありません。</div>`;
-    return;
+  } else {
+    el.innerHTML = shown.map(itemCard).join("");
   }
-  el.innerHTML = shown.map(itemCard).join("");
+  updateResultCount(document.querySelectorAll("#content .farmer-card").length, filtered.length);
 }
 
 function renderSpecial() {
+  const section = document.getElementById("special");
   const el = document.getElementById("special-carousel");
   let filtered = allListings.filter((l) => l.is_special);
   if (currentMunicipality) filtered = filtered.filter((l) => l.farmer_municipality === currentMunicipality);
   const shown = filtered.slice(0, 12);
   if (shown.length === 0) {
-    el.innerHTML = `<div class="empty-state">今はわけあり・特価の出品がありません。</div>`;
+    section.hidden = true;
     return;
   }
+  section.hidden = false;
   el.innerHTML = shown.map(itemCard).join("");
 }
 
@@ -309,10 +319,13 @@ async function loadJobsWidget() {
 function initBannerCarousel() {
   const track = document.getElementById("banner-track");
   const dotsEl = document.getElementById("banner-dots");
-  const slides = Array.from(track.children);
+  const pauseBtn = document.getElementById("banner-pause");
+  const slides = Array.from(track.querySelectorAll(".banner-slide"));
   dotsEl.innerHTML = slides.map((_, i) => `<button class="banner-dot ${i === 0 ? "active" : ""}" data-i="${i}" aria-label="${i + 1}枚目"></button>`).join("");
   const dots = Array.from(dotsEl.children);
   let current = 0;
+  let auto = null;
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function showSlide(i) {
     current = (i + slides.length) % slides.length;
@@ -320,13 +333,30 @@ function initBannerCarousel() {
     dots.forEach((d, di) => d.classList.toggle("active", di === current));
   }
 
+  function play() {
+    if (auto || reduceMotion) return;
+    auto = setInterval(() => showSlide(current + 1), 5000);
+    pauseBtn.textContent = "❚❚";
+    pauseBtn.setAttribute("aria-label", "自動再生を一時停止");
+  }
+  function pause() {
+    clearInterval(auto);
+    auto = null;
+    pauseBtn.textContent = "▶";
+    pauseBtn.setAttribute("aria-label", "自動再生を再開");
+  }
+
   dots.forEach((d) => {
     d.addEventListener("click", () => showSlide(Number(d.dataset.i)));
   });
+  pauseBtn.addEventListener("click", () => (auto ? pause() : play()));
 
   showSlide(0);
-  let auto = setInterval(() => showSlide(current + 1), 5000);
-  track.addEventListener("pointerdown", () => clearInterval(auto), { once: true });
+  if (reduceMotion) {
+    pause();
+  } else {
+    play();
+  }
 }
 
 function initSearch() {
@@ -338,11 +368,11 @@ function initSearch() {
       searchQuery = input.value.trim().toLowerCase();
       renderFarmerList();
       renderItems();
+      renderSpecial();
     }, 150);
   });
 }
 
-initNav("/");
 initBottomNav("/");
 initBannerCarousel();
 initSearch();

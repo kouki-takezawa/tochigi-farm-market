@@ -7,34 +7,71 @@
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-<header class="app-header">
-  <p class="app-title">バイト・求人一覧</p>
-  <p class="app-tagline">県内の農家が募集しているアルバイト・お手伝いを新着順に</p>
+<header class="site-nav">
+  <a href="/" class="site-logo">栃木の直売マルシェ</a>
+  <nav class="site-nav-links">
+    <a href="/">農家一覧</a>
+    <a href="/listings.html">出品一覧</a>
+    <a href="/events.html">イベント</a>
+    <a href="/map.html">マップ</a>
+    <a href="/jobs.html" class="current">バイト求人</a>
+  </nav>
+  <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
 </header>
 
-<main class="container" style="padding-top:16px;" id="content">
-  <div class="loading">読み込み中...</div>
+<div class="page-title-strip">
+  <h1>バイト・求人一覧</h1>
+  <p>県内の農家が募集しているアルバイト・お手伝いを新着順に</p>
+</div>
+
+<div class="search-strip">
+  <label class="search-bar">
+    <input type="search" id="search-input" placeholder="仕事内容・農家名・市町村で探す" />
+  </label>
+</div>
+<p class="result-count" id="result-count" aria-live="polite"></p>
+
+<main class="container wide" style="padding-top:16px;" id="content">
+  <div class="skeleton-grid"></div>
 </main>
 
 <script src="/common.js"></script>
 <script>
+let allJobs = [];
+let searchQuery = "";
+
+document.querySelector("#content .skeleton-grid").innerHTML = skeletonCards(6);
+
 async function load() {
-  const content = document.getElementById("content");
   try {
     const data = await apiFetch("/api/jobs");
-    render(data.jobs || []);
+    allJobs = data.jobs || [];
+    render();
   } catch (e) {
-    content.innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+    document.getElementById("content").innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
   }
 }
 
-function render(jobs) {
+function render() {
   const content = document.getElementById("content");
-  if (!jobs.length) {
-    content.innerHTML = `<div class="empty-state">募集中のバイト・求人はまだありません。</div>`;
+  const q = searchQuery;
+  const filtered = q
+    ? allJobs.filter(
+        (j) =>
+          (j.title || "").toLowerCase().includes(q) ||
+          (j.farmer_name || "").toLowerCase().includes(q) ||
+          (j.farmer_municipality || "").toLowerCase().includes(q) ||
+          (j.description || "").toLowerCase().includes(q)
+      )
+    : allJobs;
+
+  document.getElementById("result-count").textContent = q ? `「${q}」の検索結果: ${filtered.length}件` : "";
+
+  if (!filtered.length) {
+    content.innerHTML = `<div class="empty-state">${q ? "該当する求人が見つかりません。" : "募集中のバイト・求人はまだありません。"}</div>`;
     return;
   }
-  content.innerHTML = `<div style="display:flex;flex-direction:column;">${jobs.map(renderCard).join("")}</div>`;
+  content.innerHTML = `<div class="list-grid">${filtered.map(renderCard).join("")}</div>`;
 }
 
 function renderCard(j) {
@@ -49,7 +86,11 @@ function renderCard(j) {
   `;
 }
 
-initNav("/jobs.html");
+document.getElementById("search-input").addEventListener("input", (ev) => {
+  searchQuery = ev.target.value.trim().toLowerCase();
+  render();
+});
+
 initBottomNav("/jobs.html");
 load();
 </script>

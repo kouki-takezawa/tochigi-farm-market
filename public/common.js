@@ -66,60 +66,27 @@ function isSellerLoggedIn() {
   return localStorage.getItem("seller_logged_in") === "1";
 }
 
-function initNav(activeHref) {
-  const header = document.querySelector("header.app-header");
+// 農家名からアバターの配色を決める(同じ名前は常に同じ色になるよう
+// シンプルな文字コード和のハッシュを使う。見分けやすさのための演出で、
+// セキュリティ用途のハッシュではない)
+function avatarColorClass(name) {
+  const s = String(name || "");
+  let sum = 0;
+  for (let i = 0; i < s.length; i++) sum += s.charCodeAt(i);
+  return `c${(sum % 5) + 1}`;
+}
 
-  const btn = document.createElement("button");
-  btn.className = "hamburger-btn";
-  btn.setAttribute("aria-label", "メニュー");
-  btn.innerHTML = "☰";
-  if (header) {
-    header.appendChild(btn);
-  } else {
-    btn.classList.add("hamburger-btn-floating");
-    document.body.appendChild(btn);
-  }
-
-  const links = [
-    { href: "/", label: "農家一覧" },
-    { href: "/listings.html", label: "出品一覧" },
-    { href: "/events.html", label: "イベント一覧" },
-    { href: "/jobs.html", label: "バイト・求人" },
-    { href: "/map.html", label: "マップ" },
-    { href: "/seller.html", label: isSellerLoggedIn() ? "出品者ページ" : "出品者ログイン" },
-  ];
-
-  const overlay = document.createElement("div");
-  overlay.className = "nav-overlay";
-  overlay.innerHTML = `
-    <nav class="nav-drawer">
-      <div class="nav-drawer-header">
-        <span>メニュー</span>
-        <button class="nav-close" aria-label="閉じる">✕</button>
-      </div>
-      <ul>
-        ${links
-          .map(
-            (l) =>
-              `<li><a href="${l.href}" class="${l.href === activeHref ? "active" : ""}">${escapeHtml(l.label)}</a></li>`
-          )
-          .join("")}
-      </ul>
-    </nav>
-  `;
-  document.body.appendChild(overlay);
-
-  const close = () => overlay.classList.remove("open");
-  btn.addEventListener("click", () => overlay.classList.add("open"));
-  overlay.querySelector(".nav-close").addEventListener("click", close);
-  overlay.addEventListener("click", (ev) => {
-    if (ev.target === overlay) close();
-  });
+// カード形のローディングプレースホルダー(「読み込み中...」の文字だけでなく、
+// 実際のカードに近い形のスケルトンを薄いシマーで表示する)
+function skeletonCards(n) {
+  return Array.from({ length: n })
+    .map(() => `<div class="skeleton-card"><div class="sk-photo"></div><div class="sk-line w60"></div><div class="sk-line w40"></div></div>`)
+    .join("");
 }
 
 // アプリ的な下部タブバー(ポケットマルシェ等のプラットフォームUIを参考に、
 // 「読み物サイト」ではなく「使うプラットフォーム」であることを常時示すための主要導線)。
-// initNav() のハンバーガー(副次的な導線: 出品者ログイン等)とは役割を分けている。
+// 全ページ共通のヘッダー(.site-nav、ロゴ+横並びナビ+出品者ログイン)と役割を分けている。
 function initBottomNav(activeHref) {
   const items = [
     { href: "/", label: "ホーム" },

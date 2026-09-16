@@ -7,41 +7,78 @@
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-<header class="app-header">
-  <p class="app-title">出品一覧</p>
-  <p class="app-tagline">県内の農家から届いた「今買えるもの」を新着順に</p>
+<header class="site-nav">
+  <a href="/" class="site-logo">栃木の直売マルシェ</a>
+  <nav class="site-nav-links">
+    <a href="/">農家一覧</a>
+    <a href="/listings.html" class="current">出品一覧</a>
+    <a href="/events.html">イベント</a>
+    <a href="/map.html">マップ</a>
+    <a href="/jobs.html">バイト求人</a>
+  </nav>
+  <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
 </header>
 
-<main class="container" style="padding-top:16px;" id="content">
-  <div class="loading">読み込み中...</div>
+<div class="page-title-strip">
+  <h1>出品一覧</h1>
+  <p>県内の農家から届いた「今買えるもの」を新着順に</p>
+</div>
+
+<div class="search-strip">
+  <label class="search-bar">
+    <input type="search" id="search-input" placeholder="品目名・農家名・市町村で探す" />
+  </label>
+</div>
+<p class="result-count" id="result-count" aria-live="polite"></p>
+
+<main class="container wide" style="padding-top:16px;" id="content">
+  <div class="skeleton-grid"></div>
 </main>
 
 <script src="/common.js"></script>
 <script>
+let allListings = [];
+let searchQuery = "";
+
+document.querySelector("#content .skeleton-grid").innerHTML = skeletonCards(6);
+
 async function load() {
-  const content = document.getElementById("content");
   try {
     const data = await apiFetch("/api/listings");
-    render(data.listings || []);
+    allListings = data.listings || [];
+    render();
   } catch (e) {
-    content.innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+    document.getElementById("content").innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
   }
 }
 
-function render(listings) {
+function render() {
   const content = document.getElementById("content");
-  if (!listings.length) {
-    content.innerHTML = `<div class="empty-state">まだ出品がありません。</div>`;
+  const q = searchQuery;
+  const filtered = q
+    ? allListings.filter(
+        (l) =>
+          (l.title || "").toLowerCase().includes(q) ||
+          (l.farmer_name || "").toLowerCase().includes(q) ||
+          (l.farmer_municipality || "").toLowerCase().includes(q) ||
+          (l.comment || "").toLowerCase().includes(q)
+      )
+    : allListings;
+
+  document.getElementById("result-count").textContent = q ? `「${q}」の検索結果: ${filtered.length}件` : "";
+
+  if (!filtered.length) {
+    content.innerHTML = `<div class="empty-state">${q ? "該当する出品が見つかりません。" : "まだ出品がありません。"}</div>`;
     return;
   }
-  content.innerHTML = `<div style="display:flex;flex-direction:column;">${listings.map(renderRow).join("")}</div>`;
+  content.innerHTML = `<div class="list-grid">${filtered.map(renderRow).join("")}</div>`;
 }
 
 function renderRow(l) {
   const thumbStyle = l.image_url ? `style="background-image:url('${escapeHtml(l.image_url)}')"` : "";
   return `
     <a class="listing-card" href="/farmer.html?id=${encodeURIComponent(l.farmer_id)}" style="text-decoration:none;color:inherit;">
-      <div class="thumb" ${thumbStyle}></div>
+      <div class="thumb" role="img" aria-label="${escapeHtml(l.title)}の写真" ${thumbStyle}></div>
       <div class="info" style="flex:1;">
         <p class="title">${escapeHtml(l.title)} ${l.is_special ? `<span class="badge special">わけあり・特価</span>` : ""}</p>
         <p class="comment">${escapeHtml(l.comment)}</p>
@@ -52,7 +89,11 @@ function renderRow(l) {
   `;
 }
 
-initNav("/listings.html");
+document.getElementById("search-input").addEventListener("input", (ev) => {
+  searchQuery = ev.target.value.trim().toLowerCase();
+  render();
+});
+
 initBottomNav("/listings.html");
 load();
 </script>

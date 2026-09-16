@@ -41,12 +41,12 @@ function renderRow(l) {
   const thumbStyle = l.image_url ? `style="background-image:url('${escapeHtml(l.image_url)}')"` : "";
   return `
     <a class="listing-card" href="/farmer.html?id=${encodeURIComponent(l.farmer_id)}" style="text-decoration:none;color:inherit;">
-      <div class="thumb" ${thumbStyle}>${l.image_url ? "" : "🥬"}</div>
+      <div class="thumb" ${thumbStyle}></div>
       <div class="info" style="flex:1;">
         <p class="title">${escapeHtml(l.title)} ${l.is_special ? `<span class="badge special">わけあり・特価</span>` : ""}</p>
         <p class="comment">${escapeHtml(l.comment)}</p>
         <p class="price">${priceLabel(l.price)}</p>
-        <p style="font-size:12px;color:var(--muted);margin:4px 0 0;">🌾 ${escapeHtml(l.farmer_name)}(${escapeHtml(l.farmer_municipality)})</p>
+        <p style="font-size:12px;color:var(--muted);margin:4px 0 0;">${escapeHtml(l.farmer_name)}(${escapeHtml(l.farmer_municipality)})</p>
       </div>
     </a>
   `;

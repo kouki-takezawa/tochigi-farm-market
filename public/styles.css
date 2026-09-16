@@ -6,7 +6,7 @@
   --text: #2a2a25;
   --muted: #6b6b63;
   --border: #e2e0d5;
-  --bg: #faf9f4;
+  --bg: #ffffff;
   --card-bg: #ffffff;
   --danger: #c0392b;
   --radius: 14px;
@@ -40,139 +40,6 @@ header.app-header {
   position: relative;
 }
 
-header.app-header.hero {
-  background:
-    linear-gradient(180deg, rgba(10, 20, 8, 0.05) 0%, rgba(10, 18, 8, 0.15) 40%, rgba(8, 16, 6, 0.55) 75%, rgba(6, 12, 5, 0.85) 100%),
-    url("/images/hero-vegetables-01.jpg") center 40%/cover no-repeat;
-  min-height: 320px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 56px 20px 22px;
-}
-
-header.app-header.hero .eyebrow {
-  display: inline-block;
-  font-size: 12px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: #d9f2c8;
-  font-weight: 700;
-  margin: 0 0 8px;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
-}
-
-header.app-header.hero .app-tagline {
-  font-family: "Shippori Mincho", serif;
-  font-size: 16px;
-  font-weight: 700;
-  opacity: 1;
-  text-shadow: 0 1px 8px rgba(0,0,0,0.55);
-  margin-top: 10px;
-  text-wrap: pretty;
-}
-
-header.app-header.hero .hamburger-btn {
-  background: rgba(0,0,0,0.35);
-}
-
-/* ヒーローはブランド表現に専念させ、機能の切り替え(リスト/マップ)は
-   置かない。ヒーローには「下にスクロールして本編へ」を促すCTAのみ置く */
-.hero-cta {
-  align-self: flex-start;
-  margin-top: 18px;
-  background: #fdf6e3;
-  color: var(--green-dark);
-  border-radius: 999px;
-  padding: 13px 26px;
-}
-
-.hero-cta:hover { background: #fff; }
-
-.hero-cta span {
-  display: inline-block;
-  animation: hero-cta-bounce 1.6s ease-in-out infinite;
-}
-
-@keyframes hero-cta-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(3px); }
-}
-
-/* リスト/マップの切り替えは、実際にリストを表示するFARMERSセクション側に
-   置く。下線タブのような控えめな見た目にして、ヒーローの機能ボタンめいた
-   印象を避ける */
-.view-switch {
-  display: flex;
-  justify-content: center;
-  gap: 28px;
-  margin: 2px 0 18px;
-}
-
-.view-switch-item {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--muted);
-  text-decoration: none;
-  padding-bottom: 6px;
-  border-bottom: 2px solid transparent;
-}
-
-.view-switch-item.active {
-  color: var(--green-dark);
-  border-bottom-color: var(--green);
-}
-
-/* ブランドロゴタイプ(筆文字調)。渋温泉サイトの「渋温泉」大書きロゴを参考に、
-   ヒーローではブランド名そのものを主役にする */
-.brand-logotype {
-  font-family: "Yuji Syuku", "Shippori Mincho", serif;
-  font-size: 44px;
-  line-height: 1.2;
-  color: #fdf6e3;
-  margin: 2px 0 0;
-  text-shadow: 0 3px 14px rgba(0,0,0,0.6);
-  text-wrap: balance;
-}
-
-.brand-logotype.small {
-  font-size: 26px;
-  color: var(--green-dark);
-  text-shadow: none;
-  text-align: center;
-  margin: 0 0 10px;
-}
-
-/* 農家の直売所らしく、山並みではなく「なだらかな畑の丘」のシルエットで
-   セクションをつなぐ帯(渋温泉サイトの波型の切り替え演出を、農地の起伏に置き換えたもの) */
-.hills-divider {
-  line-height: 0;
-  background: var(--bg);
-}
-
-.hills-divider svg {
-  display: block;
-  width: 100%;
-  height: 56px;
-}
-
-.hills-divider.flip {
-  background: var(--card-bg);
-  transform: scaleY(-1);
-}
-
-.brand-footer {
-  background: linear-gradient(180deg, #f6efd6 0%, #eef2df 55%, #dfe9ce 100%);
-  padding: 28px 20px 36px;
-  text-align: center;
-}
-
-.brand-footer .footer-note,
-.brand-footer .photo-credits {
-  padding-left: 0;
-  padding-right: 0;
-}
-
 .photo-credits {
   text-align: center;
   font-size: 10px;
@@ -182,60 +49,6 @@ header.app-header.hero .hamburger-btn {
 }
 
 .photo-credits a { color: var(--muted); }
-
-/* トップページ用の紹介セクション */
-.section-eyebrow {
-  display: block;
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--green);
-  font-weight: 700;
-  margin: 0 0 8px;
-}
-
-.section-eyebrow.center { text-align: center; }
-
-.section-title {
-  font-family: "Shippori Mincho", serif;
-  font-size: 22px;
-  line-height: 1.5;
-  font-weight: 700;
-  margin: 0 0 12px;
-  color: var(--text);
-  text-wrap: pretty;
-}
-
-.section-title.center { text-align: center; }
-
-.section-body {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.9;
-  margin: 0 auto;
-  max-width: 30em;
-  text-wrap: pretty;
-}
-
-.intro-section {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 36px 16px 8px;
-}
-
-.intro-image {
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  border-radius: var(--radius);
-  box-shadow: 0 12px 28px rgba(20, 40, 20, 0.18);
-  display: block;
-}
-
-.intro-text {
-  padding: 22px 4px 4px;
-  text-align: center;
-}
 
 .listing-section {
   padding: 36px 0 0;
@@ -728,15 +541,13 @@ body.has-bottom-nav { padding-bottom: 64px; }
 .bottom-nav-item {
   flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 8px 2px 6px;
+  justify-content: center;
+  padding: 14px 2px;
   text-decoration: none;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
 }
-.bottom-nav-icon { font-size: 19px; line-height: 1; }
 .bottom-nav-item.active { color: var(--green-dark); font-weight: 700; }
 
 /* コンパクトなアプリバー(読み物としての大きな写真ヒーローの代わり) */
@@ -873,10 +684,11 @@ header.app-header.appbar .app-title {
 .search-bar input::placeholder { color: var(--muted); }
 
 /* バナーカルーセル: scroll-snapで実装(JSのタッチ処理を書かずにスワイプ対応) */
-.banner-carousel { position: relative; padding-top: 14px; }
+.banner-carousel { position: relative; max-width: 640px; margin: 0 auto; padding-top: 14px; }
 .banner-track {
   position: relative;
-  aspect-ratio: 16/7;
+  aspect-ratio: 16/6.5;
+  max-height: 260px;
   overflow: hidden;
 }
 .banner-slide {

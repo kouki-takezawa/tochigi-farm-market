@@ -122,11 +122,11 @@ function initNav(activeHref) {
 // initNav() のハンバーガー(副次的な導線: 出品者ログイン等)とは役割を分けている。
 function initBottomNav(activeHref) {
   const items = [
-    { href: "/", label: "ホーム", icon: "🏠" },
-    { href: "/listings.html", label: "出品", icon: "🥬" },
-    { href: "/map.html", label: "マップ", icon: "📍" },
-    { href: "/events.html", label: "イベント", icon: "📅" },
-    { href: "/jobs.html", label: "求人", icon: "💼" },
+    { href: "/", label: "ホーム" },
+    { href: "/listings.html", label: "出品" },
+    { href: "/map.html", label: "マップ" },
+    { href: "/events.html", label: "イベント" },
+    { href: "/jobs.html", label: "求人" },
   ];
 
   const nav = document.createElement("nav");
@@ -135,7 +135,7 @@ function initBottomNav(activeHref) {
   nav.innerHTML = items
     .map((it) => {
       const active = it.href === activeHref ? "active" : "";
-      return `<a class="bottom-nav-item ${active}" href="${it.href}"><span class="bottom-nav-icon" aria-hidden="true">${it.icon}</span><span class="bottom-nav-label">${escapeHtml(it.label)}</span></a>`;
+      return `<a class="bottom-nav-item ${active}" href="${it.href}"><span class="bottom-nav-label">${escapeHtml(it.label)}</span></a>`;
     })
     .join("");
   document.body.appendChild(nav);

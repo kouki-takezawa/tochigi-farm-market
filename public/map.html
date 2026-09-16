@@ -179,7 +179,7 @@ function renderList() {
       .map(
         (f) => `
       <a class="farmer-card" href="/farmer.html?id=${encodeURIComponent(f.id)}">
-        <div class="thumb" ${f.cover_image_url ? `style="background-image:url('${escapeHtml(f.cover_image_url)}')"` : ""}>${f.cover_image_url ? "" : "🌾"}</div>
+        <div class="thumb" ${f.cover_image_url ? `style="background-image:url('${escapeHtml(f.cover_image_url)}')"` : ""}></div>
         <div class="info">
           <p class="name">${escapeHtml(f.name)}</p>
           <p class="location">${escapeHtml(f.municipality)}${f._distance != null ? ` ・ 現在地から約${f._distance.toFixed(1)}km` : ""}</p>

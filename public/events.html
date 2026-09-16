@@ -46,7 +46,7 @@ function renderRow(e) {
         <p class="title">${escapeHtml(e.title)}</p>
         <p class="sub">${escapeHtml(formatDateLong(e.event_date))}${e.event_time ? " " + escapeHtml(e.event_time) : ""}${e.location ? " ・ " + escapeHtml(e.location) : ""}${e.fee ? " ・ 参加費" + escapeHtml(e.fee) : ""}</p>
         <p class="desc">${escapeHtml(e.description)}</p>
-        <p style="font-size:12px;color:var(--muted);margin:4px 0 0;">🌾 ${escapeHtml(e.farmer_name)}(${escapeHtml(e.farmer_municipality)})</p>
+        <p style="font-size:12px;color:var(--muted);margin:4px 0 0;">${escapeHtml(e.farmer_name)}(${escapeHtml(e.farmer_municipality)})</p>
       </div>
     </a>
   `;

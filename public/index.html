@@ -13,7 +13,6 @@
 <header class="app-header appbar">
   <p class="app-title">栃木の直売マルシェ</p>
   <label class="search-bar">
-    <span aria-hidden="true">🔍</span>
     <input type="search" id="search-input" placeholder="農家名・作物・出品名で探す" />
   </label>
 </header>
@@ -194,7 +193,7 @@ function renderFarmerCard(f) {
   if (f.next_event_date) badges.push(`<span class="badge event">${formatDateShort(f.next_event_date)} イベント</span>`);
   return `
     <a class="farmer-card" href="/farmer.html?id=${encodeURIComponent(f.id)}">
-      <div class="thumb" ${thumbStyle}>${f.cover_image_url ? "" : "🌾"}</div>
+      <div class="thumb" ${thumbStyle}></div>
       <div class="info">
         <p class="name">${escapeHtml(f.name)}</p>
         <p class="location">${escapeHtml(f.municipality)}</p>
@@ -221,7 +220,7 @@ function itemCard(l) {
   const thumbStyle = l.image_url ? `style="background-image:url('${escapeHtml(l.image_url)}')"` : "";
   return `
     <a class="item-card" href="/farmer.html?id=${encodeURIComponent(l.farmer_id)}">
-      <div class="item-photo" ${thumbStyle}>${l.image_url ? "" : "🌱"}${l.is_special ? '<span class="badge special">わけあり</span>' : ""}</div>
+      <div class="item-photo" ${thumbStyle}>${l.is_special ? '<span class="badge special">わけあり</span>' : ""}</div>
       <div class="item-producer"><span class="item-avatar">${escapeHtml(avatarInitial(l.farmer_name))}</span><span class="item-producer-name">${escapeHtml(l.farmer_name)}</span></div>
       <p class="item-title">${escapeHtml(l.title)}</p>
       <p class="item-region">${escapeHtml(l.farmer_municipality)}</p>

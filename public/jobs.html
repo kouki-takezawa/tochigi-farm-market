@@ -44,7 +44,7 @@ function renderCard(j) {
       <p class="job-wage">${escapeHtml(j.wage)}</p>
       <p class="job-meta">${j.work_date ? escapeHtml(j.work_date) : ""}${j.work_hours ? " ・ " + escapeHtml(j.work_hours) : ""}${j.capacity ? " ・ 募集" + escapeHtml(j.capacity) : ""}</p>
       ${j.description ? `<p class="job-desc">${escapeHtml(j.description)}</p>` : ""}
-      <p class="job-farmer">🌾 ${escapeHtml(j.farmer_name)}(${escapeHtml(j.farmer_municipality)})</p>
+      <p class="job-farmer">${escapeHtml(j.farmer_name)}(${escapeHtml(j.farmer_municipality)})</p>
     </a>
   `;
 }

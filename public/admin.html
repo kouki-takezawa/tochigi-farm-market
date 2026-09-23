@@ -4,6 +4,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>運営管理 | 栃木の直売マルシェ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -11,10 +14,10 @@
   <a href="/" class="site-logo">栃木の直売マルシェ</a>
   <nav class="site-nav-links">
     <a href="/">ホーム</a>
-    <a href="/farmers.html">農家一覧</a>
     <a href="/listings.html">出品一覧</a>
-    <a href="/events.html">イベント</a>
+    <a href="/farmers.html">農家一覧</a>
     <a href="/map.html">マップ</a>
+    <a href="/events.html">イベント</a>
     <a href="/jobs.html">バイト求人</a>
   </nav>
   <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
@@ -48,7 +51,7 @@
           <label>住所(マップのピン用・番地まで入れると精度が上がります)</label>
           <input type="text" name="address" placeholder="例: 栃木県宇都宮市桜1-1-1" />
           <button type="button" id="geocode-btn" class="btn secondary" style="margin-top:6px;">この住所から緯度経度を取得</button>
-          <p id="geocode-status" style="font-size:12px;color:var(--muted);margin:6px 0 0;"></p>
+          <p id="geocode-status" style="font-size:12px;color:var(--ink-2);margin:6px 0 0;"></p>
         </div>
         <div style="display:flex;gap:10px;">
           <div style="flex:1;"><label>緯度(任意)</label><input type="text" name="lat" inputmode="decimal" placeholder="例: 36.5551" /></div>
@@ -61,7 +64,7 @@
 
     <div class="card">
       <h3>管理URLの再発行</h3>
-      <p style="font-size:13px;color:var(--muted);">農家IDが分かっている場合、管理用URLを再取得できます(URLを紛失した場合用)。</p>
+      <p style="font-size:13px;color:var(--ink-2);">農家IDが分かっている場合、管理用URLを再取得できます(URLを紛失した場合用)。</p>
       <form id="reissue-form" class="stack">
         <input type="text" name="id" placeholder="農家ID(例: farmer-xxxx)" required />
         <button type="submit" class="btn secondary block">管理URLを取得</button>
@@ -111,7 +114,7 @@ async function loadFarmerList() {
           .map(
             (f) => `
         <div class="item-row">
-          <div><b>${escapeHtml(f.name)}</b><br><span style="font-size:12px;color:var(--muted);">${escapeHtml(f.municipality)} ・ ${escapeHtml(f.id)}</span></div>
+          <div><b>${escapeHtml(f.name)}</b><br><span style="font-size:12px;color:var(--ink-2);">${escapeHtml(f.municipality)} ・ ${escapeHtml(f.id)}</span></div>
           <div class="actions"><button class="btn secondary" data-delete-farmer="${escapeHtml(f.id)}">削除</button></div>
         </div>`
           )
@@ -183,7 +186,7 @@ document.getElementById("create-form").addEventListener("submit", async (ev) => 
     });
     const fullUrl = `${location.origin}${data.manage_url}`;
     resultEl.innerHTML = `
-      <div class="card" style="background:var(--green-light);margin-top:12px;">
+      <div class="card" style="background:var(--paper-2);margin-top:12px;">
         <p style="font-weight:700;margin:0 0 6px;">登録しました。この管理URLを農家にLINE等で送ってください:</p>
         <p style="word-break:break-all;font-size:13px;">${escapeHtml(fullUrl)}</p>
       </div>
@@ -212,6 +215,7 @@ document.getElementById("reissue-form").addEventListener("submit", async (ev) =>
 
 initBottomNav(null);
 init();
+initSiteFooter();
 </script>
 </body>
 </html>

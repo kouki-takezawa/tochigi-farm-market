@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>栃木の直売マルシェ</title>
+<title>栃木の直売マルシェ | 県内の農家から直接買える</title>
+<meta name="description" content="栃木県内の農家が「今日出せるもの」を載せる直売の掲示板。気になった農家にLINEや電話で直接連絡して買えます。畑のイベントや収穫の手伝い募集も掲載中。" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
@@ -14,253 +15,292 @@
   <a href="/" class="site-logo">栃木の直売マルシェ</a>
   <nav class="site-nav-links">
     <a href="/" class="current">ホーム</a>
-    <a href="/farmers.html">農家一覧</a>
     <a href="/listings.html">出品一覧</a>
-    <a href="/events.html">イベント</a>
+    <a href="/farmers.html">農家一覧</a>
     <a href="/map.html">マップ</a>
+    <a href="/events.html">イベント</a>
     <a href="/jobs.html">バイト求人</a>
   </nav>
   <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
 </header>
 
-<div class="search-strip">
-  <label class="search-bar">
-    <input type="search" id="search-input" placeholder="農家名・作物・出品名で探す" />
-  </label>
-</div>
-<p class="result-count" id="result-count" aria-live="polite"></p>
-
-<section class="banner-carousel" aria-label="お知らせ">
-  <div class="banner-track" id="banner-track">
-    <a class="banner-slide" href="#items" style="background-image:url('/images/hero-vegetables-01.jpg')">
-      <p class="banner-title">畑から、まっすぐ食卓へ。</p>
-    </a>
-    <a class="banner-slide" href="/jobs.html" style="background-image:url('/images/strawberry-greenhouse.jpg')">
-      <p class="banner-title">収穫を手伝うバイト、募集中。</p>
-    </a>
-    <a class="banner-slide" href="#join" style="background-image:url('/images/red-rice-paddy.jpg')">
-      <p class="banner-title">出品・掲載は、すべて無料です。</p>
-    </a>
-    <button class="banner-pause" id="banner-pause" aria-label="自動再生を一時停止">❚❚</button>
+<section class="hero" aria-label="栃木の直売マルシェ">
+  <div class="hero-media" id="hero-media">
+    <div class="hero-slide active" style="background-image:url('/images/hero-vegetables-01.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('/images/strawberry-greenhouse.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('/images/rice-terrace-01.jpg')"></div>
   </div>
-  <div class="banner-dots" id="banner-dots"></div>
-</section>
-
-<div class="sub-banners">
-  <a class="sub-banner" href="/map.html" style="background-image:url('/images/rice-terrace-01.jpg')">
-    <span>マップで探す</span>
-  </a>
-  <a class="sub-banner" href="/events.html" style="background-image:url('/images/skyberry-tochigi.jpg')">
-    <span>畑のイベント</span>
-  </a>
-</div>
-
-<section class="platform-section" id="items">
-  <div class="platform-section-head">
-    <h2>新着の出品</h2>
-    <a class="see-all" href="/listings.html">すべて見る →</a>
-  </div>
-  <div id="items-grid" class="skeleton-grid"></div>
-</section>
-
-<section class="area-tags-section">
-  <div class="platform-section-head">
-    <h2>エリアから探す</h2>
-    <button class="area-tags-toggle" id="area-toggle" aria-expanded="false">市町村を選ぶ ▾</button>
-  </div>
-  <div class="tabs area-tags" id="municipality-tabs" hidden></div>
-</section>
-
-<section class="platform-section" id="special" hidden>
-  <div class="platform-section-head">
-    <h2>わけあり・特価</h2>
-    <a class="see-all" href="/listings.html">すべて見る →</a>
-  </div>
-  <div id="special-carousel" class="carousel"></div>
-</section>
-
-<section class="widgets-row">
-  <div class="widget-card">
-    <div class="platform-section-head"><h2>近日のイベント</h2><a class="see-all" href="/events.html">すべて →</a></div>
-    <div id="events-widget">
-      <div class="loading">読み込み中...</div>
+  <div class="wrap">
+    <div class="hero-inner">
+      <span class="hero-eyebrow">栃木県内限定</span>
+      <h1>今日、畑から。<br />直接買える人を探す。</h1>
+      <p class="hero-lead">
+        県内の農家が「今日出せるもの」を載せています。気になった農家にLINEか電話で直接連絡して、
+        受け取り方法と支払いを決めてください。
+      </p>
+      <form class="hero-search" id="hero-search" role="search">
+        <label class="search-bar">
+          <input type="search" id="hero-q" placeholder="品目名・農家名で探す" aria-label="品目名・農家名・市町村で探す" />
+        </label>
+        <button type="submit">探す</button>
+      </form>
+      <div class="hero-quick">
+        <a href="/listings.html?cat=vegetable">野菜</a>
+        <a href="/listings.html?cat=fruit">果物</a>
+        <a href="/listings.html?cat=rice">米・穀物</a>
+        <a href="/listings.html?special=1">わけあり・特価</a>
+        <a href="/map.html">近くの農家</a>
+      </div>
+      <p class="hero-note">サイト上での決済・仲介は行っていません。やり取りは農家と直接です。</p>
     </div>
   </div>
-  <div class="widget-card">
-    <div class="platform-section-head"><h2>募集中の求人</h2><a class="see-all" href="/jobs.html">すべて →</a></div>
-    <div id="jobs-widget">
-      <div class="loading">読み込み中...</div>
+  <div class="hero-dots" id="hero-dots"></div>
+  <button class="hero-pause" id="hero-pause" aria-label="背景の自動切り替えを一時停止">❚❚</button>
+</section>
+
+<section class="section section--tint">
+  <div class="wrap">
+    <div class="stat-row" id="stat-row">
+      <div class="stat"><span class="stat-num" id="stat-farmers">–</span><span class="stat-label">軒の農家が掲載中</span></div>
+      <div class="stat"><span class="stat-num" id="stat-listings">–</span><span class="stat-label">件の出品</span></div>
+      <div class="stat"><span class="stat-num" id="stat-today">–</span><span class="stat-label">件が本日の出品</span></div>
+    </div>
+    <div class="howto">
+      <div class="howto-step">
+        <span class="howto-num">1</span>
+        <div>
+          <h3>探す</h3>
+          <p>品目や市町村、地図から、近くの農家と今日の出品を探します。</p>
+        </div>
+      </div>
+      <div class="howto-step">
+        <span class="howto-num">2</span>
+        <div>
+          <h3>直接連絡する</h3>
+          <p>農家ページのLINE・電話から本人に連絡し、在庫と受け取り方を相談します。</p>
+        </div>
+      </div>
+      <div class="howto-step">
+        <span class="howto-num">3</span>
+        <div>
+          <h3>受け取る</h3>
+          <p>畑や直売所で受け取り、支払い方法は農家の指定どおりに。手数料はかかりません。</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<div class="recruit-banner" id="join">
-  <p><strong>農家の方へ</strong>出品・イベント・求人の掲載はすべて無料。スマホから写真と一言だけで投稿できます。掲載希望の方は運営者までご連絡ください。</p>
-</div>
-
-<footer class="site-footer-grouped">
-  <div class="footer-cols">
-    <div class="footer-col">
-      <p class="footer-col-title">利用者の方へ</p>
-      <a href="/farmers.html">農家一覧</a>
-      <a href="/listings.html">出品一覧</a>
-      <a href="/events.html">イベント一覧</a>
-      <a href="/jobs.html">バイト・求人一覧</a>
-      <a href="/map.html">マップで探す</a>
+<section class="section" id="items">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>新着の出品</h2>
+      <a class="see-all" href="/listings.html">すべて見る →</a>
     </div>
-    <div class="footer-col">
-      <p class="footer-col-title">農家の方へ</p>
-      <a href="/seller.html">出品者ログイン</a>
-      <a href="#join">掲載のご案内</a>
+    <div class="card-grid" id="items-grid"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>品目から探す</h2>
+    </div>
+    <div class="cat-grid">
+      <a class="cat-card" href="/listings.html?cat=vegetable"><img src="/images/cat-vegetable.jpg" alt="" loading="lazy" /><span>野菜</span></a>
+      <a class="cat-card" href="/listings.html?cat=fruit"><img src="/images/cat-fruit.jpg" alt="" loading="lazy" /><span>果物</span></a>
+      <a class="cat-card" href="/listings.html?cat=rice"><img src="/images/cat-rice.jpg" alt="" loading="lazy" /><span>米・穀物</span></a>
+      <a class="cat-card" href="/listings.html?cat=egg"><img src="/images/cat-egg.jpg" alt="" loading="lazy" /><span>卵・肉・乳</span></a>
+      <a class="cat-card" href="/listings.html?cat=processed"><img src="/images/cat-processed.jpg" alt="" loading="lazy" /><span>加工品</span></a>
+      <a class="cat-card" href="/listings.html?cat=flower"><img src="/images/cat-flower.jpg" alt="" loading="lazy" /><span>花・苗</span></a>
     </div>
   </div>
-  <p class="footer-note">出品・イベントの投稿・閲覧はすべて無料です。購入・お申し込みは各農家と直接やり取りしてください。決済・仲介は行っておりません。</p>
-  <p class="photo-credits">
-    写真:
-    <a href="https://commons.wikimedia.org/wiki/File:Mount_Amagoi_and_Cabbage_fields.jpg" target="_blank" rel="noopener">Alpsdake</a>,
-    <a href="https://commons.wikimedia.org/wiki/File:Rice_Terrace,_Sanazawanomori.jpg" target="_blank" rel="noopener">Minakami Town</a>,
-    <a href="https://commons.wikimedia.org/wiki/File:Strawberry_greenhouse.jpg" target="_blank" rel="noopener">Joi Ito</a>,
-    <a href="https://commons.wikimedia.org/wiki/File:Red_Rice_Paddy_field_in_Japan_003.jpg" target="_blank" rel="noopener">gtknj</a>,
-    <a href="https://commons.wikimedia.org/wiki/File:Skyberry,_special_strawberry_created_in_Tochigi_prefecture.jpg" target="_blank" rel="noopener">Miyuki Meinaka</a>
-    (Wikimedia Commons, CC BY / CC BY-SA)
-  </p>
-  <p class="footer-copyright">© 栃木の直売マルシェ</p>
-</footer>
+</section>
+
+<section class="section" id="special" hidden>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>わけあり・特価</h2>
+      <a class="see-all" href="/listings.html?special=1">すべて見る →</a>
+    </div>
+    <div class="hscroll" id="special-list"></div>
+  </div>
+</section>
+
+<section class="section section--tint">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>エリアから探す</h2>
+      <a class="see-all" href="/map.html">地図で見る →</a>
+    </div>
+    <div class="chip-row" id="area-chips">
+      <span class="result-count">読み込み中…</span>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="widgets">
+      <div>
+        <div class="section-head">
+          <h2>近日のイベント</h2>
+          <a class="see-all" href="/events.html">すべて →</a>
+        </div>
+        <div class="widget-list" id="events-widget"></div>
+      </div>
+      <div>
+        <div class="section-head">
+          <h2>募集中のバイト</h2>
+          <a class="see-all" href="/jobs.html">すべて →</a>
+        </div>
+        <div class="widget-list" id="jobs-widget"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="join">
+  <div class="wrap">
+    <div class="recruit">
+      <div class="recruit-body">
+        <h2>農家の方へ</h2>
+        <p>
+          出品・イベント・求人の掲載はすべて無料です。写真1枚と一言だけ、スマホから30秒で投稿できます。
+          手数料も、決済の手続きもありません。掲載をご希望の方は運営者までご連絡ください。
+        </p>
+      </div>
+      <div class="recruit-actions">
+        <a class="btn primary" href="/seller.html">掲載について見る</a>
+        <a class="btn secondary" href="/farmers.html">掲載中の農家を見る</a>
+      </div>
+    </div>
+  </div>
+</section>
 
 <script src="/common.js"></script>
 <script>
-let allFarmers = [];
 let allListings = [];
-let currentMunicipality = "";
-let searchQuery = "";
+let allFarmers = [];
 
-document.getElementById("items-grid").innerHTML = skeletonCards(6);
+document.getElementById("items-grid").innerHTML = skeletonCards(8);
 
-// 農家一覧はTOPには表示しないが、「エリアから探す」の市町村タグを
-// 作るためにデータだけは裏で取得しておく(絞り込みは出品側に効く)
-async function loadMunicipalities() {
-  try {
-    const data = await apiFetch("/api/farmers");
-    allFarmers = data.farmers || [];
-    renderTabs();
-  } catch (e) {
-    // タグが作れないだけなので、致命的なエラー表示はしない
-  }
-}
+function initHero() {
+  const slides = Array.from(document.querySelectorAll(".hero-slide"));
+  const dotsEl = document.getElementById("hero-dots");
+  const pauseBtn = document.getElementById("hero-pause");
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-function renderTabs() {
-  const tabsEl = document.getElementById("municipality-tabs");
-  const municipalities = Array.from(new Set(allFarmers.map((f) => f.municipality)));
-  const tabs = ["すべて", ...municipalities];
-  tabsEl.innerHTML = tabs
-    .map((m) => {
-      const value = m === "すべて" ? "" : m;
-      const active = value === currentMunicipality ? "active" : "";
-      return `<button class="tab ${active}" data-value="${escapeHtml(value)}">${escapeHtml(m)}</button>`;
-    })
+  dotsEl.innerHTML = slides
+    .map((_, i) => `<button class="hero-dot ${i === 0 ? "active" : ""}" data-i="${i}" aria-label="${i + 1}枚目の背景"></button>`)
     .join("");
-  tabsEl.querySelectorAll(".tab").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      currentMunicipality = btn.dataset.value;
-      renderTabs();
-      renderItems();
-      renderSpecial();
-    });
-  });
-}
+  const dots = Array.from(dotsEl.children);
+  let current = 0;
+  let timer = null;
 
-function initAreaToggle() {
-  const toggle = document.getElementById("area-toggle");
-  const panel = document.getElementById("municipality-tabs");
-  toggle.addEventListener("click", () => {
-    const willOpen = panel.hidden;
-    panel.hidden = !willOpen;
-    toggle.setAttribute("aria-expanded", String(willOpen));
-    toggle.textContent = willOpen ? "閉じる ▴" : "市町村を選ぶ ▾";
-  });
-}
-
-function matchesSearch(text) {
-  if (!searchQuery) return true;
-  return (text || "").toLowerCase().includes(searchQuery);
-}
-
-function updateResultCount(itemCount) {
-  const el = document.getElementById("result-count");
-  if (!searchQuery) {
-    el.textContent = "";
-    return;
+  function show(i) {
+    current = (i + slides.length) % slides.length;
+    slides.forEach((s, si) => s.classList.toggle("active", si === current));
+    dots.forEach((d, di) => d.classList.toggle("active", di === current));
   }
-  el.textContent = `「${searchQuery}」の検索結果: 出品 ${itemCount}件`;
-}
-
-async function loadListings() {
-  try {
-    const data = await apiFetch("/api/listings");
-    allListings = data.listings || [];
-    renderItems();
-    renderSpecial();
-  } catch (e) {
-    document.getElementById("items-grid").innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
-    document.getElementById("special-carousel").innerHTML = "";
+  function play() {
+    if (timer || reduceMotion) return;
+    timer = setInterval(() => show(current + 1), 7000);
+    pauseBtn.textContent = "❚❚";
+    pauseBtn.setAttribute("aria-label", "背景の自動切り替えを一時停止");
   }
+  function pause() {
+    clearInterval(timer);
+    timer = null;
+    pauseBtn.textContent = "▶";
+    pauseBtn.setAttribute("aria-label", "背景の自動切り替えを再開");
+  }
+
+  dots.forEach((d) => d.addEventListener("click", () => show(Number(d.dataset.i))));
+  pauseBtn.addEventListener("click", () => (timer ? pause() : play()));
+  if (reduceMotion) pause();
+  else play();
 }
 
-function itemCard(l) {
-  const thumbStyle = l.image_url ? `style="background-image:url('${escapeHtml(l.image_url)}')"` : "";
-  return `
-    <a class="item-card" href="/farmer.html?id=${encodeURIComponent(l.farmer_id)}">
-      <div class="item-photo" role="img" aria-label="${escapeHtml(l.title)}の写真" ${thumbStyle}>${l.is_special ? '<span class="badge special">わけあり</span>' : ""}</div>
-      <div class="item-producer"><span class="item-avatar ${avatarColorClass(l.farmer_name)}">${escapeHtml((l.farmer_name || "?").trim().charAt(0))}</span><span class="item-producer-name">${escapeHtml(l.farmer_name)}</span></div>
-      <p class="item-title">${escapeHtml(l.title)}</p>
-      <p class="item-region">${escapeHtml(l.farmer_municipality)}</p>
-      <p class="item-price">${priceLabel(l.price)}</p>
-    </a>`;
+// 検索は出品一覧ページに渡す(絞り込みの機能は一覧側に集約している)
+document.getElementById("hero-search").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  const q = document.getElementById("hero-q").value.trim();
+  location.href = q ? `/listings.html?q=${encodeURIComponent(q)}` : "/listings.html";
+});
+
+function renderStats() {
+  const todayCount = allListings.filter((l) => freshnessLabel(l.created_at) === "本日").length;
+  document.getElementById("stat-farmers").textContent = allFarmers.length;
+  document.getElementById("stat-listings").textContent = allListings.length;
+  document.getElementById("stat-today").textContent = todayCount;
 }
 
 function renderItems() {
   const el = document.getElementById("items-grid");
-  let filtered = currentMunicipality ? allListings.filter((l) => l.farmer_municipality === currentMunicipality) : allListings;
-  filtered = filtered.filter((l) => matchesSearch(l.title) || matchesSearch(l.farmer_name) || matchesSearch(l.comment));
-  // 1列6件 x 2列(=12件)まで表示。それ以上は出品一覧ページへ
-  const shown = filtered.slice(0, 12);
-  if (shown.length === 0) {
-    el.innerHTML = `<div class="empty-state">まだ出品がありません。</div>`;
-  } else {
-    el.innerHTML = shown.map(itemCard).join("");
-  }
-  updateResultCount(filtered.length);
+  const shown = allListings.slice(0, 12);
+  el.innerHTML = shown.length
+    ? shown.map((l) => listingCard(l)).join("")
+    : emptyState("まだ出品がありません。", "農家からの投稿をお待ちください。");
 }
 
 function renderSpecial() {
   const section = document.getElementById("special");
-  const el = document.getElementById("special-carousel");
-  let filtered = allListings.filter((l) => l.is_special);
-  if (currentMunicipality) filtered = filtered.filter((l) => l.farmer_municipality === currentMunicipality);
-  const shown = filtered.slice(0, 12);
-  if (shown.length === 0) {
+  const shown = allListings.filter((l) => l.is_special).slice(0, 12);
+  if (!shown.length) {
     section.hidden = true;
     return;
   }
   section.hidden = false;
-  el.innerHTML = shown.map(itemCard).join("");
+  document.getElementById("special-list").innerHTML = shown.map((l) => listingCard(l)).join("");
+}
+
+function renderAreaChips() {
+  const el = document.getElementById("area-chips");
+  const counts = new Map();
+  allFarmers.forEach((f) => counts.set(f.municipality, (counts.get(f.municipality) || 0) + 1));
+  const areas = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+  if (!areas.length) {
+    el.innerHTML = `<span class="result-count">掲載中の市町村はまだありません。</span>`;
+    return;
+  }
+  el.innerHTML = areas
+    .map(([name, n]) => `<a class="chip" href="/listings.html?area=${encodeURIComponent(name)}">${escapeHtml(name)}(${n})</a>`)
+    .join("");
+}
+
+async function loadCore() {
+  try {
+    const [listingData, farmerData] = await Promise.all([apiFetch("/api/listings"), apiFetch("/api/farmers")]);
+    allListings = listingData.listings || [];
+    allFarmers = farmerData.farmers || [];
+    renderStats();
+    renderItems();
+    renderSpecial();
+    renderAreaChips();
+  } catch (e) {
+    document.getElementById("items-grid").innerHTML =
+      `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+    document.getElementById("area-chips").innerHTML = "";
+  }
 }
 
 async function loadEventsWidget() {
   const el = document.getElementById("events-widget");
   try {
     const data = await apiFetch("/api/events");
-    const events = (data.events || []).slice(0, 4);
-    if (events.length === 0) {
-      el.innerHTML = `<div class="empty-state">開催予定のイベントはまだありません。</div>`;
+    const events = (data.events || []).slice(0, 5);
+    if (!events.length) {
+      el.innerHTML = emptyState("開催予定のイベントはまだありません。");
       return;
     }
     el.innerHTML = events
       .map(
         (e) => `
       <a class="mini-row" href="/farmer.html?id=${encodeURIComponent(e.farmer_id)}">
-        <span class="mini-date">${formatDateShort(e.event_date)}</span>
+        <span class="mini-date">${escapeHtml(formatDateShort(e.event_date))}</span>
         <span class="mini-title">${escapeHtml(e.title)}</span>
+        <span class="mini-sub">${escapeHtml(e.farmer_municipality || "")}</span>
       </a>`
       )
       .join("");
@@ -273,9 +313,9 @@ async function loadJobsWidget() {
   const el = document.getElementById("jobs-widget");
   try {
     const data = await apiFetch("/api/jobs");
-    const jobs = (data.jobs || []).slice(0, 4);
-    if (jobs.length === 0) {
-      el.innerHTML = `<div class="empty-state">募集中の求人はまだありません。</div>`;
+    const jobs = (data.jobs || []).slice(0, 5);
+    if (!jobs.length) {
+      el.innerHTML = emptyState("募集中のバイトはまだありません。");
       return;
     }
     el.innerHTML = jobs
@@ -283,6 +323,7 @@ async function loadJobsWidget() {
         (j) => `
       <a class="mini-row" href="/farmer.html?id=${encodeURIComponent(j.farmer_id)}">
         <span class="mini-title">${escapeHtml(j.title)}</span>
+        <span class="mini-sub">${escapeHtml(j.farmer_municipality || "")}</span>
         <span class="mini-wage">${escapeHtml(j.wage)}</span>
       </a>`
       )
@@ -292,68 +333,10 @@ async function loadJobsWidget() {
   }
 }
 
-function initBannerCarousel() {
-  const track = document.getElementById("banner-track");
-  const dotsEl = document.getElementById("banner-dots");
-  const pauseBtn = document.getElementById("banner-pause");
-  const slides = Array.from(track.querySelectorAll(".banner-slide"));
-  dotsEl.innerHTML = slides.map((_, i) => `<button class="banner-dot ${i === 0 ? "active" : ""}" data-i="${i}" aria-label="${i + 1}枚目"></button>`).join("");
-  const dots = Array.from(dotsEl.children);
-  let current = 0;
-  let auto = null;
-  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  function showSlide(i) {
-    current = (i + slides.length) % slides.length;
-    slides.forEach((s, si) => s.classList.toggle("active", si === current));
-    dots.forEach((d, di) => d.classList.toggle("active", di === current));
-  }
-
-  function play() {
-    if (auto || reduceMotion) return;
-    auto = setInterval(() => showSlide(current + 1), 5000);
-    pauseBtn.textContent = "❚❚";
-    pauseBtn.setAttribute("aria-label", "自動再生を一時停止");
-  }
-  function pause() {
-    clearInterval(auto);
-    auto = null;
-    pauseBtn.textContent = "▶";
-    pauseBtn.setAttribute("aria-label", "自動再生を再開");
-  }
-
-  dots.forEach((d) => {
-    d.addEventListener("click", () => showSlide(Number(d.dataset.i)));
-  });
-  pauseBtn.addEventListener("click", () => (auto ? pause() : play()));
-
-  showSlide(0);
-  if (reduceMotion) {
-    pause();
-  } else {
-    play();
-  }
-}
-
-function initSearch() {
-  const input = document.getElementById("search-input");
-  let timer;
-  input.addEventListener("input", () => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      searchQuery = input.value.trim().toLowerCase();
-      renderItems();
-      renderSpecial();
-    }, 150);
-  });
-}
-
 initBottomNav("/");
-initBannerCarousel();
-initAreaToggle();
-initSearch();
-loadMunicipalities();
-loadListings();
+initSiteFooter();
+initHero();
+loadCore();
 loadEventsWidget();
 loadJobsWidget();
 </script>

@@ -4,6 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>バイト・求人一覧 | 栃木の直売マルシェ</title>
+<meta name="description" content="栃木県内の農家が募集している収穫・出荷などのアルバイトやお手伝いの一覧です。" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -11,88 +15,127 @@
   <a href="/" class="site-logo">栃木の直売マルシェ</a>
   <nav class="site-nav-links">
     <a href="/">ホーム</a>
-    <a href="/farmers.html">農家一覧</a>
     <a href="/listings.html">出品一覧</a>
-    <a href="/events.html">イベント</a>
+    <a href="/farmers.html">農家一覧</a>
     <a href="/map.html">マップ</a>
+    <a href="/events.html">イベント</a>
     <a href="/jobs.html" class="current">バイト求人</a>
   </nav>
   <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
 </header>
 
-<div class="page-title-strip">
-  <h1>バイト・求人一覧</h1>
-  <p>県内の農家が募集しているアルバイト・お手伝いを新着順に</p>
+<div class="wrap">
+  <div class="page-head">
+    <p class="breadcrumb"><a href="/">ホーム</a> ／ バイト・求人一覧</p>
+    <h1>バイト・求人一覧</h1>
+    <p>県内の農家が募集している収穫・出荷などの仕事です。応募は各農家へ直接ご連絡ください。</p>
+  </div>
 </div>
 
-<div class="search-strip">
-  <label class="search-bar">
-    <input type="search" id="search-input" placeholder="仕事内容・農家名・市町村で探す" />
-  </label>
+<div class="filter-bar">
+  <div class="wrap">
+    <form class="hero-search" id="search-form" role="search">
+      <label class="search-bar">
+        <input type="search" id="search-input" placeholder="仕事内容・農家名・市町村で探す" aria-label="仕事内容・農家名・市町村で探す" />
+      </label>
+      <button type="submit">探す</button>
+    </form>
+    <div class="filter-row">
+      <span class="filter-label">市町村</span>
+      <select id="area-select" aria-label="市町村で絞り込む">
+        <option value="">すべての市町村</option>
+      </select>
+    </div>
+  </div>
 </div>
-<p class="result-count" id="result-count" aria-live="polite"></p>
 
-<main class="container wide" style="padding-top:16px;" id="content">
-  <div class="skeleton-grid"></div>
+<main class="section">
+  <div class="wrap">
+    <p class="result-count" id="result-count" aria-live="polite"></p>
+    <div class="list-grid" id="content" style="margin-top:14px;"></div>
+  </div>
 </main>
 
 <script src="/common.js"></script>
 <script>
+const params = new URLSearchParams(location.search);
+const state = { q: params.get("q") || "", area: params.get("area") || "" };
 let allJobs = [];
-let searchQuery = "";
 
-document.querySelector("#content .skeleton-grid").innerHTML = skeletonCards(6);
+document.getElementById("content").innerHTML = skeletonCards(4);
+document.getElementById("search-input").value = state.q;
+
+function renderAreaOptions() {
+  const areas = Array.from(new Set(allJobs.map((j) => j.farmer_municipality).filter(Boolean))).sort();
+  const select = document.getElementById("area-select");
+  select.innerHTML =
+    `<option value="">すべての市町村</option>` +
+    areas.map((a) => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join("");
+  select.value = state.area;
+}
+
+function syncUrl() {
+  const next = new URLSearchParams();
+  if (state.q) next.set("q", state.q);
+  if (state.area) next.set("area", state.area);
+  const qs = next.toString();
+  history.replaceState(null, "", qs ? `?${qs}` : location.pathname);
+}
+
+function apply() {
+  syncUrl();
+  const q = state.q.toLowerCase();
+  const list = allJobs.filter((j) => {
+    if (state.area && j.farmer_municipality !== state.area) return false;
+    if (!q) return true;
+    return [j.title, j.description, j.wage, j.farmer_name, j.farmer_municipality]
+      .some((v) => (v || "").toLowerCase().includes(q));
+  });
+
+  const labels = [state.q ? `「${state.q}」` : "", state.area].filter(Boolean).join(" / ");
+  document.getElementById("result-count").textContent = labels
+    ? `${labels} の検索結果: ${list.length}件`
+    : `${list.length}件の募集`;
+
+  const content = document.getElementById("content");
+  content.innerHTML = list.length
+    ? list.map((j) => jobCard(j)).join("")
+    : allJobs.length
+    ? emptyState("条件に合う募集が見つかりません。")
+    : emptyState("募集中のバイト・求人はまだありません。", "農家からの投稿をお待ちください。");
+}
 
 async function load() {
   try {
     const data = await apiFetch("/api/jobs");
     allJobs = data.jobs || [];
-    render();
+    renderAreaOptions();
+    apply();
   } catch (e) {
-    document.getElementById("content").innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+    document.getElementById("content").innerHTML =
+      `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
   }
 }
 
-function render() {
-  const content = document.getElementById("content");
-  const q = searchQuery;
-  const filtered = q
-    ? allJobs.filter(
-        (j) =>
-          (j.title || "").toLowerCase().includes(q) ||
-          (j.farmer_name || "").toLowerCase().includes(q) ||
-          (j.farmer_municipality || "").toLowerCase().includes(q) ||
-          (j.description || "").toLowerCase().includes(q)
-      )
-    : allJobs;
-
-  document.getElementById("result-count").textContent = q ? `「${q}」の検索結果: ${filtered.length}件` : "";
-
-  if (!filtered.length) {
-    content.innerHTML = `<div class="empty-state">${q ? "該当する求人が見つかりません。" : "募集中のバイト・求人はまだありません。"}</div>`;
-    return;
-  }
-  content.innerHTML = `<div class="list-grid">${filtered.map(renderCard).join("")}</div>`;
-}
-
-function renderCard(j) {
-  return `
-    <a href="/farmer.html?id=${encodeURIComponent(j.farmer_id)}" class="job-card">
-      <p class="job-title">${escapeHtml(j.title)}</p>
-      <p class="job-wage">${escapeHtml(j.wage)}</p>
-      <p class="job-meta">${j.work_date ? escapeHtml(j.work_date) : ""}${j.work_hours ? " ・ " + escapeHtml(j.work_hours) : ""}${j.capacity ? " ・ 募集" + escapeHtml(j.capacity) : ""}</p>
-      ${j.description ? `<p class="job-desc">${escapeHtml(j.description)}</p>` : ""}
-      <p class="job-farmer">${escapeHtml(j.farmer_name)}(${escapeHtml(j.farmer_municipality)})</p>
-    </a>
-  `;
-}
-
-document.getElementById("search-input").addEventListener("input", (ev) => {
-  searchQuery = ev.target.value.trim().toLowerCase();
-  render();
+document.getElementById("search-form").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  state.q = document.getElementById("search-input").value.trim();
+  apply();
+});
+document.getElementById("search-input").addEventListener(
+  "input",
+  debounce((ev) => {
+    state.q = ev.target.value.trim();
+    apply();
+  })
+);
+document.getElementById("area-select").addEventListener("change", (ev) => {
+  state.area = ev.target.value;
+  apply();
 });
 
 initBottomNav("/jobs.html");
+initSiteFooter();
 load();
 </script>
 </body>

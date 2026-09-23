@@ -4,6 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>出品一覧 | 栃木の直売マルシェ</title>
+<meta name="description" content="栃木県内の農家が今出しているものを、品目・市町村・キーワードで絞り込んで探せます。" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -11,91 +15,208 @@
   <a href="/" class="site-logo">栃木の直売マルシェ</a>
   <nav class="site-nav-links">
     <a href="/">ホーム</a>
-    <a href="/farmers.html">農家一覧</a>
     <a href="/listings.html" class="current">出品一覧</a>
-    <a href="/events.html">イベント</a>
+    <a href="/farmers.html">農家一覧</a>
     <a href="/map.html">マップ</a>
+    <a href="/events.html">イベント</a>
     <a href="/jobs.html">バイト求人</a>
   </nav>
   <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
 </header>
 
-<div class="page-title-strip">
-  <h1>出品一覧</h1>
-  <p>県内の農家から届いた「今買えるもの」を新着順に</p>
+<div class="wrap">
+  <div class="page-head">
+    <p class="breadcrumb"><a href="/">ホーム</a> ／ 出品一覧</p>
+    <h1>出品一覧</h1>
+    <p>県内の農家から届いた「今買えるもの」を新着順に。気になったら農家ページから直接ご連絡ください。</p>
+  </div>
 </div>
 
-<div class="search-strip">
-  <label class="search-bar">
-    <input type="search" id="search-input" placeholder="品目名・農家名・市町村で探す" />
-  </label>
+<div class="filter-bar">
+  <div class="wrap">
+    <form class="hero-search" id="search-form" role="search">
+      <label class="search-bar">
+        <input type="search" id="search-input" placeholder="品目名・農家名で探す" aria-label="品目名・農家名・市町村で探す" />
+      </label>
+      <button type="submit">探す</button>
+    </form>
+    <div class="filter-row">
+      <span class="filter-label">品目</span>
+      <div class="chip-row chip-row--scroll" id="cat-chips"></div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">市町村</span>
+      <select id="area-select" aria-label="市町村で絞り込む">
+        <option value="">すべての市町村</option>
+      </select>
+      <span class="filter-label">並び順</span>
+      <select id="sort-select" aria-label="並び順">
+        <option value="new">新着順</option>
+        <option value="price-asc">価格が安い順</option>
+        <option value="price-desc">価格が高い順</option>
+      </select>
+      <button type="button" class="chip" id="special-toggle" aria-pressed="false">わけあり・特価のみ</button>
+    </div>
+  </div>
 </div>
-<p class="result-count" id="result-count" aria-live="polite"></p>
 
-<main class="container wide" style="padding-top:16px;" id="content">
-  <div class="skeleton-grid"></div>
+<main class="section">
+  <div class="wrap">
+    <p class="result-count" id="result-count" aria-live="polite"></p>
+    <div class="card-grid" id="content" style="margin-top:14px;"></div>
+  </div>
 </main>
 
 <script src="/common.js"></script>
 <script>
+const params = new URLSearchParams(location.search);
+const state = {
+  q: params.get("q") || "",
+  cat: params.get("cat") || "",
+  area: params.get("area") || "",
+  special: params.get("special") === "1",
+  sort: params.get("sort") || "new",
+};
 let allListings = [];
-let searchQuery = "";
 
-document.querySelector("#content .skeleton-grid").innerHTML = skeletonCards(6);
+document.getElementById("content").innerHTML = skeletonCards(8);
+document.getElementById("search-input").value = state.q;
+document.getElementById("sort-select").value = state.sort;
+
+function renderCatChips() {
+  const cats = [{ key: "", label: "すべて" }, ...CATEGORIES.map((c) => ({ key: c.key, label: c.label })),
+    { key: "other", label: "その他" }];
+  document.getElementById("cat-chips").innerHTML = cats
+    .map(
+      (c) =>
+        `<button type="button" class="chip ${c.key === state.cat ? "is-active" : ""}" data-cat="${escapeHtml(c.key)}">${escapeHtml(c.label)}</button>`
+    )
+    .join("");
+  document.querySelectorAll("#cat-chips .chip").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.cat = btn.dataset.cat;
+      renderCatChips();
+      apply();
+    });
+  });
+}
+
+function renderAreaOptions() {
+  const areas = Array.from(new Set(allListings.map((l) => l.farmer_municipality).filter(Boolean))).sort();
+  const select = document.getElementById("area-select");
+  select.innerHTML =
+    `<option value="">すべての市町村</option>` +
+    areas.map((a) => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join("");
+  select.value = state.area;
+}
+
+function syncUrl() {
+  const next = new URLSearchParams();
+  if (state.q) next.set("q", state.q);
+  if (state.cat) next.set("cat", state.cat);
+  if (state.area) next.set("area", state.area);
+  if (state.special) next.set("special", "1");
+  if (state.sort !== "new") next.set("sort", state.sort);
+  const qs = next.toString();
+  history.replaceState(null, "", qs ? `?${qs}` : location.pathname);
+}
+
+function filtered() {
+  const q = state.q.toLowerCase();
+  let list = allListings.filter((l) => {
+    if (state.special && !l.is_special) return false;
+    if (state.area && l.farmer_municipality !== state.area) return false;
+    if (state.cat && listingCategory(l.title).key !== state.cat) return false;
+    if (!q) return true;
+    return [l.title, l.comment, l.farmer_name, l.farmer_municipality]
+      .some((v) => (v || "").toLowerCase().includes(q));
+  });
+
+  if (state.sort === "price-asc" || state.sort === "price-desc") {
+    // 価格応相談(null)は並び順の末尾に置く
+    const dir = state.sort === "price-asc" ? 1 : -1;
+    list = list.slice().sort((a, b) => {
+      if (a.price == null && b.price == null) return 0;
+      if (a.price == null) return 1;
+      if (b.price == null) return -1;
+      return (a.price - b.price) * dir;
+    });
+  }
+  return list;
+}
+
+function describeFilters() {
+  const parts = [];
+  if (state.q) parts.push(`「${state.q}」`);
+  if (state.cat) {
+    const cat = CATEGORIES.find((c) => c.key === state.cat);
+    parts.push(cat ? cat.label : "その他");
+  }
+  if (state.area) parts.push(state.area);
+  if (state.special) parts.push("わけあり・特価");
+  return parts.join(" / ");
+}
+
+function apply() {
+  syncUrl();
+  const list = filtered();
+  const label = describeFilters();
+  document.getElementById("result-count").textContent = label
+    ? `${label} の検索結果: ${list.length}件`
+    : `${list.length}件の出品`;
+  document.getElementById("special-toggle").classList.toggle("is-active", state.special);
+  document.getElementById("special-toggle").setAttribute("aria-pressed", String(state.special));
+
+  const content = document.getElementById("content");
+  if (!list.length) {
+    content.innerHTML = allListings.length
+      ? emptyState("条件に合う出品が見つかりません。", "品目や市町村の絞り込みを外すと見つかるかもしれません。")
+      : emptyState("まだ出品がありません。", "農家からの投稿をお待ちください。");
+    return;
+  }
+  content.innerHTML = list.map((l) => listingCard(l)).join("");
+}
 
 async function load() {
   try {
     const data = await apiFetch("/api/listings");
     allListings = data.listings || [];
-    render();
+    renderAreaOptions();
+    apply();
   } catch (e) {
-    document.getElementById("content").innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+    document.getElementById("content").innerHTML =
+      `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
   }
 }
 
-function render() {
-  const content = document.getElementById("content");
-  const q = searchQuery;
-  const filtered = q
-    ? allListings.filter(
-        (l) =>
-          (l.title || "").toLowerCase().includes(q) ||
-          (l.farmer_name || "").toLowerCase().includes(q) ||
-          (l.farmer_municipality || "").toLowerCase().includes(q) ||
-          (l.comment || "").toLowerCase().includes(q)
-      )
-    : allListings;
-
-  document.getElementById("result-count").textContent = q ? `「${q}」の検索結果: ${filtered.length}件` : "";
-
-  if (!filtered.length) {
-    content.innerHTML = `<div class="empty-state">${q ? "該当する出品が見つかりません。" : "まだ出品がありません。"}</div>`;
-    return;
-  }
-  content.innerHTML = `<div class="list-grid">${filtered.map(renderRow).join("")}</div>`;
-}
-
-function renderRow(l) {
-  const thumbStyle = l.image_url ? `style="background-image:url('${escapeHtml(l.image_url)}')"` : "";
-  return `
-    <a class="listing-card" href="/farmer.html?id=${encodeURIComponent(l.farmer_id)}" style="text-decoration:none;color:inherit;">
-      <div class="thumb" role="img" aria-label="${escapeHtml(l.title)}の写真" ${thumbStyle}></div>
-      <div class="info" style="flex:1;">
-        <p class="title">${escapeHtml(l.title)} ${l.is_special ? `<span class="badge special">わけあり・特価</span>` : ""}</p>
-        <p class="comment">${escapeHtml(l.comment)}</p>
-        <p class="price">${priceLabel(l.price)}</p>
-        <p style="font-size:12px;color:var(--muted);margin:4px 0 0;">${escapeHtml(l.farmer_name)}(${escapeHtml(l.farmer_municipality)})</p>
-      </div>
-    </a>
-  `;
-}
-
-document.getElementById("search-input").addEventListener("input", (ev) => {
-  searchQuery = ev.target.value.trim().toLowerCase();
-  render();
+document.getElementById("search-form").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  state.q = document.getElementById("search-input").value.trim();
+  apply();
+});
+document.getElementById("search-input").addEventListener(
+  "input",
+  debounce((ev) => {
+    state.q = ev.target.value.trim();
+    apply();
+  })
+);
+document.getElementById("area-select").addEventListener("change", (ev) => {
+  state.area = ev.target.value;
+  apply();
+});
+document.getElementById("sort-select").addEventListener("change", (ev) => {
+  state.sort = ev.target.value;
+  apply();
+});
+document.getElementById("special-toggle").addEventListener("click", () => {
+  state.special = !state.special;
+  apply();
 });
 
+renderCatChips();
 initBottomNav("/listings.html");
+initSiteFooter();
 load();
 </script>
 </body>

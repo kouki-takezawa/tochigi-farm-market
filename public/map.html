@@ -4,15 +4,15 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>マップ | 栃木の直売マルシェ</title>
+<meta name="description" content="栃木県内の農家を地図から探せます。現在地を許可すると近い順に並び替わります。" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/styles.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 <style>
-  #map { width: 100%; height: 320px; }
-  .leaflet-popup-content { font-size: 13px; }
-  .leaflet-popup-content a { font-weight: 700; }
-  .distance-list { display: flex; flex-direction: column; gap: 10px; padding: 16px; }
-  .locate-row { display: flex; gap: 8px; padding: 12px 16px; align-items: center; flex-wrap: wrap; }
-  .locate-row select { flex: 1; min-width: 140px; }
+  .leaflet-popup-content { font-size: 13px; line-height: 1.7; }
+  .leaflet-popup-content a { font-weight: 700; color: #24402d; }
 </style>
 </head>
 <body>
@@ -20,36 +20,34 @@
   <a href="/" class="site-logo">栃木の直売マルシェ</a>
   <nav class="site-nav-links">
     <a href="/">ホーム</a>
-    <a href="/farmers.html">農家一覧</a>
     <a href="/listings.html">出品一覧</a>
-    <a href="/events.html">イベント</a>
+    <a href="/farmers.html">農家一覧</a>
     <a href="/map.html" class="current">マップ</a>
+    <a href="/events.html">イベント</a>
     <a href="/jobs.html">バイト求人</a>
   </nav>
   <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
 </header>
 
-<div class="page-title-strip">
-  <h1>マップ</h1>
-  <p>現在地または市町村から、近くの農家を探せます</p>
+<div class="wrap">
+  <div class="page-head">
+    <p class="breadcrumb"><a href="/">ホーム</a> ／ マップ</p>
+    <h1>マップから探す</h1>
+    <p>現在地または市町村から、近くの農家を探せます。位置情報を許可しなくても市町村から選べます。</p>
+  </div>
+  <div class="map-toolbar">
+    <button id="locate-btn" class="btn primary">現在地から探す</button>
+    <select id="municipality-select" aria-label="市町村から選ぶ">
+      <option value="">市町村から選ぶ</option>
+    </select>
+  </div>
+  <p id="map-status" class="map-status" aria-live="polite"></p>
 </div>
-
-<div class="locate-row">
-  <button id="locate-btn" class="btn primary">現在地から探す</button>
-  <select id="municipality-select">
-    <option value="">市町村から選ぶ</option>
-  </select>
-</div>
-<p id="map-status" style="padding:0 16px;font-size:12px;color:var(--muted);"></p>
 
 <div id="map"></div>
 
-<div id="distance-list" class="distance-list">
-  <div class="skeleton-row" style="padding:0 16px;">
-    <div class="skeleton-card"><div class="sk-line w60"></div><div class="sk-line w40"></div></div>
-    <div class="skeleton-card"><div class="sk-line w60"></div><div class="sk-line w40"></div></div>
-    <div class="skeleton-card"><div class="sk-line w60"></div><div class="sk-line w40"></div></div>
-  </div>
+<div class="wrap">
+  <div id="distance-list" class="distance-list"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -153,7 +151,7 @@ function renderMarkers() {
     marker.bindPopup(`
       <b>${escapeHtml(f.name)}</b><br>
       ${escapeHtml(f.municipality)} ・ ${escapeHtml(f.crops)}<br>
-      ${badges.length ? `<span style="color:#e0762c;">${badges.join(" / ")}</span><br>` : ""}
+      ${badges.length ? `<span style="color:#a8481f;font-weight:700;">${badges.join(" / ")}</span><br>` : ""}
       <a href="/farmer.html?id=${encodeURIComponent(f.id)}">農家ページを見る →</a>
     `);
     markers.push(marker);
@@ -183,26 +181,20 @@ function renderList() {
   const withoutLocation = allFarmers.filter((f) => f.lat == null || f.lng == null);
 
   if (!list.length && !withoutLocation.length) {
-    el.innerHTML = `<div class="empty-state">表示できる農家がありません。</div>`;
+    el.innerHTML = emptyState("表示できる農家がありません。");
     return;
   }
 
   el.innerHTML =
     list
-      .map(
-        (f) => `
-      <a class="farmer-card" href="/farmer.html?id=${encodeURIComponent(f.id)}">
-        <div class="thumb" role="img" aria-label="${escapeHtml(f.name)}の写真" ${f.cover_image_url ? `style="background-image:url('${escapeHtml(f.cover_image_url)}')"` : ""}></div>
-        <div class="info">
-          <p class="name">${escapeHtml(f.name)}</p>
-          <p class="location">${escapeHtml(f.municipality)}${f._distance != null ? ` ・ 現在地から約${f._distance.toFixed(1)}km` : ""}</p>
-          <p class="crops">${escapeHtml(f.crops)}</p>
-        </div>
-      </a>`
+      .map((f) =>
+        farmerCard(f, {
+          distanceText: f._distance != null ? `現在地から約${f._distance.toFixed(1)}km` : "",
+        })
       )
       .join("") +
     (withoutLocation.length
-      ? `<p class="empty-state" style="text-align:left;">位置情報が未登録の農家が${withoutLocation.length}件あります(<a href="/">リスト表示</a>でご確認ください)</p>`
+      ? `<p class="result-count">位置情報が未登録の農家が${withoutLocation.length}軒あります(<a href="/farmers.html">農家一覧</a>でご確認ください)</p>`
       : "");
 }
 
@@ -217,7 +209,7 @@ document.getElementById("locate-btn").addEventListener("click", () => {
     (pos) => {
       userLatLng = [pos.coords.latitude, pos.coords.longitude];
       map.setView(userLatLng, 12);
-      L.circleMarker(userLatLng, { radius: 8, color: "#2f7a3d", fillColor: "#2f7a3d", fillOpacity: 0.6 })
+      L.circleMarker(userLatLng, { radius: 8, color: "#33503c", fillColor: "#33503c", fillOpacity: 0.6 })
         .addTo(map)
         .bindPopup("現在地");
       statusEl.textContent = "現在地から近い順に並び替えました";
@@ -229,7 +221,10 @@ document.getElementById("locate-btn").addEventListener("click", () => {
   );
 });
 
+document.getElementById("distance-list").innerHTML = skeletonCards(3);
+
 initBottomNav("/map.html");
+initSiteFooter();
 load();
 </script>
 </body>

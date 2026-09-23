@@ -4,6 +4,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>出品者ページ | 栃木の直売マルシェ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -11,10 +14,10 @@
   <a href="/" class="site-logo">栃木の直売マルシェ</a>
   <nav class="site-nav-links">
     <a href="/">ホーム</a>
-    <a href="/farmers.html">農家一覧</a>
     <a href="/listings.html">出品一覧</a>
-    <a href="/events.html">イベント</a>
+    <a href="/farmers.html">農家一覧</a>
     <a href="/map.html">マップ</a>
+    <a href="/events.html">イベント</a>
     <a href="/jobs.html">バイト求人</a>
   </nav>
   <a href="/seller.html" class="site-nav-cta current">出品者ログイン</a>
@@ -38,7 +41,7 @@ function render() {
       <div class="card">
         <span class="badge event" style="margin-bottom:10px;display:inline-block;">試験運用中の簡易ログインです</span>
         <h3>出品者ログイン</h3>
-        <p style="font-size:13px;color:var(--muted);">
+        <p style="font-size:13px;color:var(--ink-2);">
           こちらは正式なアカウント認証ではありません(今後メールアドレスでのアカウント作成に置き換え予定)。
           出品・編集の実際の操作は、運営者から届く農家ごとの「管理用URL」で行います。
           ログインコードは運営者からお知らせします。
@@ -75,7 +78,7 @@ function render() {
 
     <div class="card">
       <h3>管理用URLをお持ちの方</h3>
-      <p style="font-size:13px;color:var(--muted);">届いた管理用URLをそのまま貼り付けると、出品・編集画面に移動できます。</p>
+      <p style="font-size:13px;color:var(--ink-2);">届いた管理用URLをそのまま貼り付けると、出品・編集画面に移動できます。</p>
       <form id="jump-form" class="stack">
         <input type="text" name="url" placeholder="https://.../post.html?farmer=...&token=..." required />
         <button type="submit" class="btn primary block">開く</button>
@@ -112,6 +115,7 @@ function render() {
 
 initBottomNav(null);
 render();
+initSiteFooter();
 </script>
 </body>
 </html>

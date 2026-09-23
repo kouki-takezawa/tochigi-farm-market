@@ -4,6 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>イベント一覧 | 栃木の直売マルシェ</title>
+<meta name="description" content="栃木県内の農家が開催する収穫体験や畑のイベントを、開催日順に掲載しています。" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -11,91 +15,148 @@
   <a href="/" class="site-logo">栃木の直売マルシェ</a>
   <nav class="site-nav-links">
     <a href="/">ホーム</a>
-    <a href="/farmers.html">農家一覧</a>
     <a href="/listings.html">出品一覧</a>
-    <a href="/events.html" class="current">イベント</a>
+    <a href="/farmers.html">農家一覧</a>
     <a href="/map.html">マップ</a>
+    <a href="/events.html" class="current">イベント</a>
     <a href="/jobs.html">バイト求人</a>
   </nav>
   <a href="/seller.html" class="site-nav-cta">出品者ログイン</a>
 </header>
 
-<div class="page-title-strip">
-  <h1>イベント一覧</h1>
-  <p>県内の農家で開催予定のイベントを日付順に</p>
+<div class="wrap">
+  <div class="page-head">
+    <p class="breadcrumb"><a href="/">ホーム</a> ／ イベント一覧</p>
+    <h1>イベント一覧</h1>
+    <p>収穫体験や畑の催しを開催日順に。参加のお申し込みは、各農家へ直接ご連絡ください。</p>
+  </div>
 </div>
 
-<div class="search-strip">
-  <label class="search-bar">
-    <input type="search" id="search-input" placeholder="イベント名・農家名・市町村で探す" />
-  </label>
+<div class="filter-bar">
+  <div class="wrap">
+    <form class="hero-search" id="search-form" role="search">
+      <label class="search-bar">
+        <input type="search" id="search-input" placeholder="イベント名・農家名・市町村で探す" aria-label="イベント名・農家名・市町村で探す" />
+      </label>
+      <button type="submit">探す</button>
+    </form>
+    <div class="filter-row">
+      <span class="filter-label">市町村</span>
+      <select id="area-select" aria-label="市町村で絞り込む">
+        <option value="">すべての市町村</option>
+      </select>
+    </div>
+  </div>
 </div>
-<p class="result-count" id="result-count" aria-live="polite"></p>
 
-<main class="container wide" style="padding-top:16px;" id="content">
-  <div class="skeleton-grid"></div>
+<main class="section">
+  <div class="wrap">
+    <p class="result-count" id="result-count" aria-live="polite"></p>
+    <div id="content" style="margin-top:14px;"></div>
+  </div>
 </main>
 
 <script src="/common.js"></script>
 <script>
+const params = new URLSearchParams(location.search);
+const state = { q: params.get("q") || "", area: params.get("area") || "" };
 let allEvents = [];
-let searchQuery = "";
 
-document.querySelector("#content .skeleton-grid").innerHTML = skeletonCards(6);
+document.getElementById("content").innerHTML = `<div class="list-grid">${skeletonCards(4)}</div>`;
+document.getElementById("search-input").value = state.q;
+
+function renderAreaOptions() {
+  const areas = Array.from(new Set(allEvents.map((e) => e.farmer_municipality).filter(Boolean))).sort();
+  const select = document.getElementById("area-select");
+  select.innerHTML =
+    `<option value="">すべての市町村</option>` +
+    areas.map((a) => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join("");
+  select.value = state.area;
+}
+
+function syncUrl() {
+  const next = new URLSearchParams();
+  if (state.q) next.set("q", state.q);
+  if (state.area) next.set("area", state.area);
+  const qs = next.toString();
+  history.replaceState(null, "", qs ? `?${qs}` : location.pathname);
+}
+
+function apply() {
+  syncUrl();
+  const q = state.q.toLowerCase();
+  const list = allEvents.filter((e) => {
+    if (state.area && e.farmer_municipality !== state.area) return false;
+    if (!q) return true;
+    return [e.title, e.description, e.location, e.farmer_name, e.farmer_municipality]
+      .some((v) => (v || "").toLowerCase().includes(q));
+  });
+
+  const labels = [state.q ? `「${state.q}」` : "", state.area].filter(Boolean).join(" / ");
+  document.getElementById("result-count").textContent = labels
+    ? `${labels} の検索結果: ${list.length}件`
+    : `${list.length}件のイベント`;
+
+  const content = document.getElementById("content");
+  if (!list.length) {
+    content.innerHTML = allEvents.length
+      ? emptyState("条件に合うイベントが見つかりません。")
+      : emptyState("開催予定のイベントはまだありません。", "農家からの投稿をお待ちください。");
+    return;
+  }
+
+  // 開催月ごとに区切ると、先の予定まで一覧で追いやすくなる
+  const groups = new Map();
+  list.forEach((e) => {
+    const [y, m] = String(e.event_date).split("-");
+    const key = `${y}年${parseInt(m, 10)}月`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(e);
+  });
+
+  content.innerHTML = Array.from(groups.entries())
+    .map(
+      ([month, events]) => `
+      <div class="section-head" style="margin-top:28px;">
+        <h2>${escapeHtml(month)}</h2>
+        <span class="count">${events.length}件</span>
+      </div>
+      <div class="list-grid">${events.map((e) => eventCard(e)).join("")}</div>`
+    )
+    .join("");
+}
 
 async function load() {
   try {
     const data = await apiFetch("/api/events");
     allEvents = (data.events || []).filter((e) => e.kind !== "labor");
-    render();
+    renderAreaOptions();
+    apply();
   } catch (e) {
-    document.getElementById("content").innerHTML = `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
+    document.getElementById("content").innerHTML =
+      `<div class="error-message">読み込みに失敗しました: ${escapeHtml(e.message)}</div>`;
   }
 }
 
-function render() {
-  const content = document.getElementById("content");
-  const q = searchQuery;
-  const filtered = q
-    ? allEvents.filter(
-        (e) =>
-          (e.title || "").toLowerCase().includes(q) ||
-          (e.farmer_name || "").toLowerCase().includes(q) ||
-          (e.farmer_municipality || "").toLowerCase().includes(q) ||
-          (e.location || "").toLowerCase().includes(q)
-      )
-    : allEvents;
-
-  document.getElementById("result-count").textContent = q ? `「${q}」の検索結果: ${filtered.length}件` : "";
-
-  if (!filtered.length) {
-    content.innerHTML = `<div class="empty-state">${q ? "該当するイベントが見つかりません。" : "開催予定のイベントはまだありません。"}</div>`;
-    return;
-  }
-  content.innerHTML = `<div class="list-grid">${filtered.map(renderRow).join("")}</div>`;
-}
-
-function renderRow(e) {
-  const [, m, d] = e.event_date.split("-");
-  return `
-    <a class="event-card" href="/farmer.html?id=${encodeURIComponent(e.farmer_id)}" style="text-decoration:none;color:inherit;">
-      <div class="date-box"><span>${parseInt(m, 10)}/${parseInt(d, 10)}</span></div>
-      <div class="info" style="flex:1;">
-        <p class="title">${escapeHtml(e.title)}</p>
-        <p class="sub">${escapeHtml(formatDateLong(e.event_date))}${e.event_time ? " " + escapeHtml(e.event_time) : ""}${e.location ? " ・ " + escapeHtml(e.location) : ""}${e.fee ? " ・ 参加費" + escapeHtml(e.fee) : ""}</p>
-        <p class="desc">${escapeHtml(e.description)}</p>
-        <p style="font-size:12px;color:var(--muted);margin:4px 0 0;">${escapeHtml(e.farmer_name)}(${escapeHtml(e.farmer_municipality)})</p>
-      </div>
-    </a>
-  `;
-}
-
-document.getElementById("search-input").addEventListener("input", (ev) => {
-  searchQuery = ev.target.value.trim().toLowerCase();
-  render();
+document.getElementById("search-form").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  state.q = document.getElementById("search-input").value.trim();
+  apply();
+});
+document.getElementById("search-input").addEventListener(
+  "input",
+  debounce((ev) => {
+    state.q = ev.target.value.trim();
+    apply();
+  })
+);
+document.getElementById("area-select").addEventListener("change", (ev) => {
+  state.area = ev.target.value;
+  apply();
 });
 
 initBottomNav("/events.html");
+initSiteFooter();
 load();
 </script>
 </body>

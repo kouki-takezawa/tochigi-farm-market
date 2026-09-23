@@ -357,17 +357,24 @@ body.has-bottom-nav { padding-bottom: 68px; }
   padding: 0 14px;
 }
 .search-bar:focus-within { border-color: var(--forest); box-shadow: 0 0 0 3px rgba(51, 80, 60, 0.14); }
-.search-bar input {
+/* input[type=search]という汎用ルール(フォームのセクション)と詳細度が同点だと
+   ソース順で汎用側が勝ってしまい、入力欄自体にも枠線・背景が付いて二重の箱に
+   見えてしまう。type属性まで含めて詳細度を上げ、確実にこちらを優先させる */
+.search-bar input[type="search"] {
   flex: 1;
   min-width: 0;
+  width: auto;
+  min-height: auto;
+  padding: 0;
   border: none;
+  border-radius: 0;
   outline: none;
   background: transparent;
   font-family: inherit;
-  font-size: 15px;
+  font-size: 16px; /* 他のinputと同様、iOSで入力時に拡大されるのを防ぐため16px未満にしない */
   color: var(--ink);
 }
-.search-bar input::placeholder { color: #6f6a5c; }
+.search-bar input[type="search"]::placeholder { color: #6f6a5c; }
 
 /* 一覧ページの検索帯 */
 .filter-bar {

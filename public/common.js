@@ -417,7 +417,7 @@ function initSiteFooter() {
         <a href="https://commons.wikimedia.org/wiki/File:Colors_at_Tomita_Farm_(52297395808).jpg" target="_blank" rel="noopener">Big Ben in Japan</a>
         (Wikimedia Commons, CC0 / CC BY / CC BY-SA)
       </p>
-      <p class="footer-copyright">© 栃木の直売マルシェ</p>
+      <p class="footer-copyright">© とれたて便</p>
     </div>`;
   document.body.appendChild(footer);
 }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>農家ページ | 栃木の直売マルシェ</title>
+<title>農家ページ | とれたて便</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
@@ -11,7 +11,7 @@
 </head>
 <body>
 <header class="site-nav">
-  <a href="/" class="site-logo">栃木の直売マルシェ</a>
+  <a href="/" class="site-logo">とれたて便</a>
   <nav class="site-nav-links">
     <a href="/">ホーム</a>
     <a href="/listings.html">出品一覧</a>
@@ -59,7 +59,7 @@ function contactButtons(farmer) {
 
 function render({ farmer, listings, events, jobs }) {
   const page = document.getElementById("page");
-  document.title = `${farmer.name}(${farmer.municipality}) | 栃木の直売マルシェ`;
+  document.title = `${farmer.name}(${farmer.municipality}) | とれたて便`;
 
   const normalEvents = events.filter((e) => e.kind !== "labor");
   const laborEvents = events.filter((e) => e.kind === "labor");

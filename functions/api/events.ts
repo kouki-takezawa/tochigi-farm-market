@@ -7,7 +7,9 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
 
   const { data, error } = await supabase
     .from("events")
-    .select("id, kind, title, event_date, event_time, location, description, fee, created_at, farmer_id, farmers(name, municipality)")
+    .select(
+      "id, kind, title, event_date, event_time, location, description, fee, created_at, farmer_id, farmers(name, prefecture, municipality)"
+    )
     .gte("event_date", todayDateStr)
     .order("event_date", { ascending: true })
     .limit(200);
@@ -26,6 +28,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
     created_at: e.created_at,
     farmer_id: e.farmer_id,
     farmer_name: e.farmers?.name ?? "",
+    farmer_prefecture: e.farmers?.prefecture ?? "",
     farmer_municipality: e.farmers?.municipality ?? "",
   }));
 

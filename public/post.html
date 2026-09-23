@@ -79,6 +79,13 @@ function renderAll() {
           <input type="text" name="name" required value="${escapeHtml(state.farmer.name)}" />
         </div>
         <div>
+          <label>都道府県</label>
+          <select name="prefecture" required>
+            <option value="">選択してください</option>
+            ${prefectureOptionsHtml(state.farmer.prefecture)}
+          </select>
+        </div>
+        <div>
           <label>所在地(市町村)</label>
           <input type="text" name="municipality" required value="${escapeHtml(state.farmer.municipality)}" placeholder="例: 宇都宮市" />
         </div>
@@ -130,6 +137,14 @@ function renderAll() {
           <input type="checkbox" name="is_special" id="is_special" />
           <label for="is_special" style="margin:0;">わけあり・特価品として表示する</label>
         </div>
+        <div class="checkbox-row">
+          <input type="checkbox" name="ships_available" id="ships_available" />
+          <label for="ships_available" style="margin:0;">発送も相談可として表示する</label>
+        </div>
+        <p class="field-help" style="margin-top:-10px;">
+          チェックすると出品に「発送も相談可」と表示されます。発送の可否・方法・送料は、あくまで購入者と直接相談してください
+          (当サイトが配送を手配することはありません)。
+        </p>
         <button type="submit" class="btn primary block">出品する</button>
       </form>
     </div>
@@ -229,7 +244,7 @@ function renderListingRow(l) {
   return `
     <div class="item-row" data-id="${l.id}">
       <div>
-        <p style="font-weight:700;margin:0;">${escapeHtml(l.title)} ${l.is_special ? `<span class="badge special">わけあり</span>` : ""}</p>
+        <p style="font-weight:700;margin:0;">${escapeHtml(l.title)} ${l.is_special ? `<span class="badge special">わけあり</span>` : ""} ${l.ships_available ? `<span class="badge">発送可</span>` : ""}</p>
         <p style="font-size:13px;color:var(--ink-2);margin:2px 0;">${escapeHtml(l.comment)}</p>
         <p style="font-size:13px;margin:0;">${priceLabel(l.price)}</p>
       </div>
@@ -312,6 +327,7 @@ async function onProfileSubmit(ev) {
       headers: { "x-manage-token": token },
       body: JSON.stringify({
         name: fd.get("name"),
+        prefecture: fd.get("prefecture"),
         municipality: fd.get("municipality"),
         crops: fd.get("crops"),
         description: fd.get("description"),
@@ -348,6 +364,7 @@ async function onListingSubmit(ev) {
         comment: fd.get("comment"),
         price: fd.get("price") ? Number(fd.get("price")) : null,
         is_special: fd.get("is_special") === "on",
+        ships_available: fd.get("ships_available") === "on",
         image_url: imageUrl,
       }),
     });

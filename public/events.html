@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>イベント一覧 | とれたて便</title>
-<meta name="description" content="栃木県内の農家が開催する収穫体験や畑のイベントを、開催日順に掲載しています。" />
+<meta name="description" content="全国の農家が開催する収穫体験や畑のイベントを、開催日順に掲載しています。" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
@@ -28,7 +28,7 @@
   <div class="page-head">
     <p class="breadcrumb"><a href="/">ホーム</a> ／ イベント一覧</p>
     <h1>イベント一覧</h1>
-    <p>収穫体験や畑の催しを開催日順に。参加のお申し込みは、各農家へ直接ご連絡ください。</p>
+    <p>収穫体験や畑の催しを開催日順に。現地開催のため、都道府県で絞り込むと近くの予定だけ探せます。参加のお申し込みは、各農家へ直接ご連絡ください。</p>
   </div>
 </div>
 
@@ -36,11 +36,15 @@
   <div class="wrap">
     <form class="hero-search" id="search-form" role="search">
       <label class="search-bar">
-        <input type="search" id="search-input" placeholder="イベント名・農家名・市町村で探す" aria-label="イベント名・農家名・市町村で探す" />
+        <input type="search" id="search-input" placeholder="イベント名・農家名・市町村で探す" aria-label="イベント名・農家名・都道府県・市町村で探す" />
       </label>
       <button type="submit">探す</button>
     </form>
     <div class="filter-row">
+      <span class="filter-label">都道府県</span>
+      <select id="pref-select" aria-label="都道府県で絞り込む">
+        <option value="">すべての都道府県</option>
+      </select>
       <span class="filter-label">市町村</span>
       <select id="area-select" aria-label="市町村で絞り込む">
         <option value="">すべての市町村</option>
@@ -59,14 +63,26 @@
 <script src="/common.js"></script>
 <script>
 const params = new URLSearchParams(location.search);
-const state = { q: params.get("q") || "", area: params.get("area") || "" };
+const state = { q: params.get("q") || "", pref: params.get("pref") || "", area: params.get("area") || "" };
 let allEvents = [];
 
 document.getElementById("content").innerHTML = `<div class="list-grid">${skeletonCards(4)}</div>`;
 document.getElementById("search-input").value = state.q;
 
+function renderPrefOptions() {
+  const prefs = Array.from(new Set(allEvents.map((e) => e.farmer_prefecture).filter(Boolean))).sort(
+    (a, b) => PREFECTURES.indexOf(a) - PREFECTURES.indexOf(b)
+  );
+  const select = document.getElementById("pref-select");
+  select.innerHTML =
+    `<option value="">すべての都道府県</option>` +
+    prefs.map((a) => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join("");
+  select.value = state.pref;
+}
+
 function renderAreaOptions() {
-  const areas = Array.from(new Set(allEvents.map((e) => e.farmer_municipality).filter(Boolean))).sort();
+  const pool = state.pref ? allEvents.filter((e) => e.farmer_prefecture === state.pref) : allEvents;
+  const areas = Array.from(new Set(pool.map((e) => e.farmer_municipality).filter(Boolean))).sort();
   const select = document.getElementById("area-select");
   select.innerHTML =
     `<option value="">すべての市町村</option>` +
@@ -77,6 +93,7 @@ function renderAreaOptions() {
 function syncUrl() {
   const next = new URLSearchParams();
   if (state.q) next.set("q", state.q);
+  if (state.pref) next.set("pref", state.pref);
   if (state.area) next.set("area", state.area);
   const qs = next.toString();
   history.replaceState(null, "", qs ? `?${qs}` : location.pathname);
@@ -86,13 +103,14 @@ function apply() {
   syncUrl();
   const q = state.q.toLowerCase();
   const list = allEvents.filter((e) => {
+    if (state.pref && e.farmer_prefecture !== state.pref) return false;
     if (state.area && e.farmer_municipality !== state.area) return false;
     if (!q) return true;
-    return [e.title, e.description, e.location, e.farmer_name, e.farmer_municipality]
+    return [e.title, e.description, e.location, e.farmer_name, e.farmer_prefecture, e.farmer_municipality]
       .some((v) => (v || "").toLowerCase().includes(q));
   });
 
-  const labels = [state.q ? `「${state.q}」` : "", state.area].filter(Boolean).join(" / ");
+  const labels = [state.q ? `「${state.q}」` : "", state.pref, state.area].filter(Boolean).join(" / ");
   document.getElementById("result-count").textContent = labels
     ? `${labels} の検索結果: ${list.length}件`
     : `${list.length}件のイベント`;
@@ -130,6 +148,7 @@ async function load() {
   try {
     const data = await apiFetch("/api/events");
     allEvents = (data.events || []).filter((e) => e.kind !== "labor");
+    renderPrefOptions();
     renderAreaOptions();
     apply();
   } catch (e) {
@@ -150,6 +169,12 @@ document.getElementById("search-input").addEventListener(
     apply();
   })
 );
+document.getElementById("pref-select").addEventListener("change", (ev) => {
+  state.pref = ev.target.value;
+  state.area = "";
+  renderAreaOptions();
+  apply();
+});
 document.getElementById("area-select").addEventListener("change", (ev) => {
   state.area = ev.target.value;
   apply();

@@ -2,7 +2,7 @@
   "name": "tochigi-farm-market",
   "private": true,
   "version": "0.1.0",
-  "description": "栃木県内限定・顔の見える直売マルシェ(MVP)",
+  "description": "全国対応・顔の見える直売マルシェ",
   "scripts": {
     "dev": "wrangler pages dev public --compatibility-date=2025-01-01",
     "deploy": "wrangler pages deploy public"

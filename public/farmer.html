@@ -57,9 +57,15 @@ function contactButtons(farmer) {
   return buttons;
 }
 
-function render({ farmer, listings, events, jobs }) {
+let currentFarmerId = null;
+let currentReviews = [];
+let selectedRating = 0;
+
+function render({ farmer, listings, events, jobs, reviews, review_summary }) {
   const page = document.getElementById("page");
-  document.title = `${farmer.name}(${farmer.municipality}) | とれたて便`;
+  document.title = `${farmer.name}(${placeLabel(farmer.prefecture, farmer.municipality)}) | とれたて便`;
+  currentFarmerId = farmer.id;
+  currentReviews = reviews || [];
 
   const normalEvents = events.filter((e) => e.kind !== "labor");
   const laborEvents = events.filter((e) => e.kind === "labor");
@@ -79,15 +85,16 @@ function render({ farmer, listings, events, jobs }) {
           <h1>${escapeHtml(farmer.name)}</h1>
         </div>
         <div class="farmer-meta">
-          <span class="tag">${escapeHtml(farmer.municipality)}</span>
+          <span class="tag">${escapeHtml(placeLabel(farmer.prefecture, farmer.municipality))}</span>
           ${farmer.crops ? `<span class="tag">${escapeHtml(farmer.crops)}</span>` : ""}
           ${listings.length ? `<span class="tag tag--today">出品 ${listings.length}件</span>` : ""}
         </div>
-        ${farmer.description ? `<p class="farmer-desc">${escapeHtml(farmer.description)}</p>` : ""}
+        <div style="margin-top:8px;">${reviewSummaryHtml(review_summary)}</div>
+        ${farmer.description ? `<p class="farmer-desc" style="margin-top:12px;">${escapeHtml(farmer.description)}</p>` : ""}
         ${
           buttons.length
             ? `<div class="contact-buttons">${buttons.join("")}</div>
-               <p class="field-help">購入・お申し込みは、上の連絡先から農家に直接ご連絡ください。当サイトでは決済・仲介は行いません。</p>`
+               <p class="field-help">購入・お申し込みは、上の連絡先から農家に直接ご連絡ください。当サイトでは決済・仲介は行いません(発送については出品ごとの「発送も相談可」表示をご確認のうえ、農家に直接ご相談ください)。</p>`
             : `<p class="field-help">この農家の連絡先はまだ登録されていません。</p>`
         }
       </div>
@@ -127,7 +134,42 @@ function render({ farmer, listings, events, jobs }) {
              </section>`
           : ""
       }
+
+      <section class="farmer-section">
+        <h2>利用者の評価<span class="count">${currentReviews.length}件</span></h2>
+        <div id="review-list" class="review-list">
+          ${
+            currentReviews.length
+              ? currentReviews.map((r) => reviewCard(r)).join("")
+              : `<p class="empty-state">まだ評価がありません。購入した方はぜひ最初の評価を残してください。</p>`
+          }
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <h3>評価を投稿する</h3>
+          <p class="field-help" style="margin-top:-6px;margin-bottom:12px;">全国の初対面の方同士でも安心して取引できるよう、実際にやり取りした感想を残してください。</p>
+          <form id="review-form" class="stack">
+            <div>
+              <label>評価</label>
+              <div class="rating-input" id="rating-input" role="radiogroup" aria-label="評価(1〜5)">
+                ${[1, 2, 3, 4, 5].map((n) => `<button type="button" data-rating="${n}" aria-label="${n}">★</button>`).join("")}
+              </div>
+            </div>
+            <div>
+              <label>お名前(任意)</label>
+              <input type="text" name="reviewer_name" placeholder="未入力の場合は「匿名」として表示されます" />
+            </div>
+            <div>
+              <label>コメント(任意)</label>
+              <textarea name="comment" placeholder="例: 丁寧に梱包していただき、鮮度も良かったです"></textarea>
+            </div>
+            <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <button type="submit" class="btn primary block">評価を投稿する</button>
+          </form>
+        </div>
+      </section>
     </div>`;
+
+  initReviewForm();
 
   // スマホでは連絡手段を画面下に固定する。下部タブバーと二重に固定すると
   // 画面が狭くなるため、連絡先がある農家ページではタブバーを出さない
@@ -140,6 +182,48 @@ function render({ farmer, listings, events, jobs }) {
   } else {
     initBottomNav(null);
   }
+}
+
+function initReviewForm() {
+  selectedRating = 0;
+  const ratingInput = document.getElementById("rating-input");
+  ratingInput.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      selectedRating = Number(btn.dataset.rating);
+      ratingInput.querySelectorAll("button").forEach((b) => {
+        b.classList.toggle("is-active", Number(b.dataset.rating) <= selectedRating);
+      });
+    });
+  });
+
+  document.getElementById("review-form").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    if (!selectedRating) {
+      showToast("評価(星の数)を選んでください");
+      return;
+    }
+    const form = ev.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    try {
+      const fd = new FormData(form);
+      await apiFetch(`/api/farmers/${encodeURIComponent(currentFarmerId)}/reviews`, {
+        method: "POST",
+        body: JSON.stringify({
+          rating: selectedRating,
+          reviewer_name: fd.get("reviewer_name") || "",
+          comment: fd.get("comment") || "",
+          website: fd.get("website") || "",
+        }),
+      });
+      showToast("評価を投稿しました。ありがとうございます");
+      render(await apiFetch(`/api/farmers/${encodeURIComponent(currentFarmerId)}`));
+    } catch (e) {
+      showToast(e.message);
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
 }
 
 load();

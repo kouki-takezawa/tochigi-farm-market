@@ -111,12 +111,90 @@ function debounce(fn, wait = 150) {
 
 // 農家名からアバターの配色を決める(同じ名前は常に同じ色になるよう
 // シンプルな文字コード和のハッシュを使う。見分けやすさのための演出で、
-// セキュリティ用途のハッシュではない)
+// セキュリティ用途のハッシュではない)。全国展開で掲載数が増える前提であらかじめ
+// 色数を増やし、同系色の衝突を減らしている(styles.cssのc1〜c8に対応)
 function avatarColorClass(name) {
   const s = String(name || "");
   let sum = 0;
   for (let i = 0; i < s.length; i++) sum += s.charCodeAt(i);
-  return `c${(sum % 5) + 1}`;
+  return `c${(sum % 8) + 1}`;
+}
+
+/* ------------------------------------------------------------
+   都道府県・地方
+   全国展開に伴い、市町村だけでなく都道府県単位の絞り込みを
+   全ページ共通で使えるようにする。
+   ------------------------------------------------------------ */
+
+const REGIONS = [
+  { name: "北海道", prefectures: ["北海道"] },
+  { name: "東北", prefectures: ["青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県"] },
+  { name: "関東", prefectures: ["茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県"] },
+  { name: "中部", prefectures: ["新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県"] },
+  { name: "近畿", prefectures: ["三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県"] },
+  { name: "中国", prefectures: ["鳥取県", "島根県", "岡山県", "広島県", "山口県"] },
+  { name: "四国", prefectures: ["徳島県", "香川県", "愛媛県", "高知県"] },
+  { name: "九州・沖縄", prefectures: ["福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"] },
+];
+
+const PREFECTURES = REGIONS.flatMap((r) => r.prefectures);
+
+function regionOf(prefecture) {
+  const region = REGIONS.find((r) => r.prefectures.includes(prefecture));
+  return region ? region.name : "";
+}
+
+// 市町村名だけだと同名の市町村が複数の県にあり紛らわしいため、
+// カードなどの表示では都道府県とセットで出す
+function placeLabel(prefecture, municipality) {
+  return [prefecture, municipality].filter(Boolean).join(" ");
+}
+
+function prefectureOptionsHtml(selected) {
+  return REGIONS.map(
+    (region) => `
+      <optgroup label="${escapeHtml(region.name)}">
+        ${region.prefectures
+          .map((p) => `<option value="${escapeHtml(p)}" ${p === selected ? "selected" : ""}>${escapeHtml(p)}</option>`)
+          .join("")}
+      </optgroup>`
+  ).join("");
+}
+
+// 現在地からの距離表示。近距離は小数点1桁、遠距離になるほど粒度を粗くする
+// (全国展開だと数百km単位のケースも出てくるため)
+function distanceLabel(km) {
+  if (km == null || isNaN(km)) return "";
+  if (km < 10) return `現在地から約${km.toFixed(1)}km`;
+  if (km < 100) return `現在地から約${Math.round(km)}km`;
+  return `現在地から約${Math.round(km / 10) * 10}km`;
+}
+
+/* ------------------------------------------------------------
+   評価(レビュー)
+   ------------------------------------------------------------ */
+
+function starsHtml(rating, size = "") {
+  const r = Math.round(Number(rating) || 0);
+  const stars = Array.from({ length: 5 }, (_, i) => (i < r ? "★" : "☆")).join("");
+  return `<span class="stars ${size}" aria-hidden="true">${stars}</span>`;
+}
+
+function reviewSummaryHtml(summary) {
+  if (!summary || !summary.count) return `<span class="review-summary review-summary--empty">まだ評価がありません</span>`;
+  return `<span class="review-summary">${starsHtml(summary.avg)}<b>${summary.avg.toFixed(1)}</b><span class="review-summary-count">(${summary.count}件)</span></span>`;
+}
+
+function reviewCard(review) {
+  return `
+    <div class="review-card">
+      <div class="review-card-head">
+        ${starsHtml(review.rating)}
+        <span class="review-name">${escapeHtml(review.reviewer_name || "匿名")}</span>
+        <span class="review-date">${escapeHtml(formatDateShort(new Date(Number(review.created_at) * 1000).toISOString().slice(0, 10)))}</span>
+      </div>
+      ${review.comment ? `<p class="review-comment">${escapeHtml(review.comment)}</p>` : ""}
+    </div>`;
 }
 
 function avatarHtml(name, extraClass = "") {
@@ -218,6 +296,7 @@ function listingCard(listing, options = {}) {
   const flags = [];
   if (listing.is_special) flags.push(`<span class="tag tag--special">わけあり・特価</span>`);
   if (fresh === "本日") flags.push(`<span class="tag tag--today">本日出品</span>`);
+  if (listing.ships_available) flags.push(`<span class="tag tag--ships">発送も相談可</span>`);
 
   const inner = `
     <div class="pcard-media${img.isStock ? " pcard-media--tile" : ""}">
@@ -242,7 +321,7 @@ function listingCard(listing, options = {}) {
           : `<div class="pcard-foot">
                ${avatarHtml(listing.farmer_name)}
                <span class="producer-name">${escapeHtml(listing.farmer_name)}</span>
-               <span class="pcard-place">${escapeHtml(listing.farmer_municipality || "")}</span>
+               <span class="pcard-place">${escapeHtml(placeLabel(listing.farmer_prefecture, listing.farmer_municipality))}</span>
              </div>`
       }
     </div>`;
@@ -265,7 +344,7 @@ function farmerCard(farmer, options = {}) {
         String(farmer.name || "?").trim().charAt(0)
       )}</span>`;
 
-  const place = [farmer.municipality, options.distanceText].filter(Boolean).join(" ・ ");
+  const place = [placeLabel(farmer.prefecture, farmer.municipality), options.distanceText].filter(Boolean).join(" ・ ");
 
   return `
     <a class="fcard" href="/farmer.html?id=${encodeURIComponent(farmer.id)}">
@@ -274,6 +353,7 @@ function farmerCard(farmer, options = {}) {
         <p class="fcard-name">${escapeHtml(farmer.name)}</p>
         <p class="fcard-place">${escapeHtml(place)}</p>
         <p class="fcard-crops">${escapeHtml(farmer.crops)}</p>
+        ${farmer.review_summary ? reviewSummaryHtml(farmer.review_summary) : ""}
         ${tags.length ? `<div class="fcard-tags">${tags.join("")}</div>` : ""}
       </div>
     </a>`;
@@ -308,7 +388,7 @@ function eventCard(event, options = {}) {
       ${
         options.hideFarmer
           ? ""
-          : `<p class="ecard-farmer">${escapeHtml(event.farmer_name)}(${escapeHtml(event.farmer_municipality)})</p>`
+          : `<p class="ecard-farmer">${escapeHtml(event.farmer_name)}(${escapeHtml(placeLabel(event.farmer_prefecture, event.farmer_municipality))})</p>`
       }
     </div>`;
 
@@ -331,7 +411,7 @@ function jobCard(job, options = {}) {
     ${
       options.hideFarmer
         ? ""
-        : `<p class="jcard-farmer">${escapeHtml(job.farmer_name)}(${escapeHtml(job.farmer_municipality)})</p>`
+        : `<p class="jcard-farmer">${escapeHtml(job.farmer_name)}(${escapeHtml(placeLabel(job.farmer_prefecture, job.farmer_municipality))})</p>`
     }`;
 
   if (options.hideFarmer) return `<div class="jcard">${body}</div>`;
@@ -397,8 +477,8 @@ function initSiteFooter() {
         </div>
         <div class="footer-col">
           <p class="footer-col-title">農家の方へ</p>
+          <a href="/apply.html">掲載を申し込む(無料)</a>
           <a href="/seller.html">出品者ログイン</a>
-          <a href="/#join">掲載のご案内(無料)</a>
         </div>
       </div>
       <p class="footer-note">

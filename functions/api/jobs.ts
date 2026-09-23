@@ -6,7 +6,9 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
 
   const { data, error } = await supabase
     .from("jobs")
-    .select("id, title, wage, work_date, work_hours, capacity, description, created_at, farmer_id, farmers(name, municipality)")
+    .select(
+      "id, title, wage, work_date, work_hours, capacity, description, created_at, farmer_id, farmers(name, prefecture, municipality)"
+    )
     .order("created_at", { ascending: false })
     .limit(200);
 
@@ -23,6 +25,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
     created_at: j.created_at,
     farmer_id: j.farmer_id,
     farmer_name: j.farmers?.name ?? "",
+    farmer_prefecture: j.farmers?.prefecture ?? "",
     farmer_municipality: j.farmers?.municipality ?? "",
   }));
 

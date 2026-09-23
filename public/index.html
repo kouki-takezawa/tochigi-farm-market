@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>とれたて便 | 県内の農家から直接買える</title>
-<meta name="description" content="栃木県内の農家が「今日出せるもの」を載せる直売の掲示板。気になった農家にLINEや電話で直接連絡して買えます。畑のイベントや収穫の手伝い募集も掲載中。" />
+<title>とれたて便 | 全国の農家から直接買える</title>
+<meta name="description" content="全国の農家が「今出せるもの」を載せる直売の掲示板。気になった農家にLINEや電話で直接連絡して買えます。畑のイベントや収穫の手伝い募集も掲載中。" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
@@ -32,15 +32,15 @@
   </div>
   <div class="wrap">
     <div class="hero-inner">
-      <span class="hero-eyebrow">栃木県内限定</span>
-      <h1>その日の実り、<br />その日届く。</h1>
+      <span class="hero-eyebrow">全国の農家から</span>
+      <h1>その日の実り、<br />産地から届く。</h1>
       <p class="hero-lead">
-        県内の農家が「今日出せるもの」を載せています。気になった農家にLINEか電話で直接連絡して、
-        受け取り方法と支払いを決めてください。
+        全国の農家が「今出せるもの」を載せています。気になった農家にLINEか電話で直接連絡して、
+        受け取り(または発送)方法と支払いを決めてください。
       </p>
       <form class="hero-search" id="hero-search" role="search">
         <label class="search-bar">
-          <input type="search" id="hero-q" placeholder="品目名・農家名で探す" aria-label="品目名・農家名・市町村で探す" />
+          <input type="search" id="hero-q" placeholder="品目名・農家名・都道府県で探す" aria-label="品目名・農家名・都道府県で探す" />
         </label>
         <button type="submit">探す</button>
       </form>
@@ -49,6 +49,7 @@
         <a href="/listings.html?cat=fruit">果物</a>
         <a href="/listings.html?cat=rice">米・穀物</a>
         <a href="/listings.html?special=1">わけあり・特価</a>
+        <a href="/listings.html?ships=1">発送対応</a>
         <a href="/map.html">近くの農家</a>
       </div>
       <p class="hero-note">サイト上での決済・仲介は行っていません。やり取りは農家と直接です。</p>
@@ -84,7 +85,7 @@
         <span class="howto-num">3</span>
         <div>
           <h3>受け取る</h3>
-          <p>畑や直売所で受け取り、支払い方法は農家の指定どおりに。手数料はかかりません。</p>
+          <p>畑や直売所で受け取るか、「発送も相談可」の農家なら発送も。支払い方法は農家の指定どおりに、手数料はかかりません。</p>
         </div>
       </div>
     </div>
@@ -171,7 +172,7 @@
         </p>
       </div>
       <div class="recruit-actions">
-        <a class="btn primary" href="/seller.html">掲載について見る</a>
+        <a class="btn primary" href="/apply.html">掲載を申し込む</a>
         <a class="btn secondary" href="/farmers.html">掲載中の農家を見る</a>
       </div>
     </div>
@@ -255,17 +256,22 @@ function renderSpecial() {
   document.getElementById("special-list").innerHTML = shown.map((l) => listingCard(l)).join("");
 }
 
+// 全国展開により市町村の数が膨大になるため、トップでは都道府県単位で
+// 件数の多い順に見せる(市町村までの絞り込みは出品一覧・農家一覧側で行う)
 function renderAreaChips() {
   const el = document.getElementById("area-chips");
   const counts = new Map();
-  allFarmers.forEach((f) => counts.set(f.municipality, (counts.get(f.municipality) || 0) + 1));
+  allFarmers.forEach((f) => {
+    if (!f.prefecture) return;
+    counts.set(f.prefecture, (counts.get(f.prefecture) || 0) + 1);
+  });
   const areas = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
   if (!areas.length) {
-    el.innerHTML = `<span class="result-count">掲載中の市町村はまだありません。</span>`;
+    el.innerHTML = `<span class="result-count">掲載中の都道府県はまだありません。</span>`;
     return;
   }
   el.innerHTML = areas
-    .map(([name, n]) => `<a class="chip" href="/listings.html?area=${encodeURIComponent(name)}">${escapeHtml(name)}(${n})</a>`)
+    .map(([name, n]) => `<a class="chip" href="/listings.html?pref=${encodeURIComponent(name)}">${escapeHtml(name)}(${n})</a>`)
     .join("");
 }
 

@@ -15,6 +15,7 @@ export const onRequestPut: PagesFunction<Env> = async ({ request, params, env })
     comment?: string;
     price?: number | null;
     is_special?: boolean;
+    ships_available?: boolean;
     image_url?: string | null;
   }>();
 
@@ -29,6 +30,7 @@ export const onRequestPut: PagesFunction<Env> = async ({ request, params, env })
       comment: body.comment ?? "",
       price: body.price ?? null,
       is_special: !!body.is_special,
+      ships_available: !!body.ships_available,
       image_url: body.image_url ?? null,
     })
     .eq("id", listingId)

@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>出品一覧 | とれたて便</title>
-<meta name="description" content="栃木県内の農家が今出しているものを、品目・市町村・キーワードで絞り込んで探せます。" />
+<meta name="description" content="全国の農家が今出しているものを、品目・都道府県・市町村・キーワードで絞り込んで探せます。" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
@@ -28,7 +28,7 @@
   <div class="page-head">
     <p class="breadcrumb"><a href="/">ホーム</a> ／ 出品一覧</p>
     <h1>出品一覧</h1>
-    <p>県内の農家から届いた「今買えるもの」を新着順に。気になったら農家ページから直接ご連絡ください。</p>
+    <p>全国の農家から届いた「今買えるもの」を新着順に。気になったら農家ページから直接ご連絡ください。</p>
   </div>
 </div>
 
@@ -36,7 +36,7 @@
   <div class="wrap">
     <form class="hero-search" id="search-form" role="search">
       <label class="search-bar">
-        <input type="search" id="search-input" placeholder="品目名・農家名で探す" aria-label="品目名・農家名・市町村で探す" />
+        <input type="search" id="search-input" placeholder="品目名・農家名で探す" aria-label="品目名・農家名・都道府県・市町村で探す" />
       </label>
       <button type="submit">探す</button>
     </form>
@@ -45,17 +45,25 @@
       <div class="chip-row chip-row--scroll" id="cat-chips"></div>
     </div>
     <div class="filter-row">
+      <span class="filter-label">都道府県</span>
+      <select id="pref-select" aria-label="都道府県で絞り込む">
+        <option value="">すべての都道府県</option>
+      </select>
       <span class="filter-label">市町村</span>
       <select id="area-select" aria-label="市町村で絞り込む">
         <option value="">すべての市町村</option>
       </select>
+    </div>
+    <div class="filter-row">
       <span class="filter-label">並び順</span>
       <select id="sort-select" aria-label="並び順">
         <option value="new">新着順</option>
+        <option value="near">現在地から近い順</option>
         <option value="price-asc">価格が安い順</option>
         <option value="price-desc">価格が高い順</option>
       </select>
       <button type="button" class="chip" id="special-toggle" aria-pressed="false">わけあり・特価のみ</button>
+      <button type="button" class="chip" id="ships-toggle" aria-pressed="false">発送対応のみ</button>
     </div>
   </div>
 </div>
@@ -73,11 +81,14 @@ const params = new URLSearchParams(location.search);
 const state = {
   q: params.get("q") || "",
   cat: params.get("cat") || "",
+  pref: params.get("pref") || "",
   area: params.get("area") || "",
   special: params.get("special") === "1",
+  ships: params.get("ships") === "1",
   sort: params.get("sort") || "new",
 };
 let allListings = [];
+let userLatLng = null;
 
 document.getElementById("content").innerHTML = skeletonCards(8);
 document.getElementById("search-input").value = state.q;
@@ -101,8 +112,21 @@ function renderCatChips() {
   });
 }
 
+function renderPrefOptions() {
+  const prefs = Array.from(new Set(allListings.map((l) => l.farmer_prefecture).filter(Boolean))).sort(
+    (a, b) => PREFECTURES.indexOf(a) - PREFECTURES.indexOf(b)
+  );
+  const select = document.getElementById("pref-select");
+  select.innerHTML =
+    `<option value="">すべての都道府県</option>` +
+    prefs.map((a) => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join("");
+  select.value = state.pref;
+}
+
+// 市町村は選択中の都道府県の中だけに絞る(全国分をフラットに出すと選びづらいため)
 function renderAreaOptions() {
-  const areas = Array.from(new Set(allListings.map((l) => l.farmer_municipality).filter(Boolean))).sort();
+  const pool = state.pref ? allListings.filter((l) => l.farmer_prefecture === state.pref) : allListings;
+  const areas = Array.from(new Set(pool.map((l) => l.farmer_municipality).filter(Boolean))).sort();
   const select = document.getElementById("area-select");
   select.innerHTML =
     `<option value="">すべての市町村</option>` +
@@ -114,21 +138,46 @@ function syncUrl() {
   const next = new URLSearchParams();
   if (state.q) next.set("q", state.q);
   if (state.cat) next.set("cat", state.cat);
+  if (state.pref) next.set("pref", state.pref);
   if (state.area) next.set("area", state.area);
   if (state.special) next.set("special", "1");
+  if (state.ships) next.set("ships", "1");
   if (state.sort !== "new") next.set("sort", state.sort);
   const qs = next.toString();
   history.replaceState(null, "", qs ? `?${qs}` : location.pathname);
+}
+
+function withDistance(list) {
+  if (!userLatLng) return list;
+  return list.map((l) => ({
+    ...l,
+    _distanceKm:
+      l.farmer_lat != null && l.farmer_lng != null
+        ? haversineKm(userLatLng[0], userLatLng[1], l.farmer_lat, l.farmer_lng)
+        : null,
+  }));
+}
+
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 function filtered() {
   const q = state.q.toLowerCase();
   let list = allListings.filter((l) => {
     if (state.special && !l.is_special) return false;
+    if (state.ships && !l.ships_available) return false;
+    if (state.pref && l.farmer_prefecture !== state.pref) return false;
     if (state.area && l.farmer_municipality !== state.area) return false;
     if (state.cat && listingCategory(l.title).key !== state.cat) return false;
     if (!q) return true;
-    return [l.title, l.comment, l.farmer_name, l.farmer_municipality]
+    return [l.title, l.comment, l.farmer_name, l.farmer_prefecture, l.farmer_municipality]
       .some((v) => (v || "").toLowerCase().includes(q));
   });
 
@@ -141,6 +190,15 @@ function filtered() {
       if (b.price == null) return -1;
       return (a.price - b.price) * dir;
     });
+  } else if (state.sort === "near" && userLatLng) {
+    list = withDistance(list)
+      .slice()
+      .sort((a, b) => {
+        if (a._distanceKm == null && b._distanceKm == null) return 0;
+        if (a._distanceKm == null) return 1;
+        if (b._distanceKm == null) return -1;
+        return a._distanceKm - b._distanceKm;
+      });
   }
   return list;
 }
@@ -152,8 +210,10 @@ function describeFilters() {
     const cat = CATEGORIES.find((c) => c.key === state.cat);
     parts.push(cat ? cat.label : "その他");
   }
+  if (state.pref) parts.push(state.pref);
   if (state.area) parts.push(state.area);
   if (state.special) parts.push("わけあり・特価");
+  if (state.ships) parts.push("発送対応");
   return parts.join(" / ");
 }
 
@@ -166,22 +226,46 @@ function apply() {
     : `${list.length}件の出品`;
   document.getElementById("special-toggle").classList.toggle("is-active", state.special);
   document.getElementById("special-toggle").setAttribute("aria-pressed", String(state.special));
+  document.getElementById("ships-toggle").classList.toggle("is-active", state.ships);
+  document.getElementById("ships-toggle").setAttribute("aria-pressed", String(state.ships));
 
   const content = document.getElementById("content");
   if (!list.length) {
     content.innerHTML = allListings.length
-      ? emptyState("条件に合う出品が見つかりません。", "品目や市町村の絞り込みを外すと見つかるかもしれません。")
+      ? emptyState("条件に合う出品が見つかりません。", "都道府県・市町村や品目の絞り込みを外すと見つかるかもしれません。")
       : emptyState("まだ出品がありません。", "農家からの投稿をお待ちください。");
     return;
   }
   content.innerHTML = list.map((l) => listingCard(l)).join("");
 }
 
+function requestLocationForSort() {
+  if (!navigator.geolocation) {
+    showToast("この端末では現在地取得に対応していません");
+    document.getElementById("sort-select").value = "new";
+    state.sort = "new";
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      userLatLng = [pos.coords.latitude, pos.coords.longitude];
+      apply();
+    },
+    () => {
+      showToast("位置情報の利用が許可されませんでした");
+      document.getElementById("sort-select").value = "new";
+      state.sort = "new";
+    }
+  );
+}
+
 async function load() {
   try {
     const data = await apiFetch("/api/listings");
     allListings = data.listings || [];
+    renderPrefOptions();
     renderAreaOptions();
+    if (state.sort === "near") requestLocationForSort();
     apply();
   } catch (e) {
     document.getElementById("content").innerHTML =
@@ -201,16 +285,30 @@ document.getElementById("search-input").addEventListener(
     apply();
   })
 );
+document.getElementById("pref-select").addEventListener("change", (ev) => {
+  state.pref = ev.target.value;
+  state.area = ""; // 都道府県を変えたら市町村の絞り込みはリセット
+  renderAreaOptions();
+  apply();
+});
 document.getElementById("area-select").addEventListener("change", (ev) => {
   state.area = ev.target.value;
   apply();
 });
 document.getElementById("sort-select").addEventListener("change", (ev) => {
   state.sort = ev.target.value;
+  if (state.sort === "near" && !userLatLng) {
+    requestLocationForSort();
+    return;
+  }
   apply();
 });
 document.getElementById("special-toggle").addEventListener("click", () => {
   state.special = !state.special;
+  apply();
+});
+document.getElementById("ships-toggle").addEventListener("click", () => {
+  state.ships = !state.ships;
   apply();
 });
 

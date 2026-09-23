@@ -7,7 +7,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ params, env }) => {
 
   const { data: farmer, error: farmerError } = await supabase
     .from("farmers")
-    .select("id, name, municipality, crops, description, cover_image_url, line_url, phone, lat, lng, updated_at")
+    .select("id, name, prefecture, municipality, crops, description, cover_image_url, line_url, phone, lat, lng, updated_at")
     .eq("id", id)
     .maybeSingle();
 
@@ -18,10 +18,11 @@ export const onRequestGet: PagesFunction<Env> = async ({ params, env }) => {
     { data: listings, error: listingsError },
     { data: events, error: eventsError },
     { data: jobs, error: jobsError },
+    { data: reviews, error: reviewsError },
   ] = await Promise.all([
     supabase
       .from("listings")
-      .select("id, image_url, title, comment, price, is_special, created_at")
+      .select("id, image_url, title, comment, price, is_special, ships_available, created_at")
       .eq("farmer_id", id)
       .order("created_at", { ascending: false }),
     supabase
@@ -34,13 +35,31 @@ export const onRequestGet: PagesFunction<Env> = async ({ params, env }) => {
       .select("id, title, wage, work_date, work_hours, capacity, description, created_at")
       .eq("farmer_id", id)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("reviews")
+      .select("id, reviewer_name, rating, comment, created_at")
+      .eq("farmer_id", id)
+      .order("created_at", { ascending: false }),
   ]);
 
   if (listingsError) return serverError(listingsError.message);
   if (eventsError) return serverError(eventsError.message);
   if (jobsError) return serverError(jobsError.message);
+  if (reviewsError) return serverError(reviewsError.message);
 
-  return json({ farmer, listings: listings ?? [], events: events ?? [], jobs: jobs ?? [] });
+  const ratings = (reviews ?? []).map((r) => r.rating);
+  const review_summary = ratings.length
+    ? { avg: ratings.reduce((a, b) => a + b, 0) / ratings.length, count: ratings.length }
+    : { avg: 0, count: 0 };
+
+  return json({
+    farmer,
+    listings: listings ?? [],
+    events: events ?? [],
+    jobs: jobs ?? [],
+    reviews: reviews ?? [],
+    review_summary,
+  });
 };
 
 // PUT /api/farmers/:id -> プロフィール編集(要 manage_token)
@@ -54,6 +73,7 @@ export const onRequestPut: PagesFunction<Env> = async ({ request, params, env })
 
   const body = await request.json<{
     name?: string;
+    prefecture?: string;
     municipality?: string;
     crops?: string;
     description?: string;
@@ -62,14 +82,15 @@ export const onRequestPut: PagesFunction<Env> = async ({ request, params, env })
     phone?: string;
   }>();
 
-  if (!body.name || !body.municipality) {
-    return badRequest("name と municipality は必須です");
+  if (!body.name || !body.prefecture || !body.municipality) {
+    return badRequest("name と prefecture と municipality は必須です");
   }
 
   const { error } = await supabase
     .from("farmers")
     .update({
       name: body.name,
+      prefecture: body.prefecture,
       municipality: body.municipality,
       crops: body.crops ?? "",
       description: body.description ?? "",

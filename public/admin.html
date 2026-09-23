@@ -42,6 +42,10 @@
       <h3>新しい農家を登録</h3>
       <form id="create-form" class="stack">
         <div><label>農家名</label><input type="text" name="name" required /></div>
+        <div>
+          <label>都道府県</label>
+          <select name="prefecture" required id="create-prefecture"><option value="">選択してください</option></select>
+        </div>
         <div><label>所在地(市町村)</label><input type="text" name="municipality" required placeholder="例: 宇都宮市" /></div>
         <div><label>作っているもの</label><input type="text" name="crops" placeholder="例: トマト・きゅうり" /></div>
         <div><label>紹介文</label><textarea name="description"></textarea></div>
@@ -73,6 +77,13 @@
     </div>
 
     <div class="card">
+      <h3>掲載申し込み(セルフ申請)</h3>
+      <p style="font-size:13px;color:var(--ink-2);">農家自身が申し込みフォームから登録した申請です。内容を確認し、承認すると管理URLが発行されます。</p>
+      <div id="application-list">読み込み中...</div>
+      <div id="application-result"></div>
+    </div>
+
+    <div class="card">
       <h3>登録済み農家一覧</h3>
       <div id="farmer-list">読み込み中...</div>
     </div>
@@ -101,7 +112,72 @@ async function adminFetch(path, options = {}) {
 async function init() {
   if (!getSecret()) return;
   document.getElementById("app").style.display = "block";
-  await loadFarmerList();
+  document.getElementById("create-prefecture").insertAdjacentHTML("beforeend", prefectureOptionsHtml(""));
+  await Promise.all([loadFarmerList(), loadApplicationList()]);
+}
+
+const CONTACT_METHOD_LABEL = { line: "LINE", phone: "電話", email: "メール" };
+
+async function loadApplicationList() {
+  const el = document.getElementById("application-list");
+  try {
+    const data = await adminFetch("/api/admin/applications?status=pending");
+    const applications = data.applications || [];
+    el.innerHTML = applications.length
+      ? applications
+          .map(
+            (a) => `
+        <div class="item-row" data-id="${escapeHtml(a.id)}">
+          <div>
+            <b>${escapeHtml(a.name)}</b><br>
+            <span style="font-size:12px;color:var(--ink-2);">
+              ${escapeHtml(placeLabel(a.prefecture, a.municipality))} ・ ${escapeHtml(a.crops || "(作物未記入)")}<br>
+              連絡先: ${escapeHtml(CONTACT_METHOD_LABEL[a.contact_method] || a.contact_method)} ${escapeHtml(a.contact_value)}
+            </span>
+            ${a.description ? `<p style="font-size:13px;margin:6px 0 0;">${escapeHtml(a.description)}</p>` : ""}
+          </div>
+          <div class="actions">
+            <button class="btn primary" data-action="approve" data-id="${escapeHtml(a.id)}">承認</button>
+            <button class="btn secondary" data-action="reject" data-id="${escapeHtml(a.id)}">却下</button>
+          </div>
+        </div>`
+          )
+          .join("")
+      : `<p class="empty-state">未処理の申し込みはありません。</p>`;
+
+    el.querySelectorAll('[data-action="approve"]').forEach((btn) => {
+      btn.addEventListener("click", () => onDecideApplication(btn.dataset.id, "approve"));
+    });
+    el.querySelectorAll('[data-action="reject"]').forEach((btn) => {
+      btn.addEventListener("click", () => onDecideApplication(btn.dataset.id, "reject"));
+    });
+  } catch (e) {
+    el.innerHTML = `<p class="error-message">${escapeHtml(e.message)}</p>`;
+  }
+}
+
+async function onDecideApplication(id, action) {
+  if (action === "reject" && !confirm("この申し込みを却下しますか？")) return;
+  const resultEl = document.getElementById("application-result");
+  try {
+    const data = await adminFetch(`/api/admin/applications/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      body: JSON.stringify({ action }),
+    });
+    if (action === "approve") {
+      const fullUrl = `${location.origin}${data.manage_url}`;
+      resultEl.innerHTML = `
+        <div class="card" style="background:var(--paper-2);margin-top:12px;">
+          <p style="font-weight:700;margin:0 0 6px;">承認しました。この管理URLを農家にLINE等で送ってください:</p>
+          <p style="word-break:break-all;font-size:13px;">${escapeHtml(fullUrl)}</p>
+        </div>`;
+    } else {
+      showToast("却下しました");
+    }
+    await Promise.all([loadApplicationList(), loadFarmerList()]);
+  } catch (e) {
+    showToast(e.message);
+  }
 }
 
 async function loadFarmerList() {
@@ -114,7 +190,7 @@ async function loadFarmerList() {
           .map(
             (f) => `
         <div class="item-row">
-          <div><b>${escapeHtml(f.name)}</b><br><span style="font-size:12px;color:var(--ink-2);">${escapeHtml(f.municipality)} ・ ${escapeHtml(f.id)}</span></div>
+          <div><b>${escapeHtml(f.name)}</b><br><span style="font-size:12px;color:var(--ink-2);">${escapeHtml(placeLabel(f.prefecture, f.municipality))} ・ ${escapeHtml(f.id)}</span></div>
           <div class="actions"><button class="btn secondary" data-delete-farmer="${escapeHtml(f.id)}">削除</button></div>
         </div>`
           )
@@ -142,9 +218,9 @@ async function loadFarmerList() {
 document.getElementById("geocode-btn").addEventListener("click", async () => {
   const form = document.getElementById("create-form");
   const statusEl = document.getElementById("geocode-status");
-  const address = form.address.value.trim() || `栃木県${form.municipality.value.trim()}`;
+  const address = form.address.value.trim() || `${form.prefecture.value}${form.municipality.value.trim()}`;
   if (!address) {
-    statusEl.textContent = "住所または市町村を入力してください";
+    statusEl.textContent = "住所、または都道府県・市町村を入力してください";
     return;
   }
   statusEl.textContent = "検索中...";
@@ -175,6 +251,7 @@ document.getElementById("create-form").addEventListener("submit", async (ev) => 
       method: "POST",
       body: JSON.stringify({
         name: fd.get("name"),
+        prefecture: fd.get("prefecture"),
         municipality: fd.get("municipality"),
         crops: fd.get("crops"),
         description: fd.get("description"),

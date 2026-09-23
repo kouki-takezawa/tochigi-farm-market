@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>農家一覧 | とれたて便</title>
-<meta name="description" content="栃木県内で掲載中の農家を、市町村やキーワードで絞り込んで探せます。" />
+<meta name="description" content="全国で掲載中の農家を、都道府県・市町村やキーワードで絞り込んで探せます。" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
@@ -28,7 +28,7 @@
   <div class="page-head">
     <p class="breadcrumb"><a href="/">ホーム</a> ／ 農家一覧</p>
     <h1>農家一覧</h1>
-    <p>栃木県内で掲載中の農家です。出品やイベントの更新が新しい順に並んでいます。</p>
+    <p>全国で掲載中の農家です。出品やイベントの更新が新しい順に並んでいます。</p>
   </div>
 </div>
 
@@ -36,11 +36,15 @@
   <div class="wrap">
     <form class="hero-search" id="search-form" role="search">
       <label class="search-bar">
-        <input type="search" id="search-input" placeholder="農家名・作物・市町村で探す" aria-label="農家名・作物・市町村で探す" />
+        <input type="search" id="search-input" placeholder="農家名・作物・都道府県・市町村で探す" aria-label="農家名・作物・都道府県・市町村で探す" />
       </label>
       <button type="submit">探す</button>
     </form>
     <div class="filter-row">
+      <span class="filter-label">都道府県</span>
+      <div class="chip-row chip-row--scroll" id="pref-chips"></div>
+    </div>
+    <div class="filter-row" id="municipality-row" hidden>
       <span class="filter-label">市町村</span>
       <div class="chip-row chip-row--scroll" id="area-chips"></div>
     </div>
@@ -57,14 +61,51 @@
 <script src="/common.js"></script>
 <script>
 const params = new URLSearchParams(location.search);
-const state = { q: params.get("q") || "", area: params.get("area") || "" };
+const state = { q: params.get("q") || "", pref: params.get("pref") || "", area: params.get("area") || "" };
 let allFarmers = [];
 
 document.getElementById("content").innerHTML = skeletonCards(6);
 document.getElementById("search-input").value = state.q;
 
+function renderPrefChips() {
+  const counts = new Map();
+  allFarmers.forEach((f) => {
+    if (!f.prefecture) return;
+    counts.set(f.prefecture, (counts.get(f.prefecture) || 0) + 1);
+  });
+  const prefs = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+  document.getElementById("pref-chips").innerHTML = [{ v: "", l: "すべて", n: allFarmers.length }, ...prefs.map(([v, n]) => ({ v, l: v, n }))]
+    .map(
+      (a) =>
+        `<button type="button" class="chip ${a.v === state.pref ? "is-active" : ""}" data-pref="${escapeHtml(a.v)}">${escapeHtml(a.l)}(${a.n})</button>`
+    )
+    .join("");
+  document.querySelectorAll("#pref-chips .chip").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.pref = btn.dataset.pref;
+      state.area = ""; // 都道府県を変えたら市町村の絞り込みはリセットする
+      renderPrefChips();
+      renderAreaChips();
+      apply();
+    });
+  });
+}
+
+// 市町村チップは選択中の都道府県の中だけを出す(全国分をフラットに出すと破綻するため)
 function renderAreaChips() {
-  const areas = Array.from(new Set(allFarmers.map((f) => f.municipality).filter(Boolean))).sort();
+  const row = document.getElementById("municipality-row");
+  if (!state.pref) {
+    row.hidden = true;
+    return;
+  }
+  const areas = Array.from(
+    new Set(allFarmers.filter((f) => f.prefecture === state.pref).map((f) => f.municipality).filter(Boolean))
+  ).sort();
+  if (!areas.length) {
+    row.hidden = true;
+    return;
+  }
+  row.hidden = false;
   document.getElementById("area-chips").innerHTML = [{ v: "", l: "すべて" }, ...areas.map((a) => ({ v: a, l: a }))]
     .map((a) => `<button type="button" class="chip ${a.v === state.area ? "is-active" : ""}" data-area="${escapeHtml(a.v)}">${escapeHtml(a.l)}</button>`)
     .join("");
@@ -80,6 +121,7 @@ function renderAreaChips() {
 function syncUrl() {
   const next = new URLSearchParams();
   if (state.q) next.set("q", state.q);
+  if (state.pref) next.set("pref", state.pref);
   if (state.area) next.set("area", state.area);
   const qs = next.toString();
   history.replaceState(null, "", qs ? `?${qs}` : location.pathname);
@@ -89,12 +131,13 @@ function apply() {
   syncUrl();
   const q = state.q.toLowerCase();
   const list = allFarmers.filter((f) => {
+    if (state.pref && f.prefecture !== state.pref) return false;
     if (state.area && f.municipality !== state.area) return false;
     if (!q) return true;
-    return [f.name, f.crops, f.municipality].some((v) => (v || "").toLowerCase().includes(q));
+    return [f.name, f.crops, f.prefecture, f.municipality].some((v) => (v || "").toLowerCase().includes(q));
   });
 
-  const labels = [state.q ? `「${state.q}」` : "", state.area].filter(Boolean).join(" / ");
+  const labels = [state.q ? `「${state.q}」` : "", state.pref, state.area].filter(Boolean).join(" / ");
   document.getElementById("result-count").textContent = labels
     ? `${labels} の検索結果: ${list.length}軒`
     : `${list.length}軒の農家`;
@@ -102,13 +145,14 @@ function apply() {
   const content = document.getElementById("content");
   content.innerHTML = list.length
     ? list.map((f) => farmerCard(f)).join("")
-    : emptyState("条件に合う農家が見つかりません。", "市町村の絞り込みを外すと見つかるかもしれません。");
+    : emptyState("条件に合う農家が見つかりません。", "都道府県・市町村の絞り込みを外すと見つかるかもしれません。");
 }
 
 async function load() {
   try {
     const data = await apiFetch("/api/farmers");
     allFarmers = data.farmers || [];
+    renderPrefChips();
     renderAreaChips();
     apply();
   } catch (e) {

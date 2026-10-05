@@ -1,6 +1,20 @@
 # とれたて便
 
-全国対応・顔の見える直売マルシェ。仕様全文は [SPEC.md](./SPEC.md) を参照。
+全国の農家が「今出せるもの」を載せ、買い手が LINE や電話で直接やり取りできる、**顔の見える直売マルシェ**の Web サイトです(個人開発)。仕様全文は [SPEC.md](./SPEC.md) を参照。
+
+**▶ デモ: https://tochigi-farm-market.pages.dev**
+
+![とれたて便のトップ画面](docs/screenshot.png)
+
+## ポイント
+
+- **サーバーレス構成**: 静的フロント(素の HTML/CSS/JS、ビルド不要)+ Cloudflare Pages Functions(TypeScript)+ Supabase(Postgres)+ Cloudflare R2(画像)。運用コストをほぼ 0 円に抑える構成にしています。
+- **認証を作らない設計判断**: 農家向けは「農家ID + 秘密トークン入りの管理URL」を運営者が発行する方式。「知り合いベースで直売」という事業モデルに合わせ、実装の複雑さと運用負担を下げています。
+- **信頼性への配慮**: 掲載は運営者の承認制、書き込みは Functions 経由の service_role キーのみ、不適切な評価は管理者が削除可能。写真がない出品に実物と誤解される代替写真を出さない方針もあります。
+- **運用の工夫**: Supabase 無料プランの自動一時停止を防ぐため、GitHub Actions が 3 日おきに軽いクエリを送ります。
+- **画面**: 出品・農家・イベント・求人の一覧、地図(Leaflet・現在地から近い順)、絞り込み状態が URL に同期される検索、スマホ向け下部タブバー。
+
+**技術**: TypeScript / Cloudflare Pages Functions / Supabase (PostgreSQL) / Cloudflare R2 / Leaflet / GitHub Actions
 
 ## デプロイ済みURL
 
